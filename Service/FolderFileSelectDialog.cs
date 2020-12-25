@@ -7,19 +7,43 @@ using System.Windows.Forms;
 
 namespace WindowsFormsApp1.Service
 {
-	class FolderSelectDialog
+	class FolderFileSelectDialog
 	{
-		public OpenFileDialog openFileDialog = null;
-
-		public FolderSelectDialog()
+		private OpenFileDialog openFileDialog = null;
+		private FolderBrowserDialog folderBrowserDialog = null;
+		private FolderFileSelectDialog()
 		{
-			openFileDialog = new OpenFileDialog();
+			//openFileDialog = new OpenFileDialog();
 
-			//ofd.Filter = "Folders|\n";
-			//ofd.AddExtension = false;
-			openFileDialog.CheckFileExists = false;
-			openFileDialog.DereferenceLinks = true;
-			openFileDialog.Multiselect = false;
+			//openFileDialog.Filter = "Folders|\n";
+   //         //ofd.AddExtension = false;
+   //         openFileDialog.CheckFileExists = false;
+			//openFileDialog.DereferenceLinks = true;
+			//openFileDialog.Multiselect = false;
+		}
+
+		public static OpenFileDialog GetFileDialog() {
+
+			return new OpenFileDialog
+            {
+                //Filter = "Folders|\n",
+                //ofd.AddExtension = false;
+                CheckFileExists = false,
+                DereferenceLinks = true,
+                Multiselect = false,
+				Title = "What to select",
+				InitialDirectory = @"c:\"
+			};
+		}
+
+		public static FolderBrowserDialog GetFolderDialog()
+		{
+
+			return new FolderBrowserDialog
+			{
+				Description = "Destinaton Folder",
+				Tag = "test"
+			};
 		}
 
 

@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApp1.Context;
+using WindowsFormsApp1.Entity;
 using WindowsFormsApp1.Service;
 
 namespace WindowsFormsApp1
@@ -22,34 +25,59 @@ namespace WindowsFormsApp1
         {
             //FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
             //folderBrowserDialog.ShowDialog();
-            FolderSelectDialog folderSelectDialog = new FolderSelectDialog
+            OpenFileDialog openFileDialog = FolderFileSelectDialog.GetFileDialog();
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                Title = "What to select",
-                InitialDirectory = @"c:\"
-            };
-            if (folderSelectDialog.ShowDialog == DialogResult.OK)
-            {
-                source.Text = folderSelectDialog.FileName;
+                source.Text = openFileDialog.FileName;
             }
         }
 
         private void Select_Destination_Click(object sender, EventArgs e)
         {
-            FolderSelectDialog folderSelectDialog = new FolderSelectDialog
+            FolderBrowserDialog folderBrowserDialog = FolderFileSelectDialog.GetFolderDialog();
+           
+            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
-                Title = "What to select",
-                InitialDirectory = @"c:\"
-            };
-            if (folderSelectDialog.ShowDialog == DialogResult.OK)
-            {
-                destination.Text = folderSelectDialog.FileName;
+                destination.Text = folderBrowserDialog.SelectedPath;
             }
         }
 
         private void Pull_and_Classification_Click(object sender, EventArgs e)
         {
-//asdads
+            string s = source.Text;
+            string d = destination.Text;
+            try
+            {
+                string fileName = Path.GetFileNameWithoutExtension(s);
+                string dir = Path.Combine(fileName.Split('-'));
+                string dest = Path.Combine(d, dir);
+                Directory.CreateDirectory(dest);
+                dest = Path.Combine(dest, Path.GetFileName(s));
 
+                if (File.Exists(dest))
+                {
+                    File.Delete(s);
+                }
+                else
+                {
+                    File.Move(s, dest);
+                    using (var db = new TestContext())
+                    {
+                        var ev = new Event()
+                        {
+                            eventName = "test",
+                            eventnDesc = Path.GetFileName(s),
+                            eventDate = DateTime.Now
+                        };
+                        db.Events.Add(ev);
+                        db.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //WriteToFile(ex.Message);
+            }
         }
     }
 }
