@@ -93,6 +93,7 @@ namespace WindowsFormsApp1
             this.Controls.Add(this.selectDestination);
             this.Controls.Add(this.source);
             this.Controls.Add(this.selectSource);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "PandCForm";
             this.Text = "Pull And Classification";
             this.ResumeLayout(false);
