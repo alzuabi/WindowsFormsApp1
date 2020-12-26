@@ -8,9 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WindowsFormsApp1.Context;
-using WindowsFormsApp1.Entity;
-
 using Classifacation.Service;
 using WindowsFormsApp1.Utils;
 
