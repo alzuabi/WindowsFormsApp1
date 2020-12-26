@@ -11,7 +11,7 @@ namespace WindowsFormsApp1.Context
     public class TestContext : DbContext
     {
         public TestContext()
-            : base("name=TestLogDb")
+            : base("name=ClassificationLogDb")
         { }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

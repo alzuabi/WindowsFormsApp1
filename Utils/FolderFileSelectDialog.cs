@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WindowsFormsApp1.Service
+namespace WindowsFormsApp1.Utils
 {
 	class FolderFileSelectDialog
 	{
@@ -13,21 +13,13 @@ namespace WindowsFormsApp1.Service
 		private FolderBrowserDialog folderBrowserDialog = null;
 		private FolderFileSelectDialog()
 		{
-			//openFileDialog = new OpenFileDialog();
-
-			//openFileDialog.Filter = "Folders|\n";
-   //         //ofd.AddExtension = false;
-   //         openFileDialog.CheckFileExists = false;
-			//openFileDialog.DereferenceLinks = true;
-			//openFileDialog.Multiselect = false;
 		}
 
 		public static OpenFileDialog GetFileDialog() {
 
 			return new OpenFileDialog
             {
-                //Filter = "Folders|\n",
-                //ofd.AddExtension = false;
+
                 CheckFileExists = false,
                 DereferenceLinks = true,
                 Multiselect = false,

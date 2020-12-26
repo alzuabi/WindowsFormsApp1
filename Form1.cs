@@ -10,7 +10,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.Context;
 using WindowsFormsApp1.Entity;
-using WindowsFormsApp1.Service;
+
+using Classifacation.Service;
+using WindowsFormsApp1.Utils;
 
 namespace WindowsFormsApp1
 {
@@ -23,8 +25,6 @@ namespace WindowsFormsApp1
 
         private void Select_Source_Click(object sender, EventArgs e)
         {
-            //FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
-            //folderBrowserDialog.ShowDialog();
             OpenFileDialog openFileDialog = FolderFileSelectDialog.GetFileDialog();
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -44,39 +44,17 @@ namespace WindowsFormsApp1
 
         private void Pull_and_Classification_Click(object sender, EventArgs e)
         {
+
+            var classification = Classification.GetInstance();
             string s = source.Text;
             string d = destination.Text;
             try
             {
-                string fileName = Path.GetFileNameWithoutExtension(s);
-                string dir = Path.Combine(fileName.Split('-'));
-                string dest = Path.Combine(d, dir);
-                Directory.CreateDirectory(dest);
-                dest = Path.Combine(dest, Path.GetFileName(s));
-
-                if (File.Exists(dest))
-                {
-                    File.Delete(s);
-                }
-                else
-                {
-                    File.Move(s, dest);
-                    using (var db = new TestContext())
-                    {
-                        var ev = new Event()
-                        {
-                            eventName = "test",
-                            eventnDesc = Path.GetFileName(s),
-                            eventDate = DateTime.Now
-                        };
-                        db.Events.Add(ev);
-                        db.SaveChanges();
-                    }
-                }
+                classification.pullAndClassification(s, d);
             }
-            catch (Exception ex)
-            {
-                //WriteToFile(ex.Message);
+            catch (Exception ex) {
+
+            
             }
         }
     }
