@@ -39,29 +39,33 @@ namespace WindowsFormsApp1
             this.svn = new System.Windows.Forms.RadioButton();
             this.selectSourceLocalFile = new System.Windows.Forms.Button();
             this.sourceLocalFile = new System.Windows.Forms.TextBox();
+            this.UserName = new System.Windows.Forms.Label();
+            this.UserNameTextBox = new System.Windows.Forms.TextBox();
+            this.Password = new System.Windows.Forms.Label();
+            this.PasswordTestBox = new System.Windows.Forms.TextBox();
+            this.SVNconf = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
+            this.SVNconf.SuspendLayout();
             this.SuspendLayout();
             // 
             // selectSourceSVN
             // 
-            this.selectSourceSVN.Location = new System.Drawing.Point(422, 124);
+            this.selectSourceSVN.Location = new System.Drawing.Point(393, 31);
             this.selectSourceSVN.Name = "selectSourceSVN";
             this.selectSourceSVN.Size = new System.Drawing.Size(121, 20);
             this.selectSourceSVN.TabIndex = 0;
             this.selectSourceSVN.Text = "Select Source";
             this.selectSourceSVN.UseVisualStyleBackColor = true;
-            this.selectSourceSVN.Visible = false;
             this.selectSourceSVN.Click += new System.EventHandler(this.selectSourceSvn_Click);
             // 
             // sourceSVN
             // 
-            this.sourceSVN.Location = new System.Drawing.Point(48, 125);
+            this.sourceSVN.Location = new System.Drawing.Point(19, 31);
             this.sourceSVN.Name = "sourceSVN";
             this.sourceSVN.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.sourceSVN.Size = new System.Drawing.Size(359, 20);
             this.sourceSVN.TabIndex = 1;
             this.sourceSVN.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.sourceSVN.Visible = false;
             // 
             // selectDestination
             // 
@@ -95,9 +99,9 @@ namespace WindowsFormsApp1
             // 
             this.groupBox1.Controls.Add(this.localFiles);
             this.groupBox1.Controls.Add(this.svn);
-            this.groupBox1.Location = new System.Drawing.Point(562, 99);
+            this.groupBox1.Location = new System.Drawing.Point(562, 54);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(96, 83);
+            this.groupBox1.Size = new System.Drawing.Size(96, 143);
             this.groupBox1.TabIndex = 5;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Source";
@@ -105,7 +109,7 @@ namespace WindowsFormsApp1
             // localFiles
             // 
             this.localFiles.AutoSize = true;
-            this.localFiles.Location = new System.Drawing.Point(18, 62);
+            this.localFiles.Location = new System.Drawing.Point(18, 106);
             this.localFiles.Name = "localFiles";
             this.localFiles.Size = new System.Drawing.Size(71, 17);
             this.localFiles.TabIndex = 1;
@@ -147,24 +151,74 @@ namespace WindowsFormsApp1
             this.sourceLocalFile.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.sourceLocalFile.Visible = false;
             // 
+            // UserName
+            // 
+            this.UserName.AutoSize = true;
+            this.UserName.Location = new System.Drawing.Point(17, 60);
+            this.UserName.Name = "UserName";
+            this.UserName.Size = new System.Drawing.Size(59, 13);
+            this.UserName.TabIndex = 8;
+            this.UserName.Text = "User Name";
+            // 
+            // UserNameTextBox
+            // 
+            this.UserNameTextBox.Location = new System.Drawing.Point(82, 57);
+            this.UserNameTextBox.Name = "UserNameTextBox";
+            this.UserNameTextBox.Size = new System.Drawing.Size(100, 20);
+            this.UserNameTextBox.TabIndex = 9;
+            // 
+            // Password
+            // 
+            this.Password.AutoSize = true;
+            this.Password.Location = new System.Drawing.Point(219, 60);
+            this.Password.Name = "Password";
+            this.Password.Size = new System.Drawing.Size(53, 13);
+            this.Password.TabIndex = 10;
+            this.Password.Text = "Password";
+            // 
+            // PasswordTestBox
+            // 
+            this.PasswordTestBox.Location = new System.Drawing.Point(278, 57);
+            this.PasswordTestBox.Name = "PasswordTestBox";
+            this.PasswordTestBox.Size = new System.Drawing.Size(100, 20);
+            this.PasswordTestBox.TabIndex = 11;
+            this.PasswordTestBox.UseSystemPasswordChar = true;
+            // 
+            // SVNconf
+            // 
+            this.SVNconf.Controls.Add(this.selectSourceSVN);
+            this.SVNconf.Controls.Add(this.PasswordTestBox);
+            this.SVNconf.Controls.Add(this.sourceSVN);
+            this.SVNconf.Controls.Add(this.Password);
+            this.SVNconf.Controls.Add(this.UserName);
+            this.SVNconf.Controls.Add(this.UserNameTextBox);
+            this.SVNconf.Location = new System.Drawing.Point(36, 54);
+            this.SVNconf.Name = "SVNconf";
+            this.SVNconf.Size = new System.Drawing.Size(520, 100);
+            this.SVNconf.TabIndex = 12;
+            this.SVNconf.TabStop = false;
+            this.SVNconf.Text = "SVN";
+            this.SVNconf.Visible = false;
+            // 
             // PandCForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.SVNconf);
             this.Controls.Add(this.sourceLocalFile);
             this.Controls.Add(this.selectSourceLocalFile);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.destination);
             this.Controls.Add(this.selectDestination);
-            this.Controls.Add(this.sourceSVN);
-            this.Controls.Add(this.selectSourceSVN);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "PandCForm";
             this.Text = "Pull And Classification";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.SVNconf.ResumeLayout(false);
+            this.SVNconf.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -182,6 +236,11 @@ namespace WindowsFormsApp1
         private System.Windows.Forms.RadioButton svn;
         private System.Windows.Forms.Button selectSourceLocalFile;
         private System.Windows.Forms.TextBox sourceLocalFile;
+        private System.Windows.Forms.Label UserName;
+        private System.Windows.Forms.TextBox UserNameTextBox;
+        private System.Windows.Forms.Label Password;
+        private System.Windows.Forms.TextBox PasswordTestBox;
+        private System.Windows.Forms.GroupBox SVNconf;
     }
 }
 

@@ -52,13 +52,13 @@ namespace WindowsFormsApp1
                     DeleteUnversioned = true,
                     Message = "Adding new directory for my project",
                     Mkdir = true,
-                    Password = null,
+                    Password = PasswordTestBox.Text==""? null : PasswordTestBox.Text,
                     Path = d,
                     Revert = true,
                     TrustServerCert = true,
                     UpdateBeforeCompleteSync = false,
                     Url = s,
-                    Username = null,
+                    Username = UserNameTextBox.Text == "" ? null : UserNameTextBox.Text,
                     Verbose = true,
 
                 };
@@ -95,8 +95,9 @@ namespace WindowsFormsApp1
         {
             selectSourceLocalFile.Visible = false;
             sourceLocalFile.Visible = false;
-            selectSourceSVN.Visible = true;
-            sourceSVN.Visible = true;
+            //selectSourceSVN.Visible = true;
+            //sourceSVN.Visible = true;
+            SVNconf.Visible = true;
             fromSvn = true;
         }
 
@@ -104,8 +105,9 @@ namespace WindowsFormsApp1
         {
             selectSourceLocalFile.Visible = true;
             sourceLocalFile.Visible = true;
-            selectSourceSVN.Visible = false;
-            sourceSVN.Visible = false;
+            //selectSourceSVN.Visible = false;
+            //sourceSVN.Visible = false;
+            SVNconf.Visible = false;
         }
 
         private void selectSourceLocalFile_Click(object sender, EventArgs e)
