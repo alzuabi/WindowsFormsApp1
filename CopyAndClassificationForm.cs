@@ -38,26 +38,31 @@ namespace WindowsFormsApp1
 
         private void Copy_and_Classification_Click(object sender, EventArgs e)
         {
-
-            var classification = Classification.GetInstance();
-            selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles());
-            string d = destination.Text;
-            try
+            if (ValidateChildren(ValidationConstraints.Enabled))
             {
-                    
-                foreach (var file in selectedFiles)
-                {
-                    classification.pullAndClassification(file, d);
-                }
-                //if (Directory.Exists(s))
-                //{
-                //    Directory.Delete(s);
-                //}
             }
-            catch (Exception)
+            else
             {
+                var classification = Classification.GetInstance();
+                selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles());
+                string d = destination.Text;
+                try
+                {
 
-            
+                    foreach (var file in selectedFiles)
+                    {
+                        classification.pullAndClassification(file, d);
+                    }
+                    //if (Directory.Exists(s))
+                    //{
+                    //    Directory.Delete(s);
+                    //}
+                }
+                catch (Exception)
+                {
+
+
+                }
             }
         }
 
@@ -131,7 +136,7 @@ namespace WindowsFormsApp1
                 s = sourceLocalFile;
             }
             DirectoryInfo directory = new DirectoryInfo(s);
-            FileInfo[] files = directory.GetFiles();
+            FileInfo[] files = directory.GetFiles("*.*", SearchOption.AllDirectories).Where(file => !file.Directory.FullName.Contains(".svn")).ToArray();
             var filtered = files.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden));
             return filtered;
 
@@ -154,8 +159,40 @@ namespace WindowsFormsApp1
             pullAndPushForm.ShowDialog();
         }
 
-        private void sourceSVN_TextChanged(object sender, EventArgs e)
+    
+
+        private void Source_Validating(object sender, CancelEventArgs e)
         {
+            //if (string.IsNullOrWhiteSpace(sourceSVN.Text) && string.IsNullOrWhiteSpace(sourceLocalFile.Text))
+            //{
+            //    e.Cancel = true;
+            //    sourceSVN.Focus();
+            //    sourceLocalFile.Focus();
+            //    errorProviderSource.SetError(sourceLocalFile, "Sources should not be left blank!");
+            //    errorProviderSource.SetError(sourceSVN, "Sources should not be left blank!");
+            //}
+            //else
+            //{
+            //    e.Cancel = false;
+            //    errorProviderSource.SetError(sourceLocalFile, "");
+            //    errorProviderSource.SetError(sourceSVN, "");
+            //}
+
+        }
+
+        private void Destination_Validating(object sender, CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(destination.Text))
+            {
+                e.Cancel = true;
+                destination.Focus();
+                errorProviderSource.SetError(destination, "Destination should not be left blank!");
+            }
+            else
+            {
+                e.Cancel = false;
+                errorProviderSource.SetError(destination, "");
+            }
 
         }
     }

@@ -16,7 +16,7 @@ namespace PullAndClassificationForm
 {
     public partial class SyncWithSvnForm : Form
     {
-        public string Destination { get; set; }
+        public string Destination { get; set; } 
         public string Url { get; set; }
         public SyncWithSvnForm()
         {

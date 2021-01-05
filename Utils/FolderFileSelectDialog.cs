@@ -10,10 +10,6 @@ namespace WindowsFormsApp1.Utils
 	class FolderFileSelectDialog
 	{
 		private OpenFileDialog openFileDialog = null;
-		private FolderBrowserDialog folderBrowserDialog = null;
-		private FolderFileSelectDialog()
-		{
-		}
 
 		public static OpenFileDialog GetFileDialog() {
 

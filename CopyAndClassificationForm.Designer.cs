@@ -29,6 +29,7 @@ namespace WindowsFormsApp1
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.buttonSelectFiles = new System.Windows.Forms.Button();
             this.sourceSVN = new System.Windows.Forms.TextBox();
             this.selectDestination = new System.Windows.Forms.Button();
@@ -46,8 +47,12 @@ namespace WindowsFormsApp1
             this.SVNconf = new System.Windows.Forms.GroupBox();
             this.url = new System.Windows.Forms.Label();
             this.buttonPullAndPush = new System.Windows.Forms.Button();
+            this.errorProviderSource = new System.Windows.Forms.ErrorProvider(this.components);
+            this.errorProviderDestination = new System.Windows.Forms.ErrorProvider(this.components);
             this.groupBox1.SuspendLayout();
             this.SVNconf.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProviderSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProviderDestination)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonSelectFiles
@@ -68,7 +73,7 @@ namespace WindowsFormsApp1
             this.sourceSVN.Size = new System.Drawing.Size(359, 20);
             this.sourceSVN.TabIndex = 1;
             this.sourceSVN.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.sourceSVN.TextChanged += new System.EventHandler(this.sourceSVN_TextChanged);
+            this.sourceSVN.Validating += new System.ComponentModel.CancelEventHandler(this.Source_Validating);
             // 
             // selectDestination
             // 
@@ -87,6 +92,7 @@ namespace WindowsFormsApp1
             this.destination.Size = new System.Drawing.Size(478, 20);
             this.destination.TabIndex = 3;
             this.destination.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.destination.Validating += new System.ComponentModel.CancelEventHandler(this.Destination_Validating);
             // 
             // buttonCopyAndClassification
             // 
@@ -153,6 +159,7 @@ namespace WindowsFormsApp1
             this.sourceLocalFile.TabIndex = 7;
             this.sourceLocalFile.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.sourceLocalFile.Visible = false;
+            this.sourceLocalFile.Validating += new System.ComponentModel.CancelEventHandler(this.Source_Validating);
             // 
             // UserName
             // 
@@ -222,6 +229,14 @@ namespace WindowsFormsApp1
             this.buttonPullAndPush.UseVisualStyleBackColor = true;
             this.buttonPullAndPush.Click += new System.EventHandler(this.ButtonPullAndPush_Click);
             // 
+            // errorProviderSource
+            // 
+            this.errorProviderSource.ContainerControl = this;
+            // 
+            // errorProviderDestination
+            // 
+            this.errorProviderDestination.ContainerControl = this;
+            // 
             // PandCForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -244,6 +259,8 @@ namespace WindowsFormsApp1
             this.groupBox1.PerformLayout();
             this.SVNconf.ResumeLayout(false);
             this.SVNconf.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProviderSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProviderDestination)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -268,6 +285,8 @@ namespace WindowsFormsApp1
         private System.Windows.Forms.GroupBox SVNconf;
         private System.Windows.Forms.Label url;
         private System.Windows.Forms.Button buttonPullAndPush;
+        private System.Windows.Forms.ErrorProvider errorProviderSource;
+        private System.Windows.Forms.ErrorProvider errorProviderDestination;
     }
 }
 
