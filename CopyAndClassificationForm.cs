@@ -18,8 +18,9 @@ namespace WindowsFormsApp1
     public partial class PandCForm : Form
     {
         private readonly SelectFilesForm selectedFilesForm = new SelectFilesForm();
+
         public List<string> selectedFiles = new List<string>();
-        static string global_dest;
+        //static string global_dest;
         bool fromSvn = false;
         public PandCForm()
         {
@@ -43,7 +44,7 @@ namespace WindowsFormsApp1
             //var filtered = GetFilesWithoutHidden(fromSvn, sourceSVN.Text, sourceLocalFile.Text);
             selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles());
             string d = destination.Text;
-            Temp.CloneDirectory(global_dest + "/.svn", d+"/.svn");
+            //Temp.CloneDirectory(global_dest + "/.svn", d + "/.svn");
             try
             {
                     
@@ -107,7 +108,7 @@ namespace WindowsFormsApp1
                 Temp temp = new Temp();
                 s = sourceSVN;
                 d = temp.GetTemporaryDirectory();
-                global_dest = d;
+                //global_dest = d;
 
                 Parameters parameters = new Parameters()
                 {
@@ -145,26 +146,21 @@ namespace WindowsFormsApp1
 
         }
 
-        private void PushToSvn_Click(object sender, EventArgs e)
-        {
-            Parameters parameters = new Parameters()
-            {
-                Cleanup = true,
-                Command = Command.CompleteSync,
-                DeleteUnversioned = true,
-                Message = "Adding new directory for my project",
-                Mkdir = true,
-                Password = PasswordTestBox2.Text == "" ? null : PasswordTestBox2.Text,
-                Path = destination.Text,
-                Revert = true,
-                TrustServerCert = true,
-                UpdateBeforeCompleteSync = false,
-                //Url = dsetSvn.Text,
-                Username = UserNameTextBox2.Text == "" ? null : UserNameTextBox2.Text,
-                Verbose = true,
+       
 
+        private void ButtonPullAndPush_Click(object sender, EventArgs e)
+        {
+            SyncWithSvnForm pullAndPushForm = new SyncWithSvnForm
+            {
+                Destination = destination.Text
             };
-            SvnUtils.CompleteSync(parameters);
+            
+            pullAndPushForm.ShowDialog();
+        }
+
+        private void sourceSVN_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

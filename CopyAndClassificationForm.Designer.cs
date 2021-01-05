@@ -45,13 +45,7 @@ namespace WindowsFormsApp1
             this.PasswordTestBox1 = new System.Windows.Forms.TextBox();
             this.SVNconf = new System.Windows.Forms.GroupBox();
             this.url = new System.Windows.Forms.Label();
-            this.pushToSvn = new System.Windows.Forms.Button();
-            this.PasswordTestBox2 = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.UserNameTextBox2 = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.textBoxDestSVN = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.buttonPullAndPush = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SVNconf.SuspendLayout();
             this.SuspendLayout();
@@ -74,6 +68,7 @@ namespace WindowsFormsApp1
             this.sourceSVN.Size = new System.Drawing.Size(359, 20);
             this.sourceSVN.TabIndex = 1;
             this.sourceSVN.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.sourceSVN.TextChanged += new System.EventHandler(this.sourceSVN_TextChanged);
             // 
             // selectDestination
             // 
@@ -95,9 +90,9 @@ namespace WindowsFormsApp1
             // 
             // buttonCopyAndClassification
             // 
-            this.buttonCopyAndClassification.Location = new System.Drawing.Point(53, 316);
+            this.buttonCopyAndClassification.Location = new System.Drawing.Point(158, 316);
             this.buttonCopyAndClassification.Name = "buttonCopyAndClassification";
-            this.buttonCopyAndClassification.Size = new System.Drawing.Size(605, 37);
+            this.buttonCopyAndClassification.Size = new System.Drawing.Size(418, 37);
             this.buttonCopyAndClassification.TabIndex = 4;
             this.buttonCopyAndClassification.Text = "Copy and Classification";
             this.buttonCopyAndClassification.UseVisualStyleBackColor = true;
@@ -154,7 +149,7 @@ namespace WindowsFormsApp1
             this.sourceLocalFile.Location = new System.Drawing.Point(48, 162);
             this.sourceLocalFile.Name = "sourceLocalFile";
             this.sourceLocalFile.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.sourceLocalFile.Size = new System.Drawing.Size(359, 20);
+            this.sourceLocalFile.Size = new System.Drawing.Size(368, 20);
             this.sourceLocalFile.TabIndex = 7;
             this.sourceLocalFile.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.sourceLocalFile.Visible = false;
@@ -217,80 +212,23 @@ namespace WindowsFormsApp1
             this.url.TabIndex = 12;
             this.url.Text = "URL";
             // 
-            // pushToSvn
+            // buttonPullAndPush
             // 
-            this.pushToSvn.Location = new System.Drawing.Point(422, 438);
-            this.pushToSvn.Name = "pushToSvn";
-            this.pushToSvn.Size = new System.Drawing.Size(236, 46);
-            this.pushToSvn.TabIndex = 13;
-            this.pushToSvn.Text = "Push to SVN";
-            this.pushToSvn.UseVisualStyleBackColor = true;
-            this.pushToSvn.Click += new System.EventHandler(this.PushToSvn_Click);
-            // 
-            // PasswordTestBox2
-            // 
-            this.PasswordTestBox2.Location = new System.Drawing.Point(306, 464);
-            this.PasswordTestBox2.Name = "PasswordTestBox2";
-            this.PasswordTestBox2.Size = new System.Drawing.Size(100, 20);
-            this.PasswordTestBox2.TabIndex = 14;
-            this.PasswordTestBox2.UseSystemPasswordChar = true;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(247, 467);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(53, 13);
-            this.label2.TabIndex = 13;
-            this.label2.Text = "Password";
-            // 
-            // UserNameTextBox2
-            // 
-            this.UserNameTextBox2.Location = new System.Drawing.Point(115, 464);
-            this.UserNameTextBox2.Name = "UserNameTextBox2";
-            this.UserNameTextBox2.Size = new System.Drawing.Size(100, 20);
-            this.UserNameTextBox2.TabIndex = 13;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(50, 467);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(59, 13);
-            this.label3.TabIndex = 13;
-            this.label3.Text = "User Name";
-            // 
-            // textBoxDestSVN
-            // 
-            this.textBoxDestSVN.Location = new System.Drawing.Point(91, 438);
-            this.textBoxDestSVN.Name = "textBoxDestSVN";
-            this.textBoxDestSVN.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.textBoxDestSVN.Size = new System.Drawing.Size(316, 20);
-            this.textBoxDestSVN.TabIndex = 15;
-            this.textBoxDestSVN.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(50, 441);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(26, 13);
-            this.label1.TabIndex = 13;
-            this.label1.Text = "URL";
+            this.buttonPullAndPush.Location = new System.Drawing.Point(53, 402);
+            this.buttonPullAndPush.Name = "buttonPullAndPush";
+            this.buttonPullAndPush.Size = new System.Drawing.Size(605, 64);
+            this.buttonPullAndPush.TabIndex = 13;
+            this.buttonPullAndPush.Text = "Go to Sync With SVN";
+            this.buttonPullAndPush.UseVisualStyleBackColor = true;
+            this.buttonPullAndPush.Click += new System.EventHandler(this.ButtonPullAndPush_Click);
             // 
             // PandCForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(758, 510);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBoxDestSVN);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.buttonPullAndPush);
             this.Controls.Add(this.buttonSelectFiles);
-            this.Controls.Add(this.UserNameTextBox2);
-            this.Controls.Add(this.PasswordTestBox2);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.pushToSvn);
             this.Controls.Add(this.SVNconf);
             this.Controls.Add(this.sourceLocalFile);
             this.Controls.Add(this.selectSourceLocalFile);
@@ -300,7 +238,7 @@ namespace WindowsFormsApp1
             this.Controls.Add(this.selectDestination);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "PandCForm";
-            this.Text = "Pull And Classification";
+            this.Text = "Copy And Classification";
             this.Load += new System.EventHandler(this.PandCForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -329,13 +267,7 @@ namespace WindowsFormsApp1
         private System.Windows.Forms.TextBox PasswordTestBox1;
         private System.Windows.Forms.GroupBox SVNconf;
         private System.Windows.Forms.Label url;
-        private System.Windows.Forms.Button pushToSvn;
-        private System.Windows.Forms.TextBox PasswordTestBox2;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox UserNameTextBox2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBoxDestSVN;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button buttonPullAndPush;
     }
 }
 
