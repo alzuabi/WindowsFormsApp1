@@ -25,24 +25,56 @@ namespace PullAndClassificationForm
 
         private void PushToSvn_Click(object sender, EventArgs e)
         {
-            Parameters parameters = new Parameters()
+            Parameters parameters;
+            if (Url == null)
             {
-                Cleanup = true,
-                Command = Command.CompleteSync,
-                DeleteUnversioned = true,
-                Message = "Adding new directory for my project",
-                Mkdir = true,
-                Password = PasswordTestBox2.Text == "" ? null : PasswordTestBox2.Text,
-                Path = Destination,
-                Revert = true,
-                TrustServerCert = true,
-                UpdateBeforeCompleteSync = false,
-                //Url = dsetSvn.Text,
-                Username = UserNameTextBox2.Text == "" ? null : UserNameTextBox2.Text,
-                Verbose = true,
+                Temp temp = new Temp();
+                string d = temp.GetTemporaryDirectory();
+                parameters = new Parameters()
+                {
+                    Cleanup = true,
+                    Command = Command.CheckoutUpdate,
+                    DeleteUnversioned = true,
+                    Message = "Adding new directory for my project",
+                    Mkdir = true,
+                    Password = PasswordTestBox2.Text != "" ? PasswordTestBox2.Text : null,
+                    Path = d,
+                    Revert = true,
+                    TrustServerCert = true,
+                    UpdateBeforeCompleteSync = false,
+                    Url = textBoxDestSVN.Text,
+                    Username = UserNameTextBox2.Text == "" ? null : UserNameTextBox2.Text,
+                    Verbose = true,
 
-            };
-            SvnUtils.CompleteSync(parameters);
+                };
+                SvnUtils.CheckoutUpdate(parameters);
+                Temp.CloneDirectory(d + "/.svn", Destination + "/.svn");
+
+                parameters.Path = Destination;
+                parameters.Command = Command.CompleteSync;
+                SvnUtils.CompleteSync(parameters);
+            }
+            else
+            {
+                parameters = new Parameters()
+                {
+                    Cleanup = true,
+                    Command = Command.CompleteSync,
+                    DeleteUnversioned = true,
+                    Message = "Adding new directory for my project",
+                    Mkdir = true,
+                    Password = PasswordTestBox2.Text != "" ? PasswordTestBox2.Text : null,
+                    Path = Destination,
+                    Revert = true,
+                    TrustServerCert = true,
+                    UpdateBeforeCompleteSync = false,
+                    Url = textBoxDestSVN.Text,
+                    Username = UserNameTextBox2.Text == "" ? null : UserNameTextBox2.Text,
+                    Verbose = true,
+
+                };
+                SvnUtils.CompleteSync(parameters);
+            }
         }
 
         private void ButtonFrom_Click(object sender, EventArgs e)
