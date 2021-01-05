@@ -20,7 +20,6 @@ namespace WindowsFormsApp1
         private readonly SelectFilesForm selectedFilesForm = new SelectFilesForm();
 
         public List<string> selectedFiles = new List<string>();
-        //static string global_dest;
         bool fromSvn = false;
         public PandCForm()
         {
@@ -41,10 +40,8 @@ namespace WindowsFormsApp1
         {
 
             var classification = Classification.GetInstance();
-            //var filtered = GetFilesWithoutHidden(fromSvn, sourceSVN.Text, sourceLocalFile.Text);
             selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles());
             string d = destination.Text;
-            //Temp.CloneDirectory(global_dest + "/.svn", d + "/.svn");
             try
             {
                     
@@ -108,7 +105,6 @@ namespace WindowsFormsApp1
                 Temp temp = new Temp();
                 s = sourceSVN;
                 d = temp.GetTemporaryDirectory();
-                //global_dest = d;
 
                 Parameters parameters = new Parameters()
                 {
