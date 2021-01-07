@@ -5,25 +5,32 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Classifacation.Service;
 using PullAndClassificationForm;
-using SvnClient;
-using WindowsFormsApp1.Utils;
+using Svn;
+using SvnUtils;
 
+using WindowsFormsApp1.Utils;
 namespace WindowsFormsApp1
 {
     public partial class PandCForm : Form
     {
-        private readonly SelectFilesForm selectedFilesForm = new SelectFilesForm();
-
+        //private readonly SelectFilesForm selectedFilesForm = new SelectFilesForm();
+        private readonly SelectFileForm selectedFilesForm = new SelectFileForm();
         public List<string> selectedFiles = new List<string>();
         bool fromSvn = false;
         public PandCForm()
         {
             InitializeComponent();
+            this.Text = string.Empty;
+            this.ControlBox = false;
+            this.DoubleBuffered = true;
+            this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
+
         }
 
         private void Select_Destination_Click(object sender, EventArgs e)
@@ -38,11 +45,6 @@ namespace WindowsFormsApp1
 
         private void Copy_and_Classification_Click(object sender, EventArgs e)
         {
-            if (ValidateChildren(ValidationConstraints.Enabled))
-            {
-            }
-            else
-            {
                 var classification = Classification.GetInstance();
                 selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles());
                 string d = destination.Text;
@@ -51,7 +53,7 @@ namespace WindowsFormsApp1
 
                     foreach (var file in selectedFiles)
                     {
-                        classification.pullAndClassification(file, d);
+                        classification.CopyAndClassification(file, d);
                     }
                     //if (Directory.Exists(s))
                     //{
@@ -63,7 +65,6 @@ namespace WindowsFormsApp1
 
 
                 }
-            }
         }
 
         private void Svn_CheckedChanged(object sender, EventArgs e)
@@ -95,11 +96,15 @@ namespace WindowsFormsApp1
 
         private void SelectFiles_Click(object sender, EventArgs e)
         {
-            var filtered = GetFilesWithoutHidden(fromSvn, sourceSVN.Text, sourceLocalFile.Text);
-            
-            selectedFilesForm.FillFilesDataGridView(filtered);
-            selectedFilesForm.ShowDialog();
-        }
+            try
+            {
+                var filtered = GetFilesWithoutHidden(fromSvn, sourceSVN.Text, sourceLocalFile.Text);
+
+                selectedFilesForm.FillFilesDataGridView(filtered);
+                selectedFilesForm.ShowDialog();
+            }
+            catch { }
+            }
 
 
         private IEnumerable<FileInfo> GetFilesWithoutHidden(bool fromSvn, string sourceSVN, string sourceLocalFile) {
@@ -128,7 +133,7 @@ namespace WindowsFormsApp1
                     Verbose = true,
 
                 };
-                SvnUtils.CheckoutUpdate(parameters);
+                Utils.SvnUtils.CheckoutUpdate(parameters);
                 s = d;
             }
             else
@@ -142,12 +147,16 @@ namespace WindowsFormsApp1
 
         }
 
-        private void PandCForm_Load(object sender, EventArgs e)
+        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
+        private extern static void ReleaseCapture();
+        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
+        private extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
+        private void PanelTitleBar_MouseDown(object sender, MouseEventArgs e)
         {
-
+            ReleaseCapture();
+            SendMessage(this.Handle, 0x112, 0xf012, 0);
         }
 
-       
 
         private void ButtonPullAndPush_Click(object sender, EventArgs e)
         {
@@ -194,6 +203,78 @@ namespace WindowsFormsApp1
                 errorProviderSource.SetError(destination, "");
             }
 
+        }
+
+        private void ExitButton_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+
+        }
+
+        private void maximizeButton_Click(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Normal)
+                WindowState = FormWindowState.Maximized;
+            else
+                WindowState = FormWindowState.Normal;
+        }
+
+        private void minimizeButton_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+
+        private void ButtonGetFiles_Click(object sender, EventArgs e)
+        {
+            if (checkBoxClassification.Checked)
+            {
+                var classification = Classification.GetInstance();
+                selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles());
+                string d = destination.Text;
+                try
+                {
+
+                    foreach (var file in selectedFiles)
+                    {
+                        classification.CopyAndClassification(file, d);
+                    }
+                }
+                catch (Exception)
+                {
+
+
+                }
+            }
+            else
+            {
+                if (fromSvn)
+                {
+                    Temp temp = new Temp();
+                    string d = temp.GetTemporaryDirectory();
+
+                    Parameters parameters = new Parameters()
+                    {
+                        Cleanup = true,
+                        Command = Command.CheckoutUpdate,
+                        DeleteUnversioned = true,
+                        Message = "Adding new directory for my project",
+                        Mkdir = true,
+                        Password = PasswordTestBox1.Text != "" ? PasswordTestBox1.Text : null,
+                        Path = d,
+                        Revert = true,
+                        TrustServerCert = true,
+                        UpdateBeforeCompleteSync = false,
+                        Url = sourceSVN.Text,
+                        Username = UserNameTextBox1.Text == "" ? null : UserNameTextBox1.Text,
+                        Verbose = true,
+
+                    };
+                    Utils.SvnUtils.CheckoutUpdate(parameters);
+                    Temp.CloneDirectory(d, destination.Text);
+                }
+                else
+                Temp.CloneDirectory(sourceLocalFile.Text, destination.Text);
+            }
         }
     }
 }

@@ -4,17 +4,22 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PullAndClassificationForm
 {
-    public partial class SelectFilesForm : Form
+    public partial class SelectFileForm : Form
     {
-        public SelectFilesForm()
+        public SelectFileForm()
         {
             InitializeComponent();
+            this.Text = string.Empty;
+            this.ControlBox = false;
+            this.DoubleBuffered = true;
+            this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
         }
         public void FillFilesDataGridView(IEnumerable<System.IO.FileInfo> filtered)
         {
@@ -83,18 +88,26 @@ namespace PullAndClassificationForm
             //checkBoxColumn.Selected = true;
 
         }
-
-        private void buttonSelectedFilesOk_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
         public List<string> GetSelectedFiles()
         {
             return filesDataGridView.Rows.OfType<DataGridViewRow>()
                 .Where(s => s.Cells["Selected"].Value.Equals(true))
                 .Select(s => s.Cells["_fullPath"].Value.ToString())
                 .ToList();
+        }
+        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
+        private extern static void ReleaseCapture();
+        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
+        private extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
+        private void PanelTitleBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            ReleaseCapture();
+            SendMessage(this.Handle, 0x112, 0xf012, 0);
+        }
+
+        private void buttonSelectedFilesOk_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

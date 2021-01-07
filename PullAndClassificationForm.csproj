@@ -65,6 +65,9 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="FontAwesome.Sharp, Version=5.15.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\FontAwesome.Sharp.5.15.3\lib\net45\FontAwesome.Sharp.dll</HintPath>
+    </Reference>
     <Reference Include="SharpSvn, Version=1.9007.3987.251, Culture=neutral, PublicKeyToken=d729672594885a28, processorArchitecture=x86">
       <HintPath>packages\SharpSvn.1.9-x86.1.9007.3987.251\lib\net40\SharpSvn.dll</HintPath>
     </Reference>
@@ -73,6 +76,9 @@
     </Reference>
     <Reference Include="SQLite.CodeFirst, Version=1.6.0.30, Culture=neutral, PublicKeyToken=eb96ba0a78d831a7, processorArchitecture=MSIL">
       <HintPath>packages\SQLite.CodeFirst.1.6.0.30\lib\net45\SQLite.CodeFirst.dll</HintPath>
+    </Reference>
+    <Reference Include="Svn">
+      <HintPath>..\..\..\Desktop\Svn.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -105,22 +111,20 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SelectFileForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectFileForm.Designer.cs">
+      <DependentUpon>SelectFileForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SyncWithSvnForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SyncWithSvnForm.Designer.cs">
       <DependentUpon>SyncWithSvnForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SelectFilesForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SelectFilesForm.Designer.cs">
-      <DependentUpon>SelectFilesForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SVN\Options.cs" />
-    <Compile Include="SVN\Parameters.cs" />
     <Compile Include="Utils\FolderFileSelectDialog.cs" />
-    <Compile Include="SVN\SvnUtils.cs" />
+    <Compile Include="Utils\SvnUtils.cs" />
     <Compile Include="Utils\Temp.cs" />
     <EmbeddedResource Include="CopyAndClassificationForm.resx">
       <DependentUpon>CopyAndClassificationForm.cs</DependentUpon>
@@ -135,11 +139,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="SelectFileForm.resx">
+      <DependentUpon>SelectFileForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SyncWithSvnForm.resx">
       <DependentUpon>SyncWithSvnForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SelectFilesForm.resx">
-      <DependentUpon>SelectFilesForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -166,6 +170,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\logo Multisys new.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

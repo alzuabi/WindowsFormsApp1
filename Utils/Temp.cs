@@ -31,7 +31,7 @@ namespace WindowsFormsApp1.Utils
 
             foreach (var file in Directory.GetFiles(root))
             {
-                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)));
+                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)),true);
             }
         }
     }

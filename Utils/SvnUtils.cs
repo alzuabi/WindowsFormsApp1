@@ -1,5 +1,5 @@
 ﻿using SharpSvn;
-using SvnClient;
+using Svn;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

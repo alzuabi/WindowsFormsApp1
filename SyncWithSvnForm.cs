@@ -1,5 +1,5 @@
 ﻿using SharpSvn;
-using SvnClient;
+using Svn;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,6 +22,10 @@ namespace PullAndClassificationForm
         public SyncWithSvnForm()
         {
             InitializeComponent();
+            this.Text = string.Empty;
+            this.ControlBox = false;
+            this.DoubleBuffered = true;
+            this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
         }
 
         private void PushToSvn_Click(object sender, EventArgs e)
@@ -47,12 +52,12 @@ namespace PullAndClassificationForm
                     Verbose = true,
 
                 };
-                SvnUtils.CheckoutUpdate(parameters);
+                WindowsFormsApp1.Utils.SvnUtils.CheckoutUpdate(parameters);
                 Temp.CloneDirectory(d + "/.svn", Destination + "/.svn");
 
                 parameters.Path = Destination;
                 parameters.Command = Command.CompleteSync;
-                SvnUtils.CompleteSync(parameters);
+                WindowsFormsApp1.Utils.SvnUtils.CompleteSync(parameters);
             }
             else
             {
@@ -73,7 +78,7 @@ namespace PullAndClassificationForm
                     Verbose = true,
 
                 };
-                SvnUtils.CompleteSync(parameters);
+                WindowsFormsApp1.Utils.SvnUtils.CompleteSync(parameters);
             }
         }
 
@@ -119,6 +124,20 @@ namespace PullAndClassificationForm
                     catch (Exception) { }
                 }
             }
+        }
+        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
+        private extern static void ReleaseCapture();
+        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
+        private extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
+        private void PanelTitleBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            ReleaseCapture();
+            SendMessage(this.Handle, 0x112, 0xf012, 0);
+        }
+
+        private void buttonSelectedFilesOk_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }
