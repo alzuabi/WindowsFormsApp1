@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
-namespace WindowsFormsApp1.Utils
+namespace Utils
 {
-    class Temp
+    public class Temp
     {
         //
         public string GetTemporaryDirectory()

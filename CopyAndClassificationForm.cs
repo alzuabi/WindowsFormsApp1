@@ -2,24 +2,19 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Classifacation.Service;
-using PullAndClassificationForm;
 using Svn;
-using SvnUtils;
+using Utils;
 
-using WindowsFormsApp1.Utils;
-namespace WindowsFormsApp1
+
+namespace PullAndClassification.Forms
 {
     public partial class PandCForm : Form
     {
-        //private readonly SelectFilesForm selectedFilesForm = new SelectFilesForm();
         private readonly SelectFileForm selectedFilesForm = new SelectFileForm();
         public List<string> selectedFiles = new List<string>();
         bool fromSvn = false;
@@ -85,7 +80,7 @@ namespace WindowsFormsApp1
 
         private void SelectSourceLocalFile_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog folderBrowserDialog = FolderFileSelectDialog.GetFolderDialog();
+            FolderBrowserDialog folderBrowserDialog = FolderFileSelectDialog.GetFolderDialog("Source Folder");
 
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {

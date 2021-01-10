@@ -1,17 +1,13 @@
 ﻿using SharpSvn;
 using Svn;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace WindowsFormsApp1.Utils
+namespace Utils
 {
-    class SvnUtils
+    public class SvnUtils
     {
         //
         public static void CheckoutUpdate(Parameters parameters)
@@ -142,7 +138,7 @@ namespace WindowsFormsApp1.Utils
         }
 
         // TODO: make trusting not the default
-        private static void TrustUnsignedCertificates(SharpSvn.SvnClient client)
+        private static void TrustUnsignedCertificates(SvnClient client)
         {
             client.Authentication.SslServerTrustHandlers += (sender, e) =>
             {
@@ -156,7 +152,7 @@ namespace WindowsFormsApp1.Utils
 
         public static void CompleteSync(Parameters parameters)
         {
-            using (var client = new SharpSvn.SvnClient())
+            using (var client = new SvnClient())
             {
                 SetUpClient(parameters, client);
 

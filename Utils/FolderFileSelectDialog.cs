@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WindowsFormsApp1.Utils
+namespace Utils
 {
-	class FolderFileSelectDialog
+    class FolderFileSelectDialog
 	{
 		private readonly OpenFileDialog openFileDialog = null;
 
@@ -24,12 +20,12 @@ namespace WindowsFormsApp1.Utils
 			};
 		}
 
-		public static FolderBrowserDialog GetFolderDialog()
+		public static FolderBrowserDialog GetFolderDialog(string Description = "Destinaton Folder")
 		{
 
 			return new FolderBrowserDialog
 			{
-				Description = "Destinaton Folder",
+				Description = Description,
 				Tag = "test"
 			};
 		}

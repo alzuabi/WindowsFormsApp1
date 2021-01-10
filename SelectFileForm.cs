@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace PullAndClassificationForm
+namespace PullAndClassification.Forms
 {
     public partial class SelectFileForm : Form
     {

@@ -1,19 +1,12 @@
 ﻿using SharpSvn;
 using Svn;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using WindowsFormsApp1.Utils;
+using Utils;
 
-namespace PullAndClassificationForm
+namespace PullAndClassification.Forms
 {
     public partial class SyncWithSvnForm : Form
     {
@@ -52,12 +45,12 @@ namespace PullAndClassificationForm
                     Verbose = true,
 
                 };
-                WindowsFormsApp1.Utils.SvnUtils.CheckoutUpdate(parameters);
+                Utils.SvnUtils.CheckoutUpdate(parameters);
                 Temp.CloneDirectory(d + "/.svn", Destination + "/.svn");
 
                 parameters.Path = Destination;
                 parameters.Command = Command.CompleteSync;
-                WindowsFormsApp1.Utils.SvnUtils.CompleteSync(parameters);
+                Utils.SvnUtils.CompleteSync(parameters);
             }
             else
             {
@@ -78,7 +71,7 @@ namespace PullAndClassificationForm
                     Verbose = true,
 
                 };
-                WindowsFormsApp1.Utils.SvnUtils.CompleteSync(parameters);
+                Utils.SvnUtils.CompleteSync(parameters);
             }
         }
 

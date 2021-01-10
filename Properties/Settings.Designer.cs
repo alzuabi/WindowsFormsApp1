@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PullAndClassificationForm.Properties {
+namespace PullAndClassification.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

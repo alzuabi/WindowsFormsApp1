@@ -1,5 +1,5 @@
 ﻿
-namespace PullAndClassificationForm
+namespace PullAndClassification.Forms
 {
     partial class SelectFileForm
     {
