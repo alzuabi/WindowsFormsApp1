@@ -1,5 +1,5 @@
-﻿using SharpSvn;
-using Svn;
+﻿using PullAndClassification.Utils;
+using SharpSvn;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -12,8 +12,9 @@ namespace Utils
         //
         public static void CheckoutUpdate(Parameters parameters)
         {
-            using (var client = new SharpSvn.SvnClient())
+            using (var client = new SvnClient())
             {
+                //client.Progress += new EventHandler<SvnProgressEventArgs>(client_Progress);
                 SetUpClient(parameters, client);
 
                 var target = SvnTarget.FromString(parameters.Path);
@@ -129,6 +130,11 @@ namespace Utils
             }
         }
 
+        private static void client_Progress(object sender, SvnProgressEventArgs e)
+        {
+            Console.WriteLine("Complete {0} {1}", e.Progress/ 1024, e.TotalProgress);
+        }
+
         private static bool UrlsMatch(string url1, string url2)
         {
             if (url1 == url2) return true;
@@ -138,7 +144,7 @@ namespace Utils
         }
 
         // TODO: make trusting not the default
-        private static void TrustUnsignedCertificates(SvnClient client)
+        private static void TrustUnsignedCertificates(SharpSvn.SvnClient client)
         {
             client.Authentication.SslServerTrustHandlers += (sender, e) =>
             {
@@ -152,7 +158,7 @@ namespace Utils
 
         public static void CompleteSync(Parameters parameters)
         {
-            using (var client = new SvnClient())
+            using (var client = new SharpSvn.SvnClient())
             {
                 SetUpClient(parameters, client);
 

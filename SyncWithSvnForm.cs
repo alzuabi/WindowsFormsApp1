@@ -1,136 +1,179 @@
-﻿using SharpSvn;
-using Svn;
+﻿using MetroFramework.Forms;
+using MULTISYSDbContext.Models;
+using PullAndClassification.Utils;
+using SharpSvn;
+//using Svn;
 using System;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Utils;
+using static Utils.Temp;
 
 namespace PullAndClassification.Forms
 {
-    public partial class SyncWithSvnForm : Form
+    public partial class SyncWithSvnForm : MetroForm
     {
-        public string Destination { get; set; } 
+        private BackgroundWorker bgw = new BackgroundWorker();
+        public string Destination { get; set; }
         public string Url { get; set; }
-        public SyncWithSvnForm()
+        public SyncWithSvnForm(int currentProjectId = -1)
         {
             InitializeComponent();
-            this.Text = string.Empty;
-            this.ControlBox = false;
-            this.DoubleBuffered = true;
-            this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
+            MaximizeBox = false;
+            ShadowType = MetroFormShadowType.AeroShadow;
+            Session.context = new DatabaseContext();
+            Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.context);
+            //if (currentProjectId == -1)
+            //    Session.CurrentProjectId = Session.DefaultProjectId;
+            //else
+            //    Session.CurrentProjectId = currentProjectId;
+
+            Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
         }
 
         private void PushToSvn_Click(object sender, EventArgs e)
         {
+            metroProgressBar1.Visible = true;
+            bgw.DoWork += new DoWorkEventHandler(Bgw_DoPush);
+            bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+            bgw.WorkerReportsProgress = true;
+            bgw.RunWorkerAsync();
+           
+
+        }
+
+        private void Bgw_DoPush(object sender, DoWorkEventArgs e)
+        {
+            Destination = metroFromTextBox.Text;
             Parameters parameters;
-            if (Url == null)
+
+            Temp temp = new Temp();
+            string d = temp.GetTemporaryDirectory();
+            parameters = new Parameters()
             {
-                Temp temp = new Temp();
-                string d = temp.GetTemporaryDirectory();
-                parameters = new Parameters()
-                {
-                    Cleanup = true,
-                    Command = Command.CheckoutUpdate,
-                    DeleteUnversioned = true,
-                    Message = "Adding new directory for my project",
-                    Mkdir = true,
-                    Password = PasswordTestBox2.Text != "" ? PasswordTestBox2.Text : null,
-                    Path = d,
-                    Revert = true,
-                    TrustServerCert = true,
-                    UpdateBeforeCompleteSync = false,
-                    Url = textBoxDestSVN.Text,
-                    Username = UserNameTextBox2.Text == "" ? null : UserNameTextBox2.Text,
-                    Verbose = true,
+                Cleanup = true,
+                Command = Command.CheckoutUpdate,
+                DeleteUnversioned = true,
+                Message = "Adding new directory for my project",
+                Mkdir = true,
+                Password = metroPasswordTextBox.Text != "" ? metroPasswordTextBox.Text : null,
+                Path = d,
+                Revert = true,
+                TrustServerCert = true,
+                UpdateBeforeCompleteSync = true,
+                Url = metroLabelRepoUrl.Text,
+                Username = metroUserNameTextBox.Text == "" ? null : metroUserNameTextBox.Text,
+                Verbose = true,
 
-                };
-                Utils.SvnUtils.CheckoutUpdate(parameters);
-                Temp.CloneDirectory(d + "/.svn", Destination + "/.svn");
+            };
+            SvnUtils.CheckoutUpdate(parameters);
+            Temp.CloneDirectory(d + "/.svn", Destination + "/.svn");
 
-                parameters.Path = Destination;
-                parameters.Command = Command.CompleteSync;
-                Utils.SvnUtils.CompleteSync(parameters);
-            }
-            else
-            {
-                parameters = new Parameters()
-                {
-                    Cleanup = true,
-                    Command = Command.CompleteSync,
-                    DeleteUnversioned = true,
-                    Message = "Adding new directory for my project",
-                    Mkdir = true,
-                    Password = PasswordTestBox2.Text != "" ? PasswordTestBox2.Text : null,
-                    Path = Destination,
-                    Revert = true,
-                    TrustServerCert = true,
-                    UpdateBeforeCompleteSync = false,
-                    Url = textBoxDestSVN.Text,
-                    Username = UserNameTextBox2.Text == "" ? null : UserNameTextBox2.Text,
-                    Verbose = true,
-
-                };
-                Utils.SvnUtils.CompleteSync(parameters);
-            }
+            parameters.Path = Destination;
+            parameters.Command = Command.CompleteSync;
+            SvnUtils.CompleteSync(parameters);
+            Temp.DeleteDirectory(d);
         }
 
         private void ButtonFrom_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog folderBrowserDialog = FolderFileSelectDialog.GetFolderDialog();
+            FolderBrowserDialog folderBrowserDialog = FolderFileSelectDialog.GetFolderDialog("Source Folder");
 
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
-                textBoxFrom.Text = folderBrowserDialog.SelectedPath;
-                if (Directory.Exists(Destination + "/.svn"))
-                {
-                    using (var client = new SharpSvn.SvnClient())
-                    {
-                        try
-                        {
-                            client.GetInfo(Destination, out SvnInfoEventArgs info);
-                            textBoxDestSVN.Text = info.Uri.ToString();
-                            textBoxDestSVN.ReadOnly = true;
-                            Url = textBoxDestSVN.Text;
-                        }
-                        catch (Exception) { }
-                    }
-                }
+                metroFromTextBox.Text = folderBrowserDialog.SelectedPath;
             }
         }
 
         private void PullAndPushForm_Load(object sender, EventArgs e)
         {
-            textBoxFrom.Text = Destination;
-            if (Directory.Exists(Destination + "/.svn"))
-            {
-                using (var client = new SharpSvn.SvnClient())
+            metroLabelProjectName.Text = Session.CurrentProject.Name;
+            metroLabelRepoUrl.Text = Session.CurrentProject.RepoUrl;
+            Session.context.Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
+                new ComboboxItem()
                 {
-                    try
-                    {
-                        client.GetInfo(Destination, out SvnInfoEventArgs info);
-                        textBoxDestSVN.Text = info.Uri.ToString();
-                       
-                        textBoxDestSVN.ReadOnly = true;
-                        Url = textBoxDestSVN.Text;
-                    }
-                    catch (Exception) { }
-                }
-            }
-        }
-        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
-        private extern static void ReleaseCapture();
-        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
-        private extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
-        private void PanelTitleBar_MouseDown(object sender, MouseEventArgs e)
-        {
-            ReleaseCapture();
-            SendMessage(this.Handle, 0x112, 0xf012, 0);
+                    Text = project.Name,
+                    Value = project.Id
+                })
+            );
         }
 
-        private void buttonSelectedFilesOk_Click(object sender, EventArgs e)
+        private void selectDestination_Click(object sender, EventArgs e)
         {
-            this.Close();
+            FolderBrowserDialog folderBrowserDialog = FolderFileSelectDialog.GetFolderDialog("Destination Folder");
+
+            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            {
+                metroDestinationTextBox.Text = folderBrowserDialog.SelectedPath;
+            }
+        }
+
+        private void iconCloneButton_Click(object sender, EventArgs e)
+        {
+            metroProgressBar1.Visible = true;
+            bgw.DoWork += new DoWorkEventHandler(Bgw_DoClone);
+            bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+            bgw.WorkerReportsProgress = true;
+            bgw.RunWorkerAsync();
+
+            
+        }
+
+        private void Bgw_DoClone(object sender, DoWorkEventArgs e)
+        {
+            Destination = metroDestinationTextBox.Text;
+            Temp temp = new Temp();
+            string d = temp.GetTemporaryDirectory();
+            Parameters parameters = new Parameters()
+            {
+                Cleanup = true,
+                Command = Command.CheckoutUpdate,
+                DeleteUnversioned = true,
+                Message = "Adding new directory for my project",
+                Mkdir = true,
+                Password = metroPasswordTextBox.Text != "" ? metroPasswordTextBox.Text : null,
+                Path = d,
+                Revert = true,
+                TrustServerCert = true,
+                UpdateBeforeCompleteSync = true,
+                Url = metroLabelRepoUrl.Text,
+                Username = metroUserNameTextBox.Text == "" ? null : metroUserNameTextBox.Text,
+                Verbose = true,
+
+            };
+            SvnUtils.CheckoutUpdate(parameters);
+            Temp.CloneDirectory(Path.Combine(d, ".svn"), Path.Combine(Destination, ".svn"));
+
+            parameters.Path = Destination;
+            parameters.Command = Command.CompleteSync;
+            SvnUtils.CompleteSync(parameters);
+            Temp.DeleteDirectory(d);
+        }
+
+        private void Bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            metroProgressBar1.Visible = false;
+        }
+
+        private void metroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
+            Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+
+            metroLabelProjectName.Text = Session.CurrentProject.Name;
+            metroLabelRepoUrl.Text = Session.CurrentProject.RepoUrl;
+        }
+        private void UpdateProgressBar(object sender, SvnProgressEventArgs e)
+        {
+            if (e.TotalProgress != -1)
+            {
+                metroProgressBar1.Maximum = (int)e.TotalProgress;
+            }
+            metroProgressBar1.Value = (int)e.Progress;
+
         }
     }
 }

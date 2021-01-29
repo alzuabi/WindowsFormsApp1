@@ -15,7 +15,7 @@ namespace PullAndClassification
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new PandCForm());
+            Application.Run(new CopyAndClassificationForm());
         }
     }
 }

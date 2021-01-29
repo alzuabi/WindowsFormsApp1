@@ -1,65 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
-using Classifacation.Service;
-using Svn;
+using MetroFramework.Forms;
+using MULTISYSDbContext.Models;
+using MULTISYSUtilities;
+using PullAndClassification.Utils;
+using SharpSvn;
 using Utils;
-
+using static Utils.Temp;
 
 namespace PullAndClassification.Forms
 {
-    public partial class PandCForm : Form
+    public partial class CopyAndClassificationForm : MetroForm
     {
-        private readonly SelectFileForm selectedFilesForm = new SelectFileForm();
-        public List<string> selectedFiles = new List<string>();
-        bool fromSvn = false;
-        public PandCForm()
+        private BackgroundWorker bgw = new BackgroundWorker();
+
+        private SelectFileForm selectedFilesForm;
+        IEnumerable<Temp.FileInfo> filtered = null;
+        private bool fromSvn = false;
+
+        public bool FromSvn { get => fromSvn; set => fromSvn = value; }
+
+        public CopyAndClassificationForm(int currentProjectId = -1)
         {
             InitializeComponent();
-            this.Text = string.Empty;
-            this.ControlBox = false;
-            this.DoubleBuffered = true;
-            this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
+            MaximizeBox = false;
+            ShadowType = MetroFormShadowType.AeroShadow;
+            Session.context = new DatabaseContext();
+            Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.context);
 
+            //if (currentProjectId == -1)
+            //    Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.context);
+            //else
+            //    Session.CurrentProjectId = currentProjectId;
+
+            Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
         }
 
         private void Select_Destination_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog folderBrowserDialog = FolderFileSelectDialog.GetFolderDialog();
-           
+
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
                 destination.Text = folderBrowserDialog.SelectedPath;
             }
-        }
-
-        private void Copy_and_Classification_Click(object sender, EventArgs e)
-        {
-                var classification = Classification.GetInstance();
-                selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles());
-                string d = destination.Text;
-                try
-                {
-
-                    foreach (var file in selectedFiles)
-                    {
-                        classification.CopyAndClassification(file, d);
-                    }
-                    //if (Directory.Exists(s))
-                    //{
-                    //    Directory.Delete(s);
-                    //}
-                }
-                catch (Exception)
-                {
-
-
-                }
         }
 
         private void Svn_CheckedChanged(object sender, EventArgs e)
@@ -89,68 +81,89 @@ namespace PullAndClassification.Forms
 
         }
 
-        private void SelectFiles_Click(object sender, EventArgs e)
+        [Obsolete]
+        private List<Temp.FileInfo> GetFolderFiles(SvnClient client, SvnTarget folderTarget, ref List<Temp.FileInfo> filesFound, SvnListArgs arg, string extention, ProjectFileNameParser projectFileNameParser)
+        {
+            Collection<SvnListEventArgs> listResults;
+
+            if (client.GetList(folderTarget, arg, out listResults))
+            {
+                foreach (SvnListEventArgs item in listResults
+                    .Where(item => !string.IsNullOrEmpty(item.Name) &&
+                    !item.EntryUri.AbsoluteUri.ToString().Equals(folderTarget.TargetName.ToString() + "/")))
+                {
+
+                    if (item.Entry.NodeKind == SvnNodeKind.File)
+                    {
+                        if (Path.GetExtension(item.Name).Equals(extention))
+                            filesFound.Add(
+                                        new Temp.FileInfo
+                                        {
+                                            Name = item.Name,
+                                            Path = item.EntryUri.AbsoluteUri,
+                                            Size = item.Entry.FileSize / 1024,
+                                            ValidFileStrusture = projectFileNameParser.ValiateFileName(item.Name).success,
+                                            PathToClassify = projectFileNameParser.ValiateFileName(item.Name).path
+                                        }
+                                        );
+                    }
+                    else
+                        GetFolderFiles(client, item.EntryUri, ref filesFound, arg, extention, projectFileNameParser);
+
+                }
+            }
+            return filesFound;
+        }
+
+
+        [Obsolete]
+        private IEnumerable<Temp.FileInfo> FilterFiles(bool withHidden, bool fromSvn, string sourceSVN, string sourceLocalFile, string extention)
         {
             try
             {
-                var filtered = GetFilesWithoutHidden(fromSvn, sourceSVN.Text, sourceLocalFile.Text);
+                //var projectFileNameParser = new ProjectFileNameParser(1);
+                ProjectFileNameParser projectFileNameParser = new ProjectFileNameParser(Session.CurrentProjectId);
 
-                selectedFilesForm.FillFilesDataGridView(filtered);
-                selectedFilesForm.ShowDialog();
-            }
-            catch { }
-            }
-
-
-        private IEnumerable<FileInfo> GetFilesWithoutHidden(bool fromSvn, string sourceSVN, string sourceLocalFile) {
-            string s;
-            string d;
-            if (fromSvn)
-            {
-                Temp temp = new Temp();
-                s = sourceSVN;
-                d = temp.GetTemporaryDirectory();
-
-                Parameters parameters = new Parameters()
+                List<Temp.FileInfo> filesFound = new List<Temp.FileInfo>();
+                if (fromSvn)
                 {
-                    Cleanup = true,
-                    Command = Command.CheckoutUpdate,
-                    DeleteUnversioned = true,
-                    Message = "Adding new directory for my project",
-                    Mkdir = true,
-                    Password = PasswordTestBox1.Text != "" ? PasswordTestBox1.Text : null,
-                    Path = d,
-                    Revert = true,
-                    TrustServerCert = true,
-                    UpdateBeforeCompleteSync = false,
-                    Url = s,
-                    Username = UserNameTextBox1.Text == "" ? null : UserNameTextBox1.Text,
-                    Verbose = true,
+                    using (SvnClient svnClient = new SvnClient())
+                    {
 
-                };
-                Utils.SvnUtils.CheckoutUpdate(parameters);
-                s = d;
-            }
-            else
-            {
-                s = sourceLocalFile;
-            }
-            DirectoryInfo directory = new DirectoryInfo(s);
-            FileInfo[] files = directory.GetFiles("*.*", SearchOption.AllDirectories).Where(file => !file.Directory.FullName.Contains(".svn")).ToArray();
-            var filtered = files.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden));
-            return filtered;
+                        SvnListArgs arg = new SvnListArgs
+                        {
+                            RetrieveEntries = SvnDirEntryItems.Size
 
+                        };
+                        GetFolderFiles(svnClient, sourceSVN, ref filesFound, arg, extention, projectFileNameParser);
+
+                    }
+                    return filesFound;
+
+                }
+                else
+                {
+                    DirectoryInfo directory = new DirectoryInfo(sourceLocalFile);
+                    System.IO.FileInfo[] files = directory.GetFiles("*.*", SearchOption.AllDirectories).Where(file => !file.Directory.FullName.Contains(".svn")).ToArray();
+
+                    var filtered = files
+                        .Where(f => f.Attributes.HasFlag(FileAttributes.Hidden).Equals(withHidden))
+                        .Where(f => Path.GetExtension(f.Name).Equals(extention))
+                        .Select(f => new Temp.FileInfo
+                        {
+                            Name = f.Name,
+                            Path = f.FullName,
+                            Size = f.Length / 1024,
+                            ValidFileStrusture = projectFileNameParser.ValiateFileName(f.Name).success,
+                            PathToClassify = projectFileNameParser.ValiateFileName(f.Name).path
+
+                        }).ToList();
+                    return filtered;
+                }
+            }
+            catch (Exception ex) { return null; }
         }
 
-        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
-        private extern static void ReleaseCapture();
-        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
-        private extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
-        private void PanelTitleBar_MouseDown(object sender, MouseEventArgs e)
-        {
-            ReleaseCapture();
-            SendMessage(this.Handle, 0x112, 0xf012, 0);
-        }
 
 
         private void ButtonPullAndPush_Click(object sender, EventArgs e)
@@ -159,28 +172,28 @@ namespace PullAndClassification.Forms
             {
                 Destination = destination.Text
             };
-            
+
             pullAndPushForm.ShowDialog();
         }
 
-    
+
 
         private void Source_Validating(object sender, CancelEventArgs e)
         {
-            //if (string.IsNullOrWhiteSpace(sourceSVN.Text) && string.IsNullOrWhiteSpace(sourceLocalFile.Text))
-            //{
-            //    e.Cancel = true;
-            //    sourceSVN.Focus();
-            //    sourceLocalFile.Focus();
-            //    errorProviderSource.SetError(sourceLocalFile, "Sources should not be left blank!");
-            //    errorProviderSource.SetError(sourceSVN, "Sources should not be left blank!");
-            //}
-            //else
-            //{
-            //    e.Cancel = false;
-            //    errorProviderSource.SetError(sourceLocalFile, "");
-            //    errorProviderSource.SetError(sourceSVN, "");
-            //}
+            if (string.IsNullOrWhiteSpace(metroSourceSVNTextBox.Text) && string.IsNullOrWhiteSpace(sourceLocalFile.Text))
+            {
+                e.Cancel = true;
+                metroSourceSVNTextBox.Focus();
+                sourceLocalFile.Focus();
+                errorProviderSource.SetError(sourceLocalFile, "Sources should not be left blank!");
+                errorProviderSource.SetError(metroSourceSVNTextBox, "Sources should not be left blank!");
+            }
+            else
+            {
+                e.Cancel = false;
+                errorProviderSource.SetError(sourceLocalFile, "");
+                errorProviderSource.SetError(metroSourceSVNTextBox, "");
+            }
 
         }
 
@@ -200,76 +213,74 @@ namespace PullAndClassification.Forms
 
         }
 
-        private void ExitButton_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-
-        }
-
-        private void maximizeButton_Click(object sender, EventArgs e)
-        {
-            if (WindowState == FormWindowState.Normal)
-                WindowState = FormWindowState.Maximized;
-            else
-                WindowState = FormWindowState.Normal;
-        }
-
-        private void minimizeButton_Click(object sender, EventArgs e)
-        {
-            WindowState = FormWindowState.Minimized;
-        }
-
         private void ButtonGetFiles_Click(object sender, EventArgs e)
         {
-            if (checkBoxClassification.Checked)
+            if (ValidateChildren(ValidationConstraints.Enabled))
             {
-                var classification = Classification.GetInstance();
-                selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles());
-                string d = destination.Text;
-                try
-                {
-
-                    foreach (var file in selectedFiles)
-                    {
-                        classification.CopyAndClassification(file, d);
-                    }
-                }
-                catch (Exception)
-                {
-
-
-                }
+                metroProgressBar1.Visible = true;
+                metroLabel2.Visible = true;
+                bgw.DoWork += new DoWorkEventHandler(Bgw_DoWork);
+                bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+                bgw.WorkerReportsProgress = true;
+                bgw.RunWorkerAsync();
             }
+
+        }
+
+        private void Bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            metroProgressBar1.Visible = false;
+            metroLabel2.Visible = false;
+            selectedFilesForm = new SelectFileForm(Session.CurrentProjectId)
+            {
+                CopyAndClassificationForm = this
+            };
+            selectedFilesForm.FillFilesDataGridView(filtered);
+            selectedFilesForm.ShowDialog();
+        }
+
+        [Obsolete]
+        private void Bgw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                filtered = FilterFiles(false, fromSvn, metroSourceSVNTextBox.Text, sourceLocalFile.Text, ".rvt");
+            }
+
+            catch(Exception ex) {
+                
+            }
+
+        }
+
+        private void CopyAndClassificationForm_Load(object sender, EventArgs e)
+        {
+            if(Session.CurrentProjectId==-1)
+                metroLabelProjectName.Text = "Select Project";
             else
-            {
-                if (fromSvn)
+                metroLabelProjectName.Text = Session.CurrentProject.Name;
+
+            Session.context.Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
+                new ComboboxItem()
                 {
-                    Temp temp = new Temp();
-                    string d = temp.GetTemporaryDirectory();
+                    Text = project.Name,
+                    Value = project.Id
+                })
+            );
+        }
 
-                    Parameters parameters = new Parameters()
-                    {
-                        Cleanup = true,
-                        Command = Command.CheckoutUpdate,
-                        DeleteUnversioned = true,
-                        Message = "Adding new directory for my project",
-                        Mkdir = true,
-                        Password = PasswordTestBox1.Text != "" ? PasswordTestBox1.Text : null,
-                        Path = d,
-                        Revert = true,
-                        TrustServerCert = true,
-                        UpdateBeforeCompleteSync = false,
-                        Url = sourceSVN.Text,
-                        Username = UserNameTextBox1.Text == "" ? null : UserNameTextBox1.Text,
-                        Verbose = true,
-
-                    };
-                    Utils.SvnUtils.CheckoutUpdate(parameters);
-                    Temp.CloneDirectory(d, destination.Text);
-                }
-                else
-                Temp.CloneDirectory(sourceLocalFile.Text, destination.Text);
-            }
+        private void MetroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
+            Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            metroLabelProjectName.Text = Session.CurrentProject.Name;
         }
     }
+
+
+
+
+
+
+
 }
