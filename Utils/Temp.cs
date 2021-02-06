@@ -1,5 +1,7 @@
 ﻿using MULTISYSDbContext.Models;
+using MULTISYSUtilities;
 using PullAndClassification.Forms;
+using PullAndClassification.Utils;
 using SharpSvn;
 using System;
 using System.Collections.Generic;
@@ -8,11 +10,15 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Windows.Forms;
+using MetroFramework.Controls;
+using System.ComponentModel;
+using Classification.Utils;
 
 namespace Utils
 {
     public class Temp
     {
+        public  BackgroundWorker bgw = new BackgroundWorker();
         public string GetTemporaryDirectory()
         {
             string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -58,7 +64,7 @@ namespace Utils
                 catch { }
             }
         }
-        public static void CopyAndClassify(
+        public static List<string> CopyAndClassify(
             bool checkBoxClassification,
             SelectFileForm selectedFilesForm,
             string destination,
@@ -69,52 +75,61 @@ namespace Utils
             string sourceLocalFile
             )
         {
+            var log = Log.GetInstance();
+
+            //log.LogToFile("IN CopyAndClassify");
+            List<string> summary = new List<string>();
             List<DataGridViewRow> selectedFiles = new List<DataGridViewRow>();
-
-            if (checkBoxClassification)
+            if (fromSvn)
             {
-                if (fromSvn)
-                {
-                    SvnClient client = new SvnClient();
-                    client.Authentication.DefaultCredentials = new NetworkCredential(UserName, Password);
-                    var classification = Classification.Service.Classification.GetInstance();
-                    selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles(selectedFilesForm.FilesDataGridView));
-                    selectedFilesForm.ClassificationProgressBar.Visible = true;
-                    selectedFilesForm.ClassificationProgressBar.Minimum = 1;
-                    selectedFilesForm.ClassificationProgressBar.Maximum = 100;
-                    selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Count;
+                SvnClient client = new SvnClient();
+                client.Authentication.DefaultCredentials = new NetworkCredential(UserName, Password);
+                var classification = Classification.Service.Classification.GetInstance();
+                selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles(selectedFilesForm.FilesDataGridView));
+                selectedFilesForm.ClassificationProgressBar.Visible = true;
+                selectedFilesForm.ClassificationProgressBar.Minimum = 1;
+                selectedFilesForm.ClassificationProgressBar.Maximum = 100;
+                selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Count;
 
+                selectedFiles.ForEach(row =>
+                {
+                    classification.CopyAndClassification(client, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, fromSvn);
+                    selectedFilesForm.ClassificationProgressBar.PerformStep();
+                    if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
+                        summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
+                    else
+                        summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
+                }
+                );
+            }
+            else
+            {
+                var classification = Classification.Service.Classification.GetInstance();
+                selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles(selectedFilesForm.FilesDataGridView));
+                selectedFilesForm.ClassificationProgressBar.Visible = true;
+                selectedFilesForm.ClassificationProgressBar.Minimum = 1;
+                selectedFilesForm.ClassificationProgressBar.Maximum = 100;
+                selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Count;
+                try
+                {
                     selectedFiles.ForEach(row =>
                     {
-                        classification.CopyAndClassification(client, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, fromSvn);
+                        classification.CopyAndClassification(null, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, false);
                         selectedFilesForm.ClassificationProgressBar.PerformStep();
+                        if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
+                            summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
+                        else
+                            summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
                     }
                     );
+
                 }
-                else
+                catch (Exception)
                 {
-                    var classification = Classification.Service.Classification.GetInstance();
-                    selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles(selectedFilesForm.FilesDataGridView));
-                    selectedFilesForm.ClassificationProgressBar.Visible = true;
-                    selectedFilesForm.ClassificationProgressBar.Minimum = 1;
-                    selectedFilesForm.ClassificationProgressBar.Maximum = 100;
-                    selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Count;
-                    try
-                    {
-                        selectedFiles.ForEach(row =>
-                        {
-                            classification.CopyAndClassification(null, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, false);
-                            selectedFilesForm.ClassificationProgressBar.PerformStep();
-                        }
-                        );
-
-                    }
-                    catch (Exception)
-                    {
-                    }
+                    return null;
                 }
-
             }
+            return summary;
         }
         public class FileStructure
         {
@@ -147,29 +162,6 @@ namespace Utils
             private string lot;
             private DateTime date;
             private int index;
-
-            //public FileStructure GetFileStructure(string fullPath = "", string separator = "")
-            //{
-            //    return new FileStructure(
-            //        RandomString(10),
-            //        RandomString(3),
-            //        RandomDay(),
-            //        random.Next(0, 10)
-            //        );
-            //}
-            //private static Random random = new Random();
-            //public static string RandomString(int length)
-            //{
-            //    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            //    return new string(Enumerable.Repeat(chars, length)
-            //      .Select(s => s[random.Next(s.Length)]).ToArray());
-            //}
-            //DateTime RandomDay()
-            //{
-            //    DateTime start = new DateTime(2019, 1, 1);
-            //    int range = (DateTime.Today - start).Days;
-            //    return start.AddDays(random.Next(range));
-            //}
         }
 
         public class FileInfo
@@ -190,7 +182,8 @@ namespace Utils
         }
         public class PrepareControls
         {
-            public List<MetroFramework.Controls.MetroTextBox> GetAdditionalControls(
+
+            public List<LinkedControls> GetAdditionalControls(
                 List<ProjectFileNameStructure> projectFileNameStructures,
                 int beginX,
                 int beginY,
@@ -198,31 +191,97 @@ namespace Utils
                 Form form)
             {
                 int i = 0;
-                MetroFramework.Controls.MetroTextBox metroTextBox;
-                List<MetroFramework.Controls.MetroTextBox> controls = new List<MetroFramework.Controls.MetroTextBox>();
-                projectFileNameStructures.Where(t => t.CreateFolder).ToList().ForEach(t =>
-                  {
-                      metroTextBox = new MetroFramework.Controls.MetroTextBox
-                      {
-                          Text = t.Name,
-                          Location = new Point(beginX + 50, beginY + (SepDest * ++i)),
-                          Theme = MetroFramework.MetroThemeStyle.Dark,
-                          Style = MetroFramework.MetroColorStyle.Blue,
-                          Height = 20,
-                          Width = 250
-                      };
-                      form.Controls.Add(metroTextBox);
-                      controls.Add(metroTextBox);
+                List<LinkedControls> controls = new List<LinkedControls>();
+                projectFileNameStructures.Where(t => t.CreateFolder).OrderBy(t => t.FolderOrder).ToList().ForEach(t =>
+                    {
+                        if (t.NameType.Equals(FNSTypes.fns_date.Id))
+                        {
 
-                      form.Controls.Add(new MetroFramework.Controls.MetroLabel
-                      {
+                            DateTimePicker dateTimePicker = new MetroDateTime
+                            {
+                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
+                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Style = MetroFramework.MetroColorStyle.Blue,
+                                Height = 20,
+                                Width = 250
+                            };
+                            form.Controls.Add(dateTimePicker);
+                            controls.Add(new LinkedControls(t.Id, dateTimePicker));
+                        }
+                        else if (t.NameType.Equals(FNSTypes.fns_lot.Id))
+                        {
+                            MetroComboBox metroComboBox = new MetroComboBox
+                            {
+                                Text = t.Name,
+                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
+                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Style = MetroFramework.MetroColorStyle.Blue,
+                                Height = 20,
+                                Width = 250
+                            };
+                            Session.context = new DatabaseContext();
+                            Session.context.LOTs.Where(lot => lot.ProjectId == Session.CurrentProjectId).ToList().ForEach(lot => metroComboBox.Items.Add(new ComboboxItem()
+                            {
+                                Text = lot.Name,
+                                Value = lot.Id
+                            })
+                            );
+                            form.Controls.Add(metroComboBox);
+                            controls.Add(new LinkedControls(t.Id,metroComboBox));
+                        }
+                        else if (t.NameType.Equals(FNSTypes.fns_date_index.Id))
+                        {
+                            LinkedControls linkedControls = new LinkedControls();
+                            Tuple<int, Control> tuple;
+                            DateTimePicker dateTimePicker = new MetroDateTime
+                            {
+                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
+                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Style = MetroFramework.MetroColorStyle.Blue,
+                                Height = 20,
+                                Width = 250
+                            };
+                            form.Controls.Add(dateTimePicker);
+                            tuple = Tuple.Create<int, Control>(t.Id, dateTimePicker);
+                            linkedControls.LinkedList.AddFirst(tuple);
+                            MetroTextBox metroTextBox = new MetroTextBox
+                            {
+                                Text = "index",
+                                Location = new Point(beginX + 380, beginY + (SepDest * i)),
+                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Style = MetroFramework.MetroColorStyle.Blue,
+                                Height = 20,
+                                Width = 100
+                            };
+                            form.Controls.Add(metroTextBox);
+                            tuple = Tuple.Create<int, Control>(t.Id, metroTextBox);
+                            linkedControls.LinkedList.AddLast(tuple);
+                            controls.Add(linkedControls);
+                        }
+                        else
+                        {
 
-                          Text = t.Name,
-                          Location = new Point(beginX, beginY + (SepDest * i)),
-                          Theme = MetroFramework.MetroThemeStyle.Dark
+                            MetroTextBox metroTextBox = new MetroTextBox
+                            {
+                                Text = t.Name,
+                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
+                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Style = MetroFramework.MetroColorStyle.Blue,
+                                Height = 20,
+                                Width = 250
+                            };
+                            form.Controls.Add(metroTextBox);
+                            controls.Add(new LinkedControls(t.Id,metroTextBox));
+                        }
+                        form.Controls.Add(new MetroLabel
+                        {
 
-                      });
-                  });
+                            Text = t.Name,
+                            Location = new Point(beginX, beginY + (SepDest * i)),
+                            Theme = MetroFramework.MetroThemeStyle.Dark
+
+                        });
+                    });
                 return controls;
             }
 
@@ -236,6 +295,18 @@ namespace Utils
             {
                 return Text;
             }
+        }
+        public class LinkedControls
+        {
+            private LinkedList<Tuple<int, Control>> linkedList = new LinkedList<Tuple<int, Control>>();
+
+            public LinkedList<Tuple<int, Control>> LinkedList { get => linkedList; set => linkedList = value; }
+
+            public LinkedControls(int id, Control control)
+            {
+                linkedList.AddLast(Tuple.Create(id, control));
+            }
+            public LinkedControls() { }
         }
     }
 }

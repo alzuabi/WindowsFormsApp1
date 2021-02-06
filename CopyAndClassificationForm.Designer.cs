@@ -57,11 +57,13 @@ namespace PullAndClassification.Forms
             this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
             this.metroProjectListComboBox = new MetroFramework.Controls.MetroComboBox();
             this.metroLabel3 = new MetroFramework.Controls.MetroLabel();
+            this.errorProviderSelectProject = new System.Windows.Forms.ErrorProvider(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.errorProviderSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProviderDestination)).BeginInit();
             this.panel4.SuspendLayout();
             this.SVNconf.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProviderSelectProject)).BeginInit();
             this.SuspendLayout();
             // 
             // errorProviderSource
@@ -86,7 +88,7 @@ namespace PullAndClassification.Forms
             this.panel4.Controls.Add(this.groupBox1);
             this.panel4.Location = new System.Drawing.Point(38, 98);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(674, 292);
+            this.panel4.Size = new System.Drawing.Size(627, 292);
             this.panel4.TabIndex = 19;
             // 
             // metroLabel2
@@ -107,7 +109,7 @@ namespace PullAndClassification.Forms
             // 
             // 
             this.destination.CustomButton.Image = null;
-            this.destination.CustomButton.Location = new System.Drawing.Point(294, 1);
+            this.destination.CustomButton.Location = new System.Drawing.Point(276, 1);
             this.destination.CustomButton.Name = "";
             this.destination.CustomButton.Size = new System.Drawing.Size(21, 21);
             this.destination.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
@@ -125,7 +127,7 @@ namespace PullAndClassification.Forms
             this.destination.SelectionLength = 0;
             this.destination.SelectionStart = 0;
             this.destination.ShortcutsEnabled = true;
-            this.destination.Size = new System.Drawing.Size(316, 23);
+            this.destination.Size = new System.Drawing.Size(298, 23);
             this.destination.Style = MetroFramework.MetroColorStyle.Blue;
             this.destination.TabIndex = 38;
             this.destination.Theme = MetroFramework.MetroThemeStyle.Dark;
@@ -140,7 +142,7 @@ namespace PullAndClassification.Forms
             // 
             // 
             this.sourceLocalFile.CustomButton.Image = null;
-            this.sourceLocalFile.CustomButton.Location = new System.Drawing.Point(294, 1);
+            this.sourceLocalFile.CustomButton.Location = new System.Drawing.Point(276, 1);
             this.sourceLocalFile.CustomButton.Name = "";
             this.sourceLocalFile.CustomButton.Size = new System.Drawing.Size(21, 21);
             this.sourceLocalFile.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
@@ -158,7 +160,7 @@ namespace PullAndClassification.Forms
             this.sourceLocalFile.SelectionLength = 0;
             this.sourceLocalFile.SelectionStart = 0;
             this.sourceLocalFile.ShortcutsEnabled = true;
-            this.sourceLocalFile.Size = new System.Drawing.Size(316, 23);
+            this.sourceLocalFile.Size = new System.Drawing.Size(298, 23);
             this.sourceLocalFile.Style = MetroFramework.MetroColorStyle.Blue;
             this.sourceLocalFile.TabIndex = 37;
             this.sourceLocalFile.Theme = MetroFramework.MetroThemeStyle.Dark;
@@ -170,10 +172,10 @@ namespace PullAndClassification.Forms
             // 
             // metroProgressBar1
             // 
-            this.metroProgressBar1.Location = new System.Drawing.Point(92, 238);
+            this.metroProgressBar1.Location = new System.Drawing.Point(111, 238);
             this.metroProgressBar1.Name = "metroProgressBar1";
             this.metroProgressBar1.ProgressBarStyle = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.metroProgressBar1.Size = new System.Drawing.Size(575, 5);
+            this.metroProgressBar1.Size = new System.Drawing.Size(492, 5);
             this.metroProgressBar1.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroProgressBar1.TabIndex = 33;
             this.metroProgressBar1.Theme = MetroFramework.MetroThemeStyle.Dark;
@@ -264,7 +266,7 @@ namespace PullAndClassification.Forms
             this.SVNconf.ForeColor = System.Drawing.Color.Gainsboro;
             this.SVNconf.Location = new System.Drawing.Point(126, 12);
             this.SVNconf.Name = "SVNconf";
-            this.SVNconf.Size = new System.Drawing.Size(534, 88);
+            this.SVNconf.Size = new System.Drawing.Size(477, 88);
             this.SVNconf.TabIndex = 23;
             this.SVNconf.TabStop = false;
             this.SVNconf.Text = "SVN";
@@ -285,7 +287,7 @@ namespace PullAndClassification.Forms
             this.metroPasswordTextBox.CustomButton.UseSelectable = true;
             this.metroPasswordTextBox.CustomButton.Visible = false;
             this.metroPasswordTextBox.Lines = new string[0];
-            this.metroPasswordTextBox.Location = new System.Drawing.Point(368, 55);
+            this.metroPasswordTextBox.Location = new System.Drawing.Point(326, 53);
             this.metroPasswordTextBox.MaxLength = 32767;
             this.metroPasswordTextBox.Name = "metroPasswordTextBox";
             this.metroPasswordTextBox.PasswordChar = '●';
@@ -318,7 +320,7 @@ namespace PullAndClassification.Forms
             this.metroUsernameTextBox.CustomButton.UseSelectable = true;
             this.metroUsernameTextBox.CustomButton.Visible = false;
             this.metroUsernameTextBox.Lines = new string[0];
-            this.metroUsernameTextBox.Location = new System.Drawing.Point(118, 55);
+            this.metroUsernameTextBox.Location = new System.Drawing.Point(76, 53);
             this.metroUsernameTextBox.MaxLength = 32767;
             this.metroUsernameTextBox.Name = "metroUsernameTextBox";
             this.metroUsernameTextBox.PasswordChar = '\0';
@@ -350,7 +352,7 @@ namespace PullAndClassification.Forms
             this.metroSourceSVNTextBox.CustomButton.UseSelectable = true;
             this.metroSourceSVNTextBox.CustomButton.Visible = false;
             this.metroSourceSVNTextBox.Lines = new string[0];
-            this.metroSourceSVNTextBox.Location = new System.Drawing.Point(118, 17);
+            this.metroSourceSVNTextBox.Location = new System.Drawing.Point(76, 15);
             this.metroSourceSVNTextBox.MaxLength = 32767;
             this.metroSourceSVNTextBox.Name = "metroSourceSVNTextBox";
             this.metroSourceSVNTextBox.PasswordChar = '\0';
@@ -373,7 +375,7 @@ namespace PullAndClassification.Forms
             this.url.AutoSize = true;
             this.url.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.url.ForeColor = System.Drawing.Color.Gainsboro;
-            this.url.Location = new System.Drawing.Point(86, 17);
+            this.url.Location = new System.Drawing.Point(44, 17);
             this.url.Name = "url";
             this.url.Size = new System.Drawing.Size(26, 13);
             this.url.TabIndex = 12;
@@ -383,7 +385,7 @@ namespace PullAndClassification.Forms
             // 
             this.Password.AutoSize = true;
             this.Password.ForeColor = System.Drawing.Color.Gainsboro;
-            this.Password.Location = new System.Drawing.Point(309, 59);
+            this.Password.Location = new System.Drawing.Point(267, 57);
             this.Password.Name = "Password";
             this.Password.Size = new System.Drawing.Size(53, 13);
             this.Password.TabIndex = 10;
@@ -393,7 +395,7 @@ namespace PullAndClassification.Forms
             // 
             this.UserName.AutoSize = true;
             this.UserName.ForeColor = System.Drawing.Color.Gainsboro;
-            this.UserName.Location = new System.Drawing.Point(53, 59);
+            this.UserName.Location = new System.Drawing.Point(11, 57);
             this.UserName.Name = "UserName";
             this.UserName.Size = new System.Drawing.Size(59, 13);
             this.UserName.TabIndex = 8;
@@ -459,20 +461,20 @@ namespace PullAndClassification.Forms
             this.buttonPullAndPush.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.buttonPullAndPush.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.buttonPullAndPush.UseVisualStyleBackColor = true;
-            this.buttonPullAndPush.Visible = false;
             this.buttonPullAndPush.Click += new System.EventHandler(this.ButtonPullAndPush_Click);
             // 
             // metroLabelProjectName
             // 
             this.metroLabelProjectName.AutoSize = true;
             this.metroLabelProjectName.FontWeight = MetroFramework.MetroLabelWeight.Bold;
-            this.metroLabelProjectName.Location = new System.Drawing.Point(428, 29);
+            this.metroLabelProjectName.Location = new System.Drawing.Point(281, 67);
             this.metroLabelProjectName.Name = "metroLabelProjectName";
             this.metroLabelProjectName.Size = new System.Drawing.Size(94, 19);
             this.metroLabelProjectName.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroLabelProjectName.TabIndex = 20;
             this.metroLabelProjectName.Text = "metroLabel1";
             this.metroLabelProjectName.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroLabelProjectName.Visible = false;
             // 
             // metroLabel1
             // 
@@ -490,14 +492,16 @@ namespace PullAndClassification.Forms
             this.metroProjectListComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.metroProjectListComboBox.FormattingEnabled = true;
             this.metroProjectListComboBox.ItemHeight = 23;
-            this.metroProjectListComboBox.Location = new System.Drawing.Point(523, 63);
+            this.metroProjectListComboBox.Location = new System.Drawing.Point(428, 26);
             this.metroProjectListComboBox.Name = "metroProjectListComboBox";
+            this.metroProjectListComboBox.PromptText = "Select Project";
             this.metroProjectListComboBox.Size = new System.Drawing.Size(189, 29);
             this.metroProjectListComboBox.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroProjectListComboBox.TabIndex = 35;
             this.metroProjectListComboBox.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroProjectListComboBox.UseSelectable = true;
             this.metroProjectListComboBox.SelectedIndexChanged += new System.EventHandler(this.MetroProjectListComboBox_SelectedIndexChanged);
+            this.metroProjectListComboBox.Validating += new System.ComponentModel.CancelEventHandler(this.metroProjectListComboBox_Validating);
             // 
             // metroLabel3
             // 
@@ -509,6 +513,11 @@ namespace PullAndClassification.Forms
             this.metroLabel3.TabIndex = 36;
             this.metroLabel3.Text = "Please Select Project: ";
             this.metroLabel3.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroLabel3.Visible = false;
+            // 
+            // errorProviderSelectProject
+            // 
+            this.errorProviderSelectProject.ContainerControl = this;
             // 
             // CopyAndClassificationForm
             // 
@@ -516,7 +525,7 @@ namespace PullAndClassification.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
-            this.ClientSize = new System.Drawing.Size(754, 424);
+            this.ClientSize = new System.Drawing.Size(709, 424);
             this.Controls.Add(this.metroLabel3);
             this.Controls.Add(this.metroProjectListComboBox);
             this.Controls.Add(this.metroLabel1);
@@ -537,6 +546,7 @@ namespace PullAndClassification.Forms
             this.SVNconf.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProviderSelectProject)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -573,6 +583,7 @@ namespace PullAndClassification.Forms
         private MetroFramework.Controls.MetroLabel metroLabel1;
         private MetroFramework.Controls.MetroComboBox metroProjectListComboBox;
         private MetroFramework.Controls.MetroLabel metroLabel3;
+        private ErrorProvider errorProviderSelectProject;
     }
 }
 

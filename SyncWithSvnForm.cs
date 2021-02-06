@@ -2,7 +2,6 @@
 using MULTISYSDbContext.Models;
 using PullAndClassification.Utils;
 using SharpSvn;
-//using Svn;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -16,31 +15,34 @@ namespace PullAndClassification.Forms
 {
     public partial class SyncWithSvnForm : MetroForm
     {
-        private BackgroundWorker bgw = new BackgroundWorker();
+       
         public string Destination { get; set; }
         public string Url { get; set; }
-        public SyncWithSvnForm(int currentProjectId = -1)
+        public SyncWithSvnForm(/*int currentProjectId = -1*/)
         {
             InitializeComponent();
             MaximizeBox = false;
             ShadowType = MetroFormShadowType.AeroShadow;
             Session.context = new DatabaseContext();
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.context);
-            //if (currentProjectId == -1)
-            //    Session.CurrentProjectId = Session.DefaultProjectId;
-            //else
-            //    Session.CurrentProjectId = currentProjectId;
-
             Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            //bgw.WorkerReportsProgress = true;
+            //bgw.WorkerSupportsCancellation = true;
         }
 
         private void PushToSvn_Click(object sender, EventArgs e)
         {
+            //if (bgw.IsBusy != true)
+            //{
+            BackgroundWorker bgw = new BackgroundWorker();
             metroProgressBar1.Visible = true;
-            bgw.DoWork += new DoWorkEventHandler(Bgw_DoPush);
-            bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
-            bgw.WorkerReportsProgress = true;
-            bgw.RunWorkerAsync();
+                bgw.DoWork += new DoWorkEventHandler(Bgw_DoPush);
+                bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+                bgw.WorkerReportsProgress = true;
+                bgw.RunWorkerAsync();
+            //}
+          
+            //bgw.RunWorkerAsync();
            
 
         }
@@ -70,7 +72,9 @@ namespace PullAndClassification.Forms
 
             };
             SvnUtils.CheckoutUpdate(parameters);
-            Temp.CloneDirectory(d + "/.svn", Destination + "/.svn");
+            Temp.CloneDirectory(Path.Combine(d, ".svn"), Path.Combine(Destination, ".svn"));
+
+            //Temp.CloneDirectory(d + "/.svn", Destination + "/.svn");
 
             parameters.Path = Destination;
             parameters.Command = Command.CompleteSync;
@@ -90,18 +94,19 @@ namespace PullAndClassification.Forms
 
         private void PullAndPushForm_Load(object sender, EventArgs e)
         {
-            metroLabelProjectName.Text = Session.CurrentProject.Name;
-            metroLabelRepoUrl.Text = Session.CurrentProject.RepoUrl;
-            Session.context.Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
+                Session.context.Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
                 new ComboboxItem()
                 {
                     Text = project.Name,
                     Value = project.Id
                 })
             );
+            if (Session.CurrentProjectId != -1)
+
+                metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
         }
 
-        private void selectDestination_Click(object sender, EventArgs e)
+        private void SelectDestination_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog folderBrowserDialog = FolderFileSelectDialog.GetFolderDialog("Destination Folder");
 
@@ -113,11 +118,15 @@ namespace PullAndClassification.Forms
 
         private void iconCloneButton_Click(object sender, EventArgs e)
         {
+            //if (bgw.IsBusy != true)
+            //{
+            BackgroundWorker bgw = new BackgroundWorker();
             metroProgressBar1.Visible = true;
-            bgw.DoWork += new DoWorkEventHandler(Bgw_DoClone);
-            bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
-            bgw.WorkerReportsProgress = true;
-            bgw.RunWorkerAsync();
+                bgw.DoWork += new DoWorkEventHandler(Bgw_DoClone);
+                bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+                bgw.WorkerReportsProgress = true;
+                bgw.RunWorkerAsync();
+            //}
 
             
         }
@@ -155,15 +164,23 @@ namespace PullAndClassification.Forms
 
         private void Bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            metroProgressBar1.Visible = false;
+
+            //if (bgw.WorkerSupportsCancellation == true)
+            //{
+                metroProgressBar1.Visible = false;
+            //    bgw.CancelAsync();
+            //}
+               
         }
 
-        private void metroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void MetroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+
             Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
             Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
-
             metroLabelProjectName.Text = Session.CurrentProject.Name;
+            UserSetting.setCurrentProjectId(Session.context, Session.CurrentProjectId);
+
             metroLabelRepoUrl.Text = Session.CurrentProject.RepoUrl;
         }
         private void UpdateProgressBar(object sender, SvnProgressEventArgs e)
@@ -172,7 +189,6 @@ namespace PullAndClassification.Forms
             {
                 metroProgressBar1.Maximum = (int)e.TotalProgress;
             }
-            metroProgressBar1.Value = (int)e.Progress;
 
         }
     }

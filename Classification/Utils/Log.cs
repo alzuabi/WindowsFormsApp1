@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,17 +36,19 @@ namespace Classification.Utils
 
         public void LogToFile(string Message)
         {
-            string path = AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\Files";
+            //string path = AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\Files";
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../Logs/Files");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
-            string filepath = AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\Files\\ServiceLog_" + DateTime.Now.Date.ToShortDateString().Replace('/', '_') + ".txt";
+            string filepath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../Logs/Files/ServiceLog_" + DateTime.Now.Date.ToShortDateString().Replace('/', '_') + ".txt");
+            //string filepath = AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\Files\\ServiceLog_" + DateTime.Now.Date.ToShortDateString().Replace('/', '_') + ".txt";
             if (!File.Exists(filepath))
             {
                 // Create a file to write to.   
                 using (StreamWriter sw = File.CreateText(filepath))
-                {
+                {   
                     sw.WriteLine(Message);
                 }
             }

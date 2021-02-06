@@ -1,4 +1,5 @@
-﻿using PullAndClassification.Utils;
+﻿using PullAndClassification.Forms;
+using PullAndClassification.Utils;
 using SharpSvn;
 using System;
 using System.Collections.ObjectModel;
@@ -14,7 +15,7 @@ namespace Utils
         {
             using (var client = new SvnClient())
             {
-                //client.Progress += new EventHandler<SvnProgressEventArgs>(client_Progress);
+                client.Progress += new EventHandler<SvnProgressEventArgs>(client_Progress);
                 SetUpClient(parameters, client);
 
                 var target = SvnTarget.FromString(parameters.Path);
@@ -133,6 +134,7 @@ namespace Utils
         private static void client_Progress(object sender, SvnProgressEventArgs e)
         {
             Console.WriteLine("Complete {0} {1}", e.Progress/ 1024, e.TotalProgress);
+            //SyncWithSvnForm.metroLabel5.Text = (e.Progress / 1024).ToString();
         }
 
         private static bool UrlsMatch(string url1, string url2)

@@ -14,11 +14,14 @@ namespace PullAndClassification.Utils
         private static Project currentProject;
         public static Project CurrentProject { get => currentProject; set => currentProject = value; }
         public static int CurrentProjectId { get => currentProjectId; set => currentProjectId = value; }
+        public static UserSetting UserSetting { get => userSetting; set => userSetting = value; }
+
         //public static int? DefaultProjectId { get => defaultProjectId; set => defaultProjectId = value; }
 
         private static int currentProjectId = UserSetting.getCurrentProjectId(context);
 
 
         //private static int? defaultProjectId = context.Projects.OrderByDescending(p => p.CreatedAt).FirstOrDefault()?.Id;
+        private static UserSetting userSetting;
     }
 }

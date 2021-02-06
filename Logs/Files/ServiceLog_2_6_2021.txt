@@ -1,0 +1,28 @@
+IN Classification_Click
+IN CopyAndClassify
+IN else
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\Project_qwe_ARC_0_2020-01-09.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\A_B_D.rvt' already exists.
+IN else
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\Project_qwe_ARC_0_2020-01-09.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\A_B_D.rvt' already exists.

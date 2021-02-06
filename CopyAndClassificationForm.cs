@@ -20,7 +20,6 @@ namespace PullAndClassification.Forms
 {
     public partial class CopyAndClassificationForm : MetroForm
     {
-        private BackgroundWorker bgw = new BackgroundWorker();
 
         private SelectFileForm selectedFilesForm;
         IEnumerable<Temp.FileInfo> filtered = null;
@@ -28,7 +27,7 @@ namespace PullAndClassification.Forms
 
         public bool FromSvn { get => fromSvn; set => fromSvn = value; }
 
-        public CopyAndClassificationForm(int currentProjectId = -1)
+        public CopyAndClassificationForm()
         {
             InitializeComponent();
             MaximizeBox = false;
@@ -36,11 +35,8 @@ namespace PullAndClassification.Forms
             Session.context = new DatabaseContext();
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.context);
 
-            //if (currentProjectId == -1)
-            //    Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.context);
-            //else
-            //    Session.CurrentProjectId = currentProjectId;
-
+            //bgw.WorkerReportsProgress = true;
+            //bgw.WorkerSupportsCancellation = true;
             Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
         }
 
@@ -96,8 +92,7 @@ namespace PullAndClassification.Forms
                     if (item.Entry.NodeKind == SvnNodeKind.File)
                     {
                         if (Path.GetExtension(item.Name).Equals(extention))
-                            filesFound.Add(
-                                        new Temp.FileInfo
+                            filesFound.Add(new Temp.FileInfo
                                         {
                                             Name = item.Name,
                                             Path = item.EntryUri.AbsoluteUri,
@@ -121,8 +116,8 @@ namespace PullAndClassification.Forms
         {
             try
             {
-                //var projectFileNameParser = new ProjectFileNameParser(1);
                 ProjectFileNameParser projectFileNameParser = new ProjectFileNameParser(Session.CurrentProjectId);
+                //ParserResult parserResult = projectFileNameParser.ValiateFileName("Project_qwe_ARC_0_2020-01-09.rvt");
 
                 List<Temp.FileInfo> filesFound = new List<Temp.FileInfo>();
                 if (fromSvn)
@@ -155,7 +150,7 @@ namespace PullAndClassification.Forms
                             Path = f.FullName,
                             Size = f.Length / 1024,
                             ValidFileStrusture = projectFileNameParser.ValiateFileName(f.Name).success,
-                            PathToClassify = projectFileNameParser.ValiateFileName(f.Name).path
+                            PathToClassify = projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path
 
                         }).ToList();
                     return filtered;
@@ -211,32 +206,61 @@ namespace PullAndClassification.Forms
                 errorProviderSource.SetError(destination, "");
             }
 
+
+        }
+
+        private void metroProjectListComboBox_Validating(object sender, CancelEventArgs e)
+        {
+            if (metroProjectListComboBox.SelectedIndex == -1)
+            {
+                e.Cancel = true;
+                metroProjectListComboBox.Focus();
+                errorProviderSelectProject.SetError(metroProjectListComboBox, "Should select project!");
+            }
+            else
+            {
+                e.Cancel = false;
+                errorProviderSelectProject.SetError(metroProjectListComboBox, "");
+            }
         }
 
         private void ButtonGetFiles_Click(object sender, EventArgs e)
         {
             if (ValidateChildren(ValidationConstraints.Enabled))
             {
+                //if (bgw.IsBusy != true)
+                //{
+                BackgroundWorker bgw = new BackgroundWorker();
                 metroProgressBar1.Visible = true;
-                metroLabel2.Visible = true;
-                bgw.DoWork += new DoWorkEventHandler(Bgw_DoWork);
-                bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
-                bgw.WorkerReportsProgress = true;
-                bgw.RunWorkerAsync();
+                    metroLabel2.Visible = true;
+                    bgw.DoWork += new DoWorkEventHandler(Bgw_DoWork);
+                    bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+
+                    bgw.WorkerReportsProgress = true;
+                    bgw.RunWorkerAsync();
+                //}
+               
             }
 
         }
 
         private void Bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            metroProgressBar1.Visible = false;
-            metroLabel2.Visible = false;
-            selectedFilesForm = new SelectFileForm(Session.CurrentProjectId)
-            {
-                CopyAndClassificationForm = this
-            };
-            selectedFilesForm.FillFilesDataGridView(filtered);
-            selectedFilesForm.ShowDialog();
+            //if (bgw.WorkerSupportsCancellation == true)
+            //{
+                
+                metroProgressBar1.Visible = false;
+                metroLabel2.Visible = false;
+                selectedFilesForm = new SelectFileForm()
+                {
+                    CopyAndClassificationForm = this
+                };
+                selectedFilesForm.FillFilesDataGridView(filtered);
+                //bgw.RunWorkerCompleted -= new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+                selectedFilesForm.ShowDialog();
+                //bgw.CancelAsync();
+
+            //}
         }
 
         [Obsolete]
@@ -255,18 +279,25 @@ namespace PullAndClassification.Forms
 
         private void CopyAndClassificationForm_Load(object sender, EventArgs e)
         {
-            if(Session.CurrentProjectId==-1)
-                metroLabelProjectName.Text = "Select Project";
-            else
-                metroLabelProjectName.Text = Session.CurrentProject.Name;
-
+            metroProjectListComboBox.DropDownStyle = ComboBoxStyle.DropDown;
             Session.context.Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
-                new ComboboxItem()
-                {
-                    Text = project.Name,
-                    Value = project.Id
-                })
-            );
+    new ComboboxItem()
+    {
+        Text = project.Name,
+        Value = project.Id
+    })
+);
+            if (Session.CurrentProjectId != -1)
+            //{
+            //    metroProjectListComboBox.Text = "-select-";
+            //    //metroProjectListComboBox.SelectedText = "Select";
+            //}
+            ////metroLabelProjectName.Text = "Select Project";
+            //else
+                metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
+                //metroLabelProjectName.Text = Session.CurrentProject.Name;
+
+
         }
 
         private void MetroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -274,13 +305,9 @@ namespace PullAndClassification.Forms
             Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
             Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
             metroLabelProjectName.Text = Session.CurrentProject.Name;
+            UserSetting.setCurrentProjectId(Session.context, Session.CurrentProjectId);
         }
+
+       
     }
-
-
-
-
-
-
-
 }

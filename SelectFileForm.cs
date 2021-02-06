@@ -1,17 +1,15 @@
-﻿using MetroFramework.Controls;
+﻿using Classification.Utils;
 using MetroFramework.Forms;
 using MULTISYSDbContext.Models;
+using MULTISYSUtilities;
 using PullAndClassification.Utils;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Utils;
 using static Utils.Temp;
@@ -21,28 +19,23 @@ namespace PullAndClassification.Forms
     public partial class SelectFileForm : MetroForm
     {
         private int indexRow;
-        //private static Random random = new Random();
         private CopyAndClassificationForm copyAndClassificationForm;
-        private List<MetroTextBox> controls;
+        private List<LinkedControls> controls;
         public CopyAndClassificationForm CopyAndClassificationForm
         {
             get { return copyAndClassificationForm; }
             set { copyAndClassificationForm = value; }
         }
 
-        public List<MetroTextBox> Controls1 { get => controls; set => controls = value; }
+        public List<LinkedControls> Controls1 { get => controls; set => controls = value; }
 
-        public SelectFileForm(int currentProjectId = -1)
+        public SelectFileForm()
         {
             InitializeComponent();
             MaximizeBox = false;
             ShadowType = MetroFormShadowType.AeroShadow;
             Session.context = new DatabaseContext();
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.context);
-            //if (currentProjectId == -1)
-            //    Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.context);
-            //else
-            //    Session.CurrentProjectId = currentProjectId;
 
             Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
         }
@@ -80,50 +73,25 @@ namespace PullAndClassification.Forms
                     t.ValidFileStrusture, t.PathToClassify);
 
             }
-
             filesDataGridView.DataSource = dtFiles;
-
             filesDataGridView.Columns["_fullPath"].Visible = false;
-
-            DataGridViewButtonColumn btn = new DataGridViewButtonColumn();
-            //filesDataGridView.Columns.
-            //filesDataGridView.Columns.Add(btn);
-            btn.HeaderText = "";
-            btn.Text = "Modify";
-            btn.Name = "btn";
-            btn.UseColumnTextForButtonValue = true;
 
         }
         private void FilesDataGridView_ModifyCellClick(object sender, DataGridViewCellEventArgs e)
         {
-            //FileStructure fileStructure = new FileStructure().GetFileStructure();
-
-            //metroProjectNameTextBox.Text = fileStructure.ProjectName;
-            //metroLotTextBox.Text = fileStructure.Lot;
-            //metroProjectDateTime.Value = fileStructure.Date;
-            //metroIndexTextBox.Text = fileStructure.Index.ToString();
-
             indexRow = e.RowIndex;
-
-            //FileStructureForm fileStructureForm = new FileStructureForm(new FileStructure(), e.RowIndex);
-            //fileStructureForm.ShowDialog();
-            //MessageBox.Show((e.RowIndex + 1) + "  Row  " + (e.ColumnIndex + 1) + "  Column button clicked ");
         }
+
         public List<DataGridViewRow> GetSelectedFiles(DataGridView dataGridView) => dataGridView.Rows.OfType<DataGridViewRow>()
                 .Where(s => s.Cells["Selected"].Value.Equals(true))
-                //.Select(s => s.Cells["_fullPath"].Value.ToString())
                 .ToList();
 
 
-        private void ButtonSelectedFilesOk_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
         private void Classification_Click(object sender, EventArgs e)
         {
+
             classificationProgressBar.Visible = true;
-            CopyAndClassify(
+            List<string> summary = CopyAndClassify(
                 true,
                 this,
                 copyAndClassificationForm.Destination.Text,
@@ -133,57 +101,77 @@ namespace PullAndClassification.Forms
                 copyAndClassificationForm.MetroSourceSVNTextBox.Text,
                 copyAndClassificationForm.SourceLocalFile.Text
                 );
-
-            //Db.context.LOTs.ToList().ForEach(r => Console.WriteLine(r.ToString()));
-            //context.Projects.ToList().ForEach(r => Console.WriteLine(r.ToString()));
-
+            SummaryMessageBox(summary.Aggregate(new StringBuilder(),
+                                               (sb, val) => sb.AppendLine(val),
+                                               sb => sb.ToString()), "Summary");
         }
-        //public bool CheckFileStructure(string fileName)
-        //{
-        //    return NextBoolean();
-        //}
-        //public bool NextBoolean()
-        //{
+        public void SummaryMessageBox(string message, string caption)
+        {
+            MessageBox.Show(new Form { Size = new Size(600, 800) }, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
 
-        //    return random.Next(0, 2) > 0;
-        //}
-        //[DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
-        //private extern static void ReleaseCapture();
-        //[DllImport("user32.DLL", EntryPoint = "SendMessage")]
-        //private extern static void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
-        //private void PanelTitleBar_MouseDown(object sender, MouseEventArgs e)
-        //{
-        //    ReleaseCapture();
-        //    SendMessage(Handle, 0x112, 0xf012, 0);
-        //}
 
         private void FilesDataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-            {
+        {
             foreach (DataGridViewRow row in FilesDataGridView.Rows)
-                if (!(bool)row.Cells["fileStrusture"].Value)
+                if ((bool)row.Cells["fileStrusture"].Value)
                 {
-                    row.DefaultCellStyle.BackColor = Color.MediumVioletRed;
+                    row.DefaultCellStyle.BackColor = Color.FromArgb(0, 198, 247);
                     row.DefaultCellStyle.ForeColor = Color.White;
                 }
+                else
+                {
+                    row.DefaultCellStyle.BackColor = Color.Red;
+                    row.DefaultCellStyle.ForeColor = Color.White;
+                }
+        }
+
+
+
+        private void SelectFileForm_Load(object sender, EventArgs e)
+        {
+            metroLabelProjectName.Text = Session.CurrentProject.Name;
+            Controls1 = new PrepareControls().GetAdditionalControls(
+               Session.CurrentProject.ProjectFileNameStructures.ToList(),
+               778,
+               20,
+               60,
+               this);
+
         }
 
         private void MetroUpdateProjectButton_Click(object sender, EventArgs e)
         {
             DataGridViewRow newDataRow = filesDataGridView.Rows[indexRow];
-            newDataRow.Cells["ClassificationPath"].Value = Path.Combine(Controls1.Select(c => c.Text).ToArray());
-            //newDataRow.Cells["Name"].Value = metroProjectNameTextBox.Text + metroLotTextBox.Text + metroProjectDateTime.Value + metroIndexTextBox.Text;
-        }
+            newDataRow.Cells["ClassificationPath"].Value = Path.Combine(Controls1.Select(linkedControls =>
+            {
+                string text = "";
+                foreach (Tuple<int, Control> tubleControl in linkedControls.LinkedList)
 
-        private void SelectFileForm_Load(object sender, EventArgs e)
-        {
-            metroLabelProjectName.Text = Session.CurrentProject.Name;
-             Controls1 = new PrepareControls().GetAdditionalControls(
-                Session.CurrentProject.ProjectFileNameStructures.ToList(),
-                778,
-                20,
-                60,
-                this);
-            //controls.ForEach(c => Controls.Add(c));
+                    switch (tubleControl.Item2)
+                    {
+                        
+                        case DateTimePicker picker:
+                            {
+                                var projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures.Where(s => s.Id == tubleControl.Item1).FirstOrDefault();
+                                if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date.Id))
+                                {
+                                    text += picker.Value.ToString(projectFileNameStructures.Description);
+                                    break;
+                                }
+                                else if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date_index.Id))
+                                {
+                                    text += picker.Value.ToString(projectFileNameStructures.Description)+"_";
+                                }
+                                break;
+                            }
+                        default:
+                            text += tubleControl.Item2.Text;
+                            break;
+                    }
+                return text;
+            }
+            ).ToArray());
         }
     }
 }

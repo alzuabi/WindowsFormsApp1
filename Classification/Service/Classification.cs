@@ -55,6 +55,8 @@ namespace Classification.Service
                 }
                 else
                 {
+                    log.LogToFile("IN CopyAndClassification fun");
+
                     string dest = Path.Combine(dir, d);
                     Directory.CreateDirectory(dest);
                     dest = Path.Combine(dest, Path.GetFileName(s));
