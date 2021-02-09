@@ -1,0 +1,116 @@
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\A_B_D.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-8\DaPe_In8ex_index\A_B_D.rvt ,at 2/8/2021 5:56:19 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-8\DaPe_In8ex_index\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\E_F_G.rvt ,to C:\Users\ASUS\Desktop\zzz\E_F_G.rvt ,at 2/8/2021 6:00:07 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\Project_qwe_ARC_0_2020-01-09.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\LOT\Index\Date\A_B_D.rvt ,to C:\Users\ASUS\Desktop\zzz\A_B_D.rvt ,at 2/8/2021 6:00:07 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\A_B_D.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-8\DaPe_In8ex_index\A_B_D.rvt ,at 2/8/2021 6:01:50 PM
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\E_F_G.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\PLB\Index\2021-2-8\DaPe_In8ex_index\E_F_G.rvt ,at 2/8/2021 6:02:07 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\ARC\0\2020-01-09\Project_qwe_ARC_0_2020-01-09.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\PLB\Index\2021-2-8\DaPe_In8ex_1\Project_qwe_ARC_0_2020-01-09.rvt ,at 2/8/2021 6:02:22 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\LOT\Index\123\E_F_G.rvt ,to C:\Users\ASUS\Desktop\zzz\E_F_G.rvt ,at 2/8/2021 6:02:22 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\LOT\Index\Date\A_B_D.rvt ,to C:\Users\ASUS\Desktop\zzz\A_B_D.rvt ,at 2/8/2021 6:02:22 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+IN CopyAndClassification fun
+An error occurred while starting a transaction on the provider connection. See the inner exception for details.
+IN CopyAndClassification fun
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-8\DaPe_In8ex_index\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\ARC\0\2020-01-09\Project_qwe_ARC_0_2020-01-09.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\ARC\Index\2021-2-8\DaPe_In8ex_index\Project_qwe_ARC_0_2020-01-09.rvt ,at 2/8/2021 6:09:53 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\A_B_D.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-8\DaPe_In8ex_index\A_B_D.rvt ,at 2/8/2021 6:10:56 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-8\DaPe_In8ex_index\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\ARC\0\2020-01-09\Project_qwe_ARC_0_2020-01-09.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\STR\Index\2021-2-8\DaPe_In8ex_index\Project_qwe_ARC_0_2020-01-09.rvt ,at 2/8/2021 6:13:22 PM
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-8\DaPe_In8ex_index\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\ARC\0\2020-01-09\Project_qwe_ARC_0_2020-01-09.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-22\DaPe_In8ex_index\Project_qwe_ARC_0_2020-01-09.rvt ,at 2/8/2021 6:15:23 PM
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\A_B_D.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\ARC\Index\2021-2-8\DaPe_In8ex_index\A_B_D.rvt ,at 2/8/2021 8:31:20 PM
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\ARC\0\2020-01-09\Project_qwe_ARC_0_2020-01-09.rvt ,to C:\Users\ASUS\Desktop\zzz\Project_qwe_ARC_0_2020-01-09.rvt ,at 2/8/2021 8:31:20 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\LOT\Index\8787\E_F_G.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\ARC\Index\2021-2-8\DaPe_In8ex_index\E_F_G.rvt ,at 2/8/2021 8:31:21 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-8\DaPe_In8ex_index\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\Project_qwe_ARC_0_2020-01-09.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\A_B_D.rvt' already exists.

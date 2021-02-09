@@ -32,12 +32,12 @@ namespace PullAndClassification.Forms
             InitializeComponent();
             MaximizeBox = false;
             ShadowType = MetroFormShadowType.AeroShadow;
-            Session.context = new DatabaseContext();
-            Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.context);
+            //Session.context = new DatabaseContext();
+            Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
 
             //bgw.WorkerReportsProgress = true;
             //bgw.WorkerSupportsCancellation = true;
-            Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
         }
 
         private void Select_Destination_Click(object sender, EventArgs e)
@@ -116,9 +116,8 @@ namespace PullAndClassification.Forms
         {
             try
             {
-                ProjectFileNameParser projectFileNameParser = new ProjectFileNameParser(Session.CurrentProjectId);
-                //ParserResult parserResult = projectFileNameParser.ValiateFileName("Project_qwe_ARC_0_2020-01-09.rvt");
-
+                ProjectFileNameParser projectFileNameParser = new ProjectFileNameParser(Session.GetDatabaseContext(),Session.CurrentProjectId);
+               
                 List<Temp.FileInfo> filesFound = new List<Temp.FileInfo>();
                 if (fromSvn)
                 {
@@ -302,10 +301,11 @@ namespace PullAndClassification.Forms
 
         private void MetroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //Session.context = new DatabaseContext();
             Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
-            Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
             metroLabelProjectName.Text = Session.CurrentProject.Name;
-            UserSetting.setCurrentProjectId(Session.context, Session.CurrentProjectId);
+            UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
         }
 
        

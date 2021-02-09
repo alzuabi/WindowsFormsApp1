@@ -23,5 +23,9 @@ namespace PullAndClassification.Utils
 
         //private static int? defaultProjectId = context.Projects.OrderByDescending(p => p.CreatedAt).FirstOrDefault()?.Id;
         private static UserSetting userSetting;
+
+        public static DatabaseContext GetDatabaseContext() {
+            return new DatabaseContext();
+        }
     }
 }

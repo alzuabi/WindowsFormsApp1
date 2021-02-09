@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using MetroFramework.Controls;
 using System.ComponentModel;
 using Classification.Utils;
+using Newtonsoft.Json;
 
 namespace Utils
 {
@@ -80,6 +81,7 @@ namespace Utils
             //log.LogToFile("IN CopyAndClassify");
             List<string> summary = new List<string>();
             List<DataGridViewRow> selectedFiles = new List<DataGridViewRow>();
+           
             if (fromSvn)
             {
                 SvnClient client = new SvnClient();
@@ -89,18 +91,37 @@ namespace Utils
                 selectedFilesForm.ClassificationProgressBar.Visible = true;
                 selectedFilesForm.ClassificationProgressBar.Minimum = 1;
                 selectedFilesForm.ClassificationProgressBar.Maximum = 100;
-                selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Count;
-
-                selectedFiles.ForEach(row =>
+                selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Where(s => !string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString())).ToList().Count;
+                try
                 {
-                    classification.CopyAndClassification(client, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, fromSvn);
-                    selectedFilesForm.ClassificationProgressBar.PerformStep();
-                    if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
-                        summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
-                    else
-                        summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
+                    using (var db = Session.GetDatabaseContext())
+                    {
+                        var rowsToDelete = db.ProjectFiles.AsEnumerable()
+                                    .Where(r => r.ProjectId == Session.CurrentProjectId)
+                                    .ToList();
+                        foreach (var row in rowsToDelete)
+                            db.ProjectFiles.Remove(row);
+                        db.SaveChanges();
+                    }
+                    selectedFiles.ForEach(row =>
+                    {
+                        if (!string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
+                        {
+                            classification.CopyAndClassification(client, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, fromSvn);
+                            Tuple<int, string, Dictionary<string, string>> _ProjectFileproperties = (Tuple<int, string, Dictionary<string, string>>)row.Cells["_ProjectFileProperties"].Value;
+
+                            SaveProjectFile(_ProjectFileproperties, destination, row.Cells["_fullPath"].Value.ToString());
+
+                            selectedFilesForm.ClassificationProgressBar.PerformStep();
+                            //if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
+                            //    summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
+                            //else
+                            summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
+                        }
+                    }
+                    );
                 }
-                );
+                catch { }
             }
             else
             {
@@ -109,17 +130,33 @@ namespace Utils
                 selectedFilesForm.ClassificationProgressBar.Visible = true;
                 selectedFilesForm.ClassificationProgressBar.Minimum = 1;
                 selectedFilesForm.ClassificationProgressBar.Maximum = 100;
-                selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Count;
+                selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Where(s=> !string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString())).ToList().Count;
                 try
                 {
+                    using (var db = Session.GetDatabaseContext())
+                    {
+                        var rowsToDelete = db.ProjectFiles.AsEnumerable()
+                                    .Where(r => r.ProjectId == Session.CurrentProjectId)
+                                    .ToList();
+                        foreach (var row in rowsToDelete)
+                            db.ProjectFiles.Remove(row);
+                        db.SaveChanges();
+                    }
                     selectedFiles.ForEach(row =>
                     {
-                        classification.CopyAndClassification(null, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, false);
-                        selectedFilesForm.ClassificationProgressBar.PerformStep();
-                        if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
-                            summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
-                        else
+
+                        if (!string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
+                        {
+                            classification.CopyAndClassification(null, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, false);
+                            Tuple<int, string, Dictionary<string, string>> _ProjectFileproperties = row.Cells["_ProjectFileProperties"].Value == null ? null : (Tuple<int, string, Dictionary<string, string>>)row.Cells["_ProjectFileProperties"].Value;
+                            SaveProjectFile(_ProjectFileproperties, destination, row.Cells["_fullPath"].Value.ToString());
+
+                            selectedFilesForm.ClassificationProgressBar.PerformStep();
+                            //if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
+                            //    summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
+                            //else
                             summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
+                        }
                     }
                     );
 
@@ -131,6 +168,25 @@ namespace Utils
             }
             return summary;
         }
+
+        private static void SaveProjectFile(Tuple<int, string, Dictionary<string, string>> projectFileproperties, string destination, string file)
+        {
+            using (var db = Session.GetDatabaseContext())
+            {
+
+                ProjectFile projectFile = new ProjectFile()
+                {
+                    ProjectId = projectFileproperties.Item1,
+
+                    File =Path.Combine(destination,projectFileproperties.Item2, Path.GetFileName(file)),
+                    Properties = JsonConvert.SerializeObject(projectFileproperties.Item3)
+                };
+                db.ProjectFiles.Add(projectFile);
+                db.SaveChanges();
+
+            }
+        }
+
         public class FileStructure
         {
             public FileStructure(
@@ -219,8 +275,8 @@ namespace Utils
                                 Height = 20,
                                 Width = 250
                             };
-                            Session.context = new DatabaseContext();
-                            Session.context.LOTs.Where(lot => lot.ProjectId == Session.CurrentProjectId).ToList().ForEach(lot => metroComboBox.Items.Add(new ComboboxItem()
+                            //Session.context = new DatabaseContext();
+                            Session.GetDatabaseContext().LOTs.Where(lot => lot.ProjectId == Session.CurrentProjectId).ToList().ForEach(lot => metroComboBox.Items.Add(new ComboboxItem()
                             {
                                 Text = lot.Name,
                                 Value = lot.Id

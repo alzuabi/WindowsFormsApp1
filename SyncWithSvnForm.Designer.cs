@@ -48,7 +48,7 @@ namespace PullAndClassification.Forms
             this.metroLabel4 = new MetroFramework.Controls.MetroLabel();
             this.metroProjectListComboBox = new MetroFramework.Controls.MetroComboBox();
             this.metroProgressBar1 = new MetroFramework.Controls.MetroProgressBar();
-            metroLabel5 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel5 = new MetroFramework.Controls.MetroLabel();
             this.metroLabel6 = new MetroFramework.Controls.MetroLabel();
             this.groupBox1.SuspendLayout();
             this.Push.SuspendLayout();
@@ -413,11 +413,11 @@ namespace PullAndClassification.Forms
             // 
             // metroLabel5
             // 
-            metroLabel5.AutoSize = true;
-            metroLabel5.Location = new System.Drawing.Point(61, 152);
-            metroLabel5.Name = "metroLabel5";
-            metroLabel5.Size = new System.Drawing.Size(0, 0);
-            metroLabel5.TabIndex = 42;
+            this.metroLabel5.AutoSize = true;
+            this.metroLabel5.Location = new System.Drawing.Point(61, 152);
+            this.metroLabel5.Name = "metroLabel5";
+            this.metroLabel5.Size = new System.Drawing.Size(0, 0);
+            this.metroLabel5.TabIndex = 42;
             // 
             // metroLabel6
             // 
@@ -427,6 +427,7 @@ namespace PullAndClassification.Forms
             this.metroLabel6.Size = new System.Drawing.Size(83, 19);
             this.metroLabel6.TabIndex = 43;
             this.metroLabel6.Text = "metroLabel6";
+            this.metroLabel6.Visible = false;
             // 
             // SyncWithSvnForm
             // 
@@ -434,7 +435,7 @@ namespace PullAndClassification.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(708, 464);
             this.Controls.Add(this.metroLabel6);
-            this.Controls.Add(metroLabel5);
+            this.Controls.Add(this.metroLabel5);
             this.Controls.Add(this.metroProgressBar1);
             this.Controls.Add(this.metroProjectListComboBox);
             this.Controls.Add(this.metroLabel1);
@@ -481,7 +482,7 @@ namespace PullAndClassification.Forms
         private FontAwesome.Sharp.IconButton buttonFrom;
         private MetroFramework.Controls.MetroComboBox metroProjectListComboBox;
         private MetroFramework.Controls.MetroProgressBar metroProgressBar1;
-        public static MetroFramework.Controls.MetroLabel metroLabel5;
         public MetroFramework.Controls.MetroLabel metroLabel6;
+        public MetroFramework.Controls.MetroLabel metroLabel5;
     }
 }

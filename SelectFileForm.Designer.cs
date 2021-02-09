@@ -40,6 +40,7 @@ namespace PullAndClassification.Forms
             this.classificationProgressBar = new MetroFramework.Controls.MetroProgressBar();
             this.metroLabelProjectName = new MetroFramework.Controls.MetroLabel();
             this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
+            this.metroButtonCheck = new MetroFramework.Controls.MetroButton();
             ((System.ComponentModel.ISupportInitialize)(this.filesDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -78,6 +79,8 @@ namespace PullAndClassification.Forms
             // 
             // filesDataGridView
             // 
+            this.filesDataGridView.AllowUserToAddRows = false;
+            this.filesDataGridView.AllowUserToDeleteRows = false;
             this.filesDataGridView.AllowUserToResizeRows = false;
             this.filesDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.filesDataGridView.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
@@ -106,6 +109,7 @@ namespace PullAndClassification.Forms
             this.filesDataGridView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             this.filesDataGridView.Location = new System.Drawing.Point(46, 67);
             this.filesDataGridView.Name = "filesDataGridView";
+            this.filesDataGridView.ReadOnly = true;
             this.filesDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
@@ -161,11 +165,24 @@ namespace PullAndClassification.Forms
             this.metroLabel1.Text = "Current Project";
             this.metroLabel1.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
+            // metroButtonCheck
+            // 
+            this.metroButtonCheck.Location = new System.Drawing.Point(322, 476);
+            this.metroButtonCheck.Name = "metroButtonCheck";
+            this.metroButtonCheck.Size = new System.Drawing.Size(75, 23);
+            this.metroButtonCheck.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroButtonCheck.TabIndex = 23;
+            this.metroButtonCheck.Text = "Check";
+            this.metroButtonCheck.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroButtonCheck.UseSelectable = true;
+            this.metroButtonCheck.Click += new System.EventHandler(this.MetroButton1_Click);
+            // 
             // SelectFileForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1331, 532);
+            this.Controls.Add(this.metroButtonCheck);
             this.Controls.Add(this.metroLabel1);
             this.Controls.Add(this.metroLabelProjectName);
             this.Controls.Add(this.classificationProgressBar);
@@ -193,6 +210,7 @@ namespace PullAndClassification.Forms
         private MetroFramework.Controls.MetroProgressBar classificationProgressBar;
         private MetroFramework.Controls.MetroLabel metroLabelProjectName;
         private MetroFramework.Controls.MetroLabel metroLabel1;
+        private MetroFramework.Controls.MetroButton metroButtonCheck;
 
         public MetroFramework.Controls.MetroGrid FilesDataGridView { get => filesDataGridView; set => filesDataGridView = value; }
         public MetroFramework.Controls.MetroProgressBar ClassificationProgressBar { get => classificationProgressBar; set => classificationProgressBar = value; }

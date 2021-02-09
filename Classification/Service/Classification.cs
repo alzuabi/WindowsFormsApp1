@@ -1,4 +1,6 @@
 ﻿using Classification.Utils;
+using MULTISYSDbContext.Models;
+using PullAndClassification.Utils;
 using SharpSvn;
 using System;
 using System.Collections.Generic;
@@ -55,13 +57,24 @@ namespace Classification.Service
                 }
                 else
                 {
-                    log.LogToFile("IN CopyAndClassification fun");
-
                     string dest = Path.Combine(dir, d);
                     Directory.CreateDirectory(dest);
                     dest = Path.Combine(dest, Path.GetFileName(s));
 
                     File.Copy(s, dest);
+
+                    //using (var db = new DatabaseContext())
+                    //{
+                    //    ProjectFile projectFile = new ProjectFile()
+                    //    {
+                    //        ProjectId = Session.CurrentProjectId,
+                    //        Properties ="{test:test}",
+                    //        File = d
+                    //    };
+                    //    db.ProjectFiles.Add(projectFile);
+                    //    db.SaveChanges();
+                    //}
+                    //projectFile.
                     log.LogToFile("Move File, " + s + " ,to " + dest + " ,at " + DateTime.Now);
                     log.LogToDataBase("Move", "Move File " + s + " to " + dest);
                     //}

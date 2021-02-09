@@ -34,47 +34,55 @@ namespace PullAndClassification.Forms
             InitializeComponent();
             MaximizeBox = false;
             ShadowType = MetroFormShadowType.AeroShadow;
-            Session.context = new DatabaseContext();
-            Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.context);
+            //Session.context = new DatabaseContext();
+            Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
 
-            Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
         }
         public void FillFilesDataGridView(IEnumerable<Temp.FileInfo> filtered)
         {
-            filesDataGridView.MultiSelect = true;
-            filesDataGridView.AllowUserToAddRows = false;
-            filesDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            DataTable dtFiles = new DataTable();
-            var temp = filtered.Select(
-                x => new
-                {
-                    x.Path,
-                    x.Name,
-                    x.Size,
-                    x.Selected,
-                    x.ValidFileStrusture,
-                    x.PathToClassify
-                }
-                );
-
-
-            dtFiles.Columns.Add("Name", typeof(string));
-            dtFiles.Columns.Add("Size", typeof(string));
-            dtFiles.Columns.Add("Selected", typeof(bool));
-            dtFiles.Columns.Add("_fullPath", typeof(string));
-            dtFiles.Columns.Add("FileStrusture", typeof(bool));
-            dtFiles.Columns.Add("ClassificationPath", typeof(string));
-
-            dtFiles.Columns["Selected"].DefaultValue = true;
-            foreach (var t in temp)
+            try
             {
+                filesDataGridView.MultiSelect = true;
+                filesDataGridView.AllowUserToAddRows = false;
+                filesDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                DataTable dtFiles = new DataTable();
+                var temp = filtered.Select(
+                    x => new
+                    {
+                        x.Path,
+                        x.Name,
+                        x.Size,
+                        x.Selected,
+                        x.ValidFileStrusture,
+                        x.PathToClassify
+                    }
+                    );
 
-                dtFiles.Rows.Add(t.Name, t.Size + " KB", t.Selected, t.Path,
-                    t.ValidFileStrusture, t.PathToClassify);
 
+                dtFiles.Columns.Add("Name", typeof(string));
+                dtFiles.Columns.Add("Size", typeof(string));
+                dtFiles.Columns.Add("Selected", typeof(bool));
+                dtFiles.Columns.Add("_fullPath", typeof(string));
+                dtFiles.Columns.Add("FileStrusture", typeof(bool));
+                dtFiles.Columns.Add("ClassificationPath", typeof(string));
+                dtFiles.Columns.Add("_ProjectFileProperties", typeof(Tuple<int, string, Dictionary<string,string>>));
+
+                dtFiles.Columns["Selected"].DefaultValue = true;
+                foreach (var t in temp)
+                {
+
+                    dtFiles.Rows.Add(t.Name, t.Size + " KB", t.Selected, t.Path,
+                        t.ValidFileStrusture,
+                        t.ValidFileStrusture ? t.PathToClassify:""
+                       );
+
+                }
+                filesDataGridView.DataSource = dtFiles;
+                filesDataGridView.Columns["_fullPath"].Visible = false;
+                filesDataGridView.Columns["_ProjectFileProperties"].Visible = false;
             }
-            filesDataGridView.DataSource = dtFiles;
-            filesDataGridView.Columns["_fullPath"].Visible = false;
+            catch { }
 
         }
         private void FilesDataGridView_ModifyCellClick(object sender, DataGridViewCellEventArgs e)
@@ -101,6 +109,7 @@ namespace PullAndClassification.Forms
                 copyAndClassificationForm.MetroSourceSVNTextBox.Text,
                 copyAndClassificationForm.SourceLocalFile.Text
                 );
+            
             SummaryMessageBox(summary.Aggregate(new StringBuilder(),
                                                (sb, val) => sb.AppendLine(val),
                                                sb => sb.ToString()), "Summary");
@@ -131,29 +140,43 @@ namespace PullAndClassification.Forms
         private void SelectFileForm_Load(object sender, EventArgs e)
         {
             metroLabelProjectName.Text = Session.CurrentProject.Name;
-            Controls1 = new PrepareControls().GetAdditionalControls(
-               Session.CurrentProject.ProjectFileNameStructures.ToList(),
-               778,
-               20,
-               60,
-               this);
-
+            try
+            {
+                Controls1 = new PrepareControls().GetAdditionalControls(
+                   Session.CurrentProject.ProjectFileNameStructures.ToList(),
+                   778,
+                   20,
+                   60,
+                   this);
+            }
+            catch(Exception ex)
+                {
+                MessageBox.Show(new Form { Size = new Size(600, 800) }, "Please Check project tables", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void MetroUpdateProjectButton_Click(object sender, EventArgs e)
         {
             DataGridViewRow newDataRow = filesDataGridView.Rows[indexRow];
+            //Tuple<int, string, Dictionary<string, string>> _ProjectFileproperties;
+            Dictionary<string, string> _properties = new Dictionary<string, string>();
+
             newDataRow.Cells["ClassificationPath"].Value = Path.Combine(Controls1.Select(linkedControls =>
             {
                 string text = "";
                 foreach (Tuple<int, Control> tubleControl in linkedControls.LinkedList)
+                {
+                    var projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures.Where(s => s.Id == tubleControl.Item1).FirstOrDefault();
+
+
+                   
 
                     switch (tubleControl.Item2)
                     {
-                        
+
                         case DateTimePicker picker:
                             {
-                                var projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures.Where(s => s.Id == tubleControl.Item1).FirstOrDefault();
+                                _properties.Add(projectFileNameStructures.NameType, picker.Value.ToString(projectFileNameStructures.Description));
                                 if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date.Id))
                                 {
                                     text += picker.Value.ToString(projectFileNameStructures.Description);
@@ -161,17 +184,35 @@ namespace PullAndClassification.Forms
                                 }
                                 else if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date_index.Id))
                                 {
-                                    text += picker.Value.ToString(projectFileNameStructures.Description)+"_";
+                                    text += picker.Value.ToString(projectFileNameStructures.Description) + "_";
                                 }
                                 break;
                             }
                         default:
+                            if (_properties.ContainsKey(projectFileNameStructures.NameType))
+                                _properties[projectFileNameStructures.NameType] = _properties[projectFileNameStructures.NameType] + "_" + tubleControl.Item2.Text;
+                            else
+                                _properties.Add(projectFileNameStructures.NameType, tubleControl.Item2.Text);
+
                             text += tubleControl.Item2.Text;
                             break;
                     }
+                }
+
                 return text;
             }
             ).ToArray());
+            newDataRow.Cells["_ProjectFileProperties"].Value = Tuple.Create <int, string, Dictionary< string,string>> (Session.CurrentProjectId, newDataRow.Cells["ClassificationPath"].Value.ToString(), _properties);
+        }
+
+        private void MetroButton1_Click(object sender, EventArgs e)
+        {
+            CheckForm checkForm = new CheckForm();
+            checkForm.FillFilesDifferances(
+                Session.GetDatabaseContext().ProjectFiles.Where(project=>project.ProjectId==Session.CurrentProjectId)
+                );
+            //bgw.RunWorkerCompleted -= new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+            checkForm.ShowDialog();
         }
     }
 }

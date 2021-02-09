@@ -1,0 +1,38 @@
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\Project_qwe_ARC_0_2020-01-09.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\A_B_D.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-7\DaPe_In7ex_index\A_B_D.rvt ,at 2/7/2021 8:46:42 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\A_B_D.rvt' already exists.
+IN CopyAndClassification fun
+Move File, C:\Users\ASUS\Desktop\klm\A_B_D.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-7\DaPe_In7ex_index\A_B_D.rvt ,at 2/7/2021 8:49:43 PM
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The operation cannot be completed because the DbContext has been disposed.
+IN CopyAndClassification fun
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-7\DaPe_In7ex_index\E_F_G.rvt' already exists.
+IN CopyAndClassification fun
+The operation cannot be completed because the DbContext has been disposed.

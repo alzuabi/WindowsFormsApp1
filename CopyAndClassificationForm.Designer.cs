@@ -461,6 +461,7 @@ namespace PullAndClassification.Forms
             this.buttonPullAndPush.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.buttonPullAndPush.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.buttonPullAndPush.UseVisualStyleBackColor = true;
+            this.buttonPullAndPush.Visible = false;
             this.buttonPullAndPush.Click += new System.EventHandler(this.ButtonPullAndPush_Click);
             // 
             // metroLabelProjectName
