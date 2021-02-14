@@ -81,6 +81,14 @@ namespace PullAndClassification.Forms
                 filesDataGridView.DataSource = dtFiles;
                 filesDataGridView.Columns["_fullPath"].Visible = false;
                 filesDataGridView.Columns["_ProjectFileProperties"].Visible = false;
+                filesDataGridView.Columns["Name"].ReadOnly = true;
+                filesDataGridView.Columns["Size"].ReadOnly = true;
+                filesDataGridView.Columns["Selected"].ReadOnly = false;
+                filesDataGridView.Columns["_fullPath"].ReadOnly = true;
+                filesDataGridView.Columns["FileStrusture"].ReadOnly = true;
+                filesDataGridView.Columns["ClassificationPath"].ReadOnly = true;
+                filesDataGridView.Columns["_ProjectFileProperties"].ReadOnly = true;
+
             }
             catch { }
 
@@ -109,11 +117,10 @@ namespace PullAndClassification.Forms
                 copyAndClassificationForm.MetroSourceSVNTextBox.Text,
                 copyAndClassificationForm.SourceLocalFile.Text
                 );
-            
-            SummaryMessageBox(summary.Aggregate(new StringBuilder(),
-                                               (sb, val) => sb.AppendLine(val),
-                                               sb => sb.ToString()), "Summary");
-        }
+                SummaryMessageBox(summary.Aggregate(new StringBuilder(),
+                                                   (sb, val) => sb.AppendLine(val),
+                                                   sb => sb.ToString()), "Summary");
+            }
         public void SummaryMessageBox(string message, string caption)
         {
             MessageBox.Show(new Form { Size = new Size(600, 800) }, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -207,11 +214,8 @@ namespace PullAndClassification.Forms
 
         private void MetroButton1_Click(object sender, EventArgs e)
         {
-            CheckForm checkForm = new CheckForm();
-            checkForm.FillFilesDifferances(
-                Session.GetDatabaseContext().ProjectFiles.Where(project=>project.ProjectId==Session.CurrentProjectId)
-                );
-            //bgw.RunWorkerCompleted -= new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+            CheckDiscrepancyForm checkForm = new CheckDiscrepancyForm();
+            checkForm.FillFilesDifferances(copyAndClassificationForm.Destination.Text);
             checkForm.ShowDialog();
         }
     }

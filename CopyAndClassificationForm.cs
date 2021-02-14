@@ -33,6 +33,7 @@ namespace PullAndClassification.Forms
             MaximizeBox = false;
             ShadowType = MetroFormShadowType.AeroShadow;
             //Session.context = new DatabaseContext();
+
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
 
             //bgw.WorkerReportsProgress = true;
@@ -93,18 +94,17 @@ namespace PullAndClassification.Forms
                     {
                         if (Path.GetExtension(item.Name).Equals(extention))
                             filesFound.Add(new Temp.FileInfo
-                                        {
-                                            Name = item.Name,
-                                            Path = item.EntryUri.AbsoluteUri,
-                                            Size = item.Entry.FileSize / 1024,
-                                            ValidFileStrusture = projectFileNameParser.ValiateFileName(item.Name).success,
-                                            PathToClassify = projectFileNameParser.ValiateFileName(item.Name).path
-                                        }
+                            {
+                                Name = item.Name,
+                                Path = item.EntryUri.AbsoluteUri,
+                                Size = item.Entry.FileSize / 1024,
+                                ValidFileStrusture = projectFileNameParser.ValiateFileName(item.Name).success,
+                                PathToClassify = projectFileNameParser.ValiateFileName(item.Name).path
+                            }
                                         );
                     }
                     else
                         GetFolderFiles(client, item.EntryUri, ref filesFound, arg, extention, projectFileNameParser);
-
                 }
             }
             return filesFound;
@@ -116,8 +116,8 @@ namespace PullAndClassification.Forms
         {
             try
             {
-                ProjectFileNameParser projectFileNameParser = new ProjectFileNameParser(Session.GetDatabaseContext(),Session.CurrentProjectId);
-               
+                ProjectFileNameParser projectFileNameParser = new ProjectFileNameParser(Session.GetDatabaseContext(), Session.CurrentProjectId);
+
                 List<Temp.FileInfo> filesFound = new List<Temp.FileInfo>();
                 if (fromSvn)
                 {
@@ -204,8 +204,6 @@ namespace PullAndClassification.Forms
                 e.Cancel = false;
                 errorProviderSource.SetError(destination, "");
             }
-
-
         }
 
         private void metroProjectListComboBox_Validating(object sender, CancelEventArgs e)
@@ -231,14 +229,14 @@ namespace PullAndClassification.Forms
                 //{
                 BackgroundWorker bgw = new BackgroundWorker();
                 metroProgressBar1.Visible = true;
-                    metroLabel2.Visible = true;
-                    bgw.DoWork += new DoWorkEventHandler(Bgw_DoWork);
-                    bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+                metroLabel2.Visible = true;
+                bgw.DoWork += new DoWorkEventHandler(Bgw_DoWork);
+                bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
 
-                    bgw.WorkerReportsProgress = true;
-                    bgw.RunWorkerAsync();
+                bgw.WorkerReportsProgress = true;
+                bgw.RunWorkerAsync();
                 //}
-               
+
             }
 
         }
@@ -247,17 +245,17 @@ namespace PullAndClassification.Forms
         {
             //if (bgw.WorkerSupportsCancellation == true)
             //{
-                
-                metroProgressBar1.Visible = false;
-                metroLabel2.Visible = false;
-                selectedFilesForm = new SelectFileForm()
-                {
-                    CopyAndClassificationForm = this
-                };
-                selectedFilesForm.FillFilesDataGridView(filtered);
-                //bgw.RunWorkerCompleted -= new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
-                selectedFilesForm.ShowDialog();
-                //bgw.CancelAsync();
+
+            metroProgressBar1.Visible = false;
+            metroLabel2.Visible = false;
+            selectedFilesForm = new SelectFileForm()
+            {
+                CopyAndClassificationForm = this
+            };
+            selectedFilesForm.FillFilesDataGridView(filtered);
+            //bgw.RunWorkerCompleted -= new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+            selectedFilesForm.ShowDialog();
+            //bgw.CancelAsync();
 
             //}
         }
@@ -270,8 +268,9 @@ namespace PullAndClassification.Forms
                 filtered = FilterFiles(false, fromSvn, metroSourceSVNTextBox.Text, sourceLocalFile.Text, ".rvt");
             }
 
-            catch(Exception ex) {
-                
+            catch (Exception ex)
+            {
+
             }
 
         }
@@ -287,14 +286,14 @@ namespace PullAndClassification.Forms
     })
 );
             if (Session.CurrentProjectId != -1)
-            //{
-            //    metroProjectListComboBox.Text = "-select-";
-            //    //metroProjectListComboBox.SelectedText = "Select";
-            //}
-            ////metroLabelProjectName.Text = "Select Project";
-            //else
+                //{
+                //    metroProjectListComboBox.Text = "-select-";
+                //    //metroProjectListComboBox.SelectedText = "Select";
+                //}
+                ////metroLabelProjectName.Text = "Select Project";
+                //else
                 metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
-                //metroLabelProjectName.Text = Session.CurrentProject.Name;
+            //metroLabelProjectName.Text = Session.CurrentProject.Name;
 
 
         }
@@ -308,6 +307,6 @@ namespace PullAndClassification.Forms
             UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
         }
 
-       
+
     }
 }

@@ -1,0 +1,6 @@
+Move File, C:\Users\ASUS\Desktop\klm\A_B_D.rvt ,to C:\Users\ASUS\Desktop\zzz\2\Part\STR\Index\2021-2-14\A_B_D.rvt ,at 2/14/2021 5:51:19 PM
+Move File, C:\Users\ASUS\Desktop\klm\E_F_G.rvt ,to C:\Users\ASUS\Desktop\zzz\1\Part\STR\Index\2021-2-14\E_F_G.rvt ,at 2/14/2021 5:51:19 PM
+Move File, C:\Users\ASUS\Desktop\klm\ARC\0\2020-01-09\Project_qwe_ARC_0_2020-01-09.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\STR\Index\2021-2-14\Project_qwe_ARC_0_2020-01-09.rvt ,at 2/14/2021 5:51:19 PM
+Move File, C:\Users\ASUS\Desktop\klm\A_B_D.rvt ,to C:\Users\ASUS\Desktop\zzz\2\Part\STR\Index\2021-2-14\A_B_D.rvt ,at 2/14/2021 6:02:55 PM
+Move File, C:\Users\ASUS\Desktop\klm\E_F_G.rvt ,to C:\Users\ASUS\Desktop\zzz\1\Part\STR\Index\2021-2-14\E_F_G.rvt ,at 2/14/2021 6:02:55 PM
+Move File, C:\Users\ASUS\Desktop\klm\ARC\0\2020-01-09\Project_qwe_ARC_0_2020-01-09.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\STR\Index\2021-2-14\Project_qwe_ARC_0_2020-01-09.rvt ,at 2/14/2021 6:02:55 PM

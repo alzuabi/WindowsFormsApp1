@@ -137,3 +137,10 @@ Move File, C:\Users\ASUS\Desktop\klm\ARC\0\2020-01-09\Project_qwe_ARC_0_2020-01-
 The operation cannot be completed because the DbContext has been disposed.
 Move File, C:\Users\ASUS\Desktop\klm\LOT\Index\8787\E_F_G.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\PLB\Index\2021-2-6\DaPe_In9ex_index\E_F_G.rvt ,at 2/9/2021 2:56:39 PM
 The operation cannot be completed because the DbContext has been disposed.
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-9\DaPe_In9ex_index\A_B_D.rvt' already exists.
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-9\DaPe_In9ex_index\E_F_G.rvt' already exists.
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-9\DaPe_In9ex_index\A_B_D.rvt' already exists.
+Move File, C:\Users\ASUS\Desktop\klm\ARC\0\2020-01-09\Project_qwe_ARC_0_2020-01-09.rvt ,to C:\Users\ASUS\Desktop\zzz\Project\Part\PLB\Index\2021-2-9\DaPe_In9ex_111\Project_qwe_ARC_0_2020-01-09.rvt ,at 2/9/2021 4:29:36 PM
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\PLB\Index\2021-2-9\DaPe_In9ex_index\A_B_D.rvt' already exists.
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\Index\2021-2-9\DaPe_In9ex_index\A_B_D.rvt' already exists.
+The file 'C:\Users\ASUS\Desktop\zzz\Project\Part\PLB\Index\2021-2-9\DaPe_In9ex_index\E_F_G.rvt' already exists.

@@ -88,13 +88,13 @@ namespace PullAndClassification.Forms
             this.panel4.Controls.Add(this.groupBox1);
             this.panel4.Location = new System.Drawing.Point(38, 98);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(627, 292);
+            this.panel4.Size = new System.Drawing.Size(712, 292);
             this.panel4.TabIndex = 19;
             // 
             // metroLabel2
             // 
             this.metroLabel2.AutoSize = true;
-            this.metroLabel2.Location = new System.Drawing.Point(21, 230);
+            this.metroLabel2.Location = new System.Drawing.Point(94, 232);
             this.metroLabel2.Name = "metroLabel2";
             this.metroLabel2.Size = new System.Drawing.Size(65, 19);
             this.metroLabel2.Style = MetroFramework.MetroColorStyle.Blue;
@@ -118,7 +118,7 @@ namespace PullAndClassification.Forms
             this.destination.CustomButton.UseSelectable = true;
             this.destination.CustomButton.Visible = false;
             this.destination.Lines = new string[0];
-            this.destination.Location = new System.Drawing.Point(305, 187);
+            this.destination.Location = new System.Drawing.Point(378, 189);
             this.destination.MaxLength = 32767;
             this.destination.Name = "destination";
             this.destination.PasswordChar = '\0';
@@ -151,7 +151,7 @@ namespace PullAndClassification.Forms
             this.sourceLocalFile.CustomButton.UseSelectable = true;
             this.sourceLocalFile.CustomButton.Visible = false;
             this.sourceLocalFile.Lines = new string[0];
-            this.sourceLocalFile.Location = new System.Drawing.Point(305, 121);
+            this.sourceLocalFile.Location = new System.Drawing.Point(378, 123);
             this.sourceLocalFile.MaxLength = 32767;
             this.sourceLocalFile.Name = "sourceLocalFile";
             this.sourceLocalFile.PasswordChar = '\0';
@@ -172,7 +172,7 @@ namespace PullAndClassification.Forms
             // 
             // metroProgressBar1
             // 
-            this.metroProgressBar1.Location = new System.Drawing.Point(111, 238);
+            this.metroProgressBar1.Location = new System.Drawing.Point(184, 240);
             this.metroProgressBar1.Name = "metroProgressBar1";
             this.metroProgressBar1.ProgressBarStyle = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.metroProgressBar1.Size = new System.Drawing.Size(492, 5);
@@ -189,16 +189,16 @@ namespace PullAndClassification.Forms
             this.buttonGetFiles.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonGetFiles.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonGetFiles.ForeColor = System.Drawing.Color.Gainsboro;
-            this.buttonGetFiles.IconChar = FontAwesome.Sharp.IconChar.Clone;
+            this.buttonGetFiles.IconChar = FontAwesome.Sharp.IconChar.CheckSquare;
             this.buttonGetFiles.IconColor = System.Drawing.Color.Gainsboro;
             this.buttonGetFiles.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.buttonGetFiles.IconSize = 30;
             this.buttonGetFiles.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buttonGetFiles.Location = new System.Drawing.Point(305, 249);
+            this.buttonGetFiles.Location = new System.Drawing.Point(326, 251);
             this.buttonGetFiles.Name = "buttonGetFiles";
-            this.buttonGetFiles.Size = new System.Drawing.Size(90, 40);
+            this.buttonGetFiles.Size = new System.Drawing.Size(106, 40);
             this.buttonGetFiles.TabIndex = 29;
-            this.buttonGetFiles.Text = "Get Files";
+            this.buttonGetFiles.Text = "Select Files";
             this.buttonGetFiles.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.buttonGetFiles.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.buttonGetFiles.UseVisualStyleBackColor = true;
@@ -217,7 +217,7 @@ namespace PullAndClassification.Forms
             this.selectDestination.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.selectDestination.IconSize = 30;
             this.selectDestination.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.selectDestination.Location = new System.Drawing.Point(142, 178);
+            this.selectDestination.Location = new System.Drawing.Point(215, 180);
             this.selectDestination.Name = "selectDestination";
             this.selectDestination.Size = new System.Drawing.Size(143, 38);
             this.selectDestination.TabIndex = 28;
@@ -241,7 +241,7 @@ namespace PullAndClassification.Forms
             this.selectSourceLocalFile.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.selectSourceLocalFile.IconSize = 30;
             this.selectSourceLocalFile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.selectSourceLocalFile.Location = new System.Drawing.Point(142, 114);
+            this.selectSourceLocalFile.Location = new System.Drawing.Point(215, 116);
             this.selectSourceLocalFile.Name = "selectSourceLocalFile";
             this.selectSourceLocalFile.Padding = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.selectSourceLocalFile.Size = new System.Drawing.Size(143, 35);
@@ -264,7 +264,7 @@ namespace PullAndClassification.Forms
             this.SVNconf.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SVNconf.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SVNconf.ForeColor = System.Drawing.Color.Gainsboro;
-            this.SVNconf.Location = new System.Drawing.Point(126, 12);
+            this.SVNconf.Location = new System.Drawing.Point(199, 14);
             this.SVNconf.Name = "SVNconf";
             this.SVNconf.Size = new System.Drawing.Size(477, 88);
             this.SVNconf.TabIndex = 23;
@@ -410,7 +410,7 @@ namespace PullAndClassification.Forms
             this.groupBox1.ForeColor = System.Drawing.Color.Gainsboro;
             this.groupBox1.Location = new System.Drawing.Point(16, 7);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(93, 137);
+            this.groupBox1.Size = new System.Drawing.Size(143, 137);
             this.groupBox1.TabIndex = 21;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Source";
@@ -419,7 +419,7 @@ namespace PullAndClassification.Forms
             // 
             this.localFiles.AutoSize = true;
             this.localFiles.ForeColor = System.Drawing.Color.Gainsboro;
-            this.localFiles.Location = new System.Drawing.Point(6, 107);
+            this.localFiles.Location = new System.Drawing.Point(51, 109);
             this.localFiles.Name = "localFiles";
             this.localFiles.Size = new System.Drawing.Size(71, 17);
             this.localFiles.TabIndex = 1;
@@ -432,7 +432,7 @@ namespace PullAndClassification.Forms
             // 
             this.svn.AutoSize = true;
             this.svn.ForeColor = System.Drawing.Color.Gainsboro;
-            this.svn.Location = new System.Drawing.Point(6, 26);
+            this.svn.Location = new System.Drawing.Point(78, 28);
             this.svn.Name = "svn";
             this.svn.Size = new System.Drawing.Size(44, 17);
             this.svn.TabIndex = 0;
@@ -461,14 +461,13 @@ namespace PullAndClassification.Forms
             this.buttonPullAndPush.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.buttonPullAndPush.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.buttonPullAndPush.UseVisualStyleBackColor = true;
-            this.buttonPullAndPush.Visible = false;
             this.buttonPullAndPush.Click += new System.EventHandler(this.ButtonPullAndPush_Click);
             // 
             // metroLabelProjectName
             // 
             this.metroLabelProjectName.AutoSize = true;
             this.metroLabelProjectName.FontWeight = MetroFramework.MetroLabelWeight.Bold;
-            this.metroLabelProjectName.Location = new System.Drawing.Point(281, 67);
+            this.metroLabelProjectName.Location = new System.Drawing.Point(376, 67);
             this.metroLabelProjectName.Name = "metroLabelProjectName";
             this.metroLabelProjectName.Size = new System.Drawing.Size(94, 19);
             this.metroLabelProjectName.Style = MetroFramework.MetroColorStyle.Blue;
@@ -480,7 +479,7 @@ namespace PullAndClassification.Forms
             // metroLabel1
             // 
             this.metroLabel1.AutoSize = true;
-            this.metroLabel1.Location = new System.Drawing.Point(324, 29);
+            this.metroLabel1.Location = new System.Drawing.Point(419, 29);
             this.metroLabel1.Name = "metroLabel1";
             this.metroLabel1.Size = new System.Drawing.Size(98, 19);
             this.metroLabel1.Style = MetroFramework.MetroColorStyle.Blue;
@@ -493,7 +492,7 @@ namespace PullAndClassification.Forms
             this.metroProjectListComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.metroProjectListComboBox.FormattingEnabled = true;
             this.metroProjectListComboBox.ItemHeight = 23;
-            this.metroProjectListComboBox.Location = new System.Drawing.Point(428, 26);
+            this.metroProjectListComboBox.Location = new System.Drawing.Point(523, 26);
             this.metroProjectListComboBox.Name = "metroProjectListComboBox";
             this.metroProjectListComboBox.PromptText = "Select Project";
             this.metroProjectListComboBox.Size = new System.Drawing.Size(189, 29);
@@ -507,7 +506,7 @@ namespace PullAndClassification.Forms
             // metroLabel3
             // 
             this.metroLabel3.AutoSize = true;
-            this.metroLabel3.Location = new System.Drawing.Point(381, 67);
+            this.metroLabel3.Location = new System.Drawing.Point(476, 67);
             this.metroLabel3.Name = "metroLabel3";
             this.metroLabel3.Size = new System.Drawing.Size(136, 19);
             this.metroLabel3.Style = MetroFramework.MetroColorStyle.Blue;
@@ -526,7 +525,7 @@ namespace PullAndClassification.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
-            this.ClientSize = new System.Drawing.Size(709, 424);
+            this.ClientSize = new System.Drawing.Size(793, 424);
             this.Controls.Add(this.metroLabel3);
             this.Controls.Add(this.metroProjectListComboBox);
             this.Controls.Add(this.metroLabel1);
@@ -536,7 +535,7 @@ namespace PullAndClassification.Forms
             this.Name = "CopyAndClassificationForm";
             this.Opacity = 0.95D;
             this.Resizable = false;
-            this.Text = "Copy And Classification";
+            this.Text = "Copy And Classification Form";
             this.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.Load += new System.EventHandler(this.CopyAndClassificationForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.errorProviderSource)).EndInit();

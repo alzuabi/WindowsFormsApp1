@@ -148,7 +148,9 @@ namespace Utils
                         if (!string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
                         {
                             classification.CopyAndClassification(null, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, false);
-                            Tuple<int, string, Dictionary<string, string>> _ProjectFileproperties = row.Cells["_ProjectFileProperties"].Value == null ? null : (Tuple<int, string, Dictionary<string, string>>)row.Cells["_ProjectFileProperties"].Value;
+                            
+                            Tuple<int, string, Dictionary<string, string>>? _ProjectFileproperties = row.Cells["_ProjectFileProperties"].Value == null ? null : (Tuple<int, string, Dictionary<string, string>>)row.Cells["_ProjectFileProperties"].Value;
+                            
                             SaveProjectFile(_ProjectFileproperties, destination, row.Cells["_fullPath"].Value.ToString());
 
                             selectedFilesForm.ClassificationProgressBar.PerformStep();

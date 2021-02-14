@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3ED1EDFD-AF54-452A-9C7E-7FFA0E0C7F88}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>PullAndClassification</RootNamespace>
     <AssemblyName>PullAndClassification</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
@@ -30,6 +30,8 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NullableReferenceTypes>true</NullableReferenceTypes>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -58,15 +60,15 @@
   <ItemGroup>
     <Reference Include="MULTISYSDbContext, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Downloads\khaled\MULTISYSDbContext.dll</HintPath>
+      <HintPath>..\SharedDlls\MULTISYSDbContext.dll</HintPath>
     </Reference>
     <Reference Include="MULTISYSSettings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Downloads\Release-28-01-2020_Classification_Ibrahim\Release\MULTISYSSettings.dll</HintPath>
+      <HintPath>..\SharedDlls\MULTISYSSettings.dll</HintPath>
     </Reference>
     <Reference Include="MULTISYSUtilities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Downloads\MULTISYSUtilities.dll</HintPath>
+      <HintPath>..\SharedDlls\MULTISYSUtilities.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -82,11 +84,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CheckForm.cs">
+    <Compile Include="CheckDiscrepancyForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CheckForm.Designer.cs">
-      <DependentUpon>CheckForm.cs</DependentUpon>
+    <Compile Include="CheckDiscrepancyForm.Designer.cs">
+      <DependentUpon>CheckDiscrepancyForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Classification\Service\Classification.cs" />
     <Compile Include="Classification\Utils\Log.cs" />
@@ -96,7 +98,6 @@
     <Compile Include="CopyAndClassificationForm.Designer.cs">
       <DependentUpon>CopyAndClassificationForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectFileForm.cs">
       <SubType>Form</SubType>
@@ -122,8 +123,8 @@
     <Compile Include="Utils\Parameters.cs" />
     <Compile Include="Utils\SvnUtils.cs" />
     <Compile Include="Utils\Temp.cs" />
-    <EmbeddedResource Include="CheckForm.resx">
-      <DependentUpon>CheckForm.cs</DependentUpon>
+    <EmbeddedResource Include="CheckDiscrepancyForm.resx">
+      <DependentUpon>CheckDiscrepancyForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="CopyAndClassificationForm.resx">
       <DependentUpon>CopyAndClassificationForm.cs</DependentUpon>
@@ -184,6 +185,9 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="ReaLTaiizor">
+      <Version>3.7.8.1</Version>
     </PackageReference>
     <PackageReference Include="SharpSvn.1.9-x64">
       <Version>1.9007.3987.251</Version>

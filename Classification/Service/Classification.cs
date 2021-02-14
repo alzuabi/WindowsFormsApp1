@@ -52,7 +52,7 @@ namespace Classification.Service
                         stream.WriteTo(outputFileStream);
                     }
                     log.LogToFile("Move File, " + s + " ,to " + dest + " ,at " + DateTime.Now);
-                    log.LogToDataBase("Move", "Move File " + s + " to " + dest);
+                    //log.LogToDataBase("Move", "Move File " + s + " to " + dest);
 
                 }
                 else
@@ -61,7 +61,7 @@ namespace Classification.Service
                     Directory.CreateDirectory(dest);
                     dest = Path.Combine(dest, Path.GetFileName(s));
 
-                    File.Copy(s, dest);
+                    File.Copy(s, dest, true);
 
                     //using (var db = new DatabaseContext())
                     //{
@@ -76,7 +76,7 @@ namespace Classification.Service
                     //}
                     //projectFile.
                     log.LogToFile("Move File, " + s + " ,to " + dest + " ,at " + DateTime.Now);
-                    log.LogToDataBase("Move", "Move File " + s + " to " + dest);
+                    //log.LogToDataBase("Move", "Move File " + s + " to " + dest);
                     //}
                 }
             }
