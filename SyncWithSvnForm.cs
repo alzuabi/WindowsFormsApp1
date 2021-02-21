@@ -23,27 +23,20 @@ namespace PullAndClassification.Forms
             InitializeComponent();
             MaximizeBox = false;
             ShadowType = MetroFormShadowType.AeroShadow;
-            Session.context = new DatabaseContext();
-            Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.context);
-            Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
-            //bgw.WorkerReportsProgress = true;
-            //bgw.WorkerSupportsCancellation = true;
+            //Session.context = new DatabaseContext();
+            Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
+            Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            metroDestinationTextBox.Text = metroFromTextBox.Text = UserSetting.getRootDistinationPath(Session.GetDatabaseContext());
         }
 
         private void PushToSvn_Click(object sender, EventArgs e)
         {
-            //if (bgw.IsBusy != true)
-            //{
             BackgroundWorker bgw = new BackgroundWorker();
             metroProgressBar1.Visible = true;
                 bgw.DoWork += new DoWorkEventHandler(Bgw_DoPush);
                 bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
                 bgw.WorkerReportsProgress = true;
                 bgw.RunWorkerAsync();
-            //}
-          
-            //bgw.RunWorkerAsync();
-           
 
         }
 
@@ -116,18 +109,14 @@ namespace PullAndClassification.Forms
             }
         }
 
-        private void iconCloneButton_Click(object sender, EventArgs e)
+        private void IconCloneButton_Click(object sender, EventArgs e)
         {
-            //if (bgw.IsBusy != true)
-            //{
             BackgroundWorker bgw = new BackgroundWorker();
             metroProgressBar1.Visible = true;
                 bgw.DoWork += new DoWorkEventHandler(Bgw_DoClone);
                 bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
                 bgw.WorkerReportsProgress = true;
                 bgw.RunWorkerAsync();
-            //}
-
             
         }
 
@@ -164,13 +153,7 @@ namespace PullAndClassification.Forms
 
         private void Bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-
-            //if (bgw.WorkerSupportsCancellation == true)
-            //{
                 metroProgressBar1.Visible = false;
-            //    bgw.CancelAsync();
-            //}
-               
         }
 
         private void MetroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -190,6 +173,11 @@ namespace PullAndClassification.Forms
                 metroProgressBar1.Maximum = (int)e.TotalProgress;
             }
 
+        }
+
+        private void buttonSelectedFilesOk_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

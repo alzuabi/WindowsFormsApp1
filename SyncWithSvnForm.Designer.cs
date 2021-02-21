@@ -90,6 +90,7 @@ namespace PullAndClassification.Forms
             this.buttonSelectedFilesOk.Text = "OK";
             this.buttonSelectedFilesOk.UseVisualStyleBackColor = true;
             this.buttonSelectedFilesOk.Visible = false;
+            this.buttonSelectedFilesOk.Click += new System.EventHandler(this.buttonSelectedFilesOk_Click);
             // 
             // iconCloneButton
             // 
@@ -111,7 +112,7 @@ namespace PullAndClassification.Forms
             this.iconCloneButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.iconCloneButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.iconCloneButton.UseVisualStyleBackColor = true;
-            this.iconCloneButton.Click += new System.EventHandler(this.iconCloneButton_Click);
+            this.iconCloneButton.Click += new System.EventHandler(this.IconCloneButton_Click);
             // 
             // groupBox1
             // 
@@ -146,6 +147,7 @@ namespace PullAndClassification.Forms
             this.metroDestinationTextBox.MaxLength = 32767;
             this.metroDestinationTextBox.Name = "metroDestinationTextBox";
             this.metroDestinationTextBox.PasswordChar = '\0';
+            this.metroDestinationTextBox.ReadOnly = true;
             this.metroDestinationTextBox.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.metroDestinationTextBox.SelectedText = "";
             this.metroDestinationTextBox.SelectionLength = 0;
@@ -161,6 +163,8 @@ namespace PullAndClassification.Forms
             // 
             // selectDestination
             // 
+            this.selectDestination.BackColor = System.Drawing.Color.Transparent;
+            this.selectDestination.Enabled = false;
             this.selectDestination.FlatAppearance.BorderSize = 0;
             this.selectDestination.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.selectDestination.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -178,7 +182,7 @@ namespace PullAndClassification.Forms
             this.selectDestination.Text = "To";
             this.selectDestination.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.selectDestination.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.selectDestination.UseVisualStyleBackColor = true;
+            this.selectDestination.UseVisualStyleBackColor = false;
             this.selectDestination.Click += new System.EventHandler(this.SelectDestination_Click);
             // 
             // metroLabelRepoUrl
@@ -325,6 +329,7 @@ namespace PullAndClassification.Forms
             this.metroFromTextBox.MaxLength = 32767;
             this.metroFromTextBox.Name = "metroFromTextBox";
             this.metroFromTextBox.PasswordChar = '\0';
+            this.metroFromTextBox.ReadOnly = true;
             this.metroFromTextBox.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.metroFromTextBox.SelectedText = "";
             this.metroFromTextBox.SelectionLength = 0;
@@ -341,6 +346,7 @@ namespace PullAndClassification.Forms
             // buttonFrom
             // 
             this.buttonFrom.BackColor = System.Drawing.Color.Transparent;
+            this.buttonFrom.Enabled = false;
             this.buttonFrom.FlatAppearance.BorderSize = 0;
             this.buttonFrom.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
             this.buttonFrom.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
@@ -482,7 +488,7 @@ namespace PullAndClassification.Forms
         private FontAwesome.Sharp.IconButton buttonFrom;
         private MetroFramework.Controls.MetroComboBox metroProjectListComboBox;
         private MetroFramework.Controls.MetroProgressBar metroProgressBar1;
-        public MetroFramework.Controls.MetroLabel metroLabel6;
         public MetroFramework.Controls.MetroLabel metroLabel5;
+        public MetroFramework.Controls.MetroLabel metroLabel6;
     }
 }

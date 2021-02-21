@@ -32,6 +32,10 @@ namespace PullAndClassification
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridViewFilesDifferances = new System.Windows.Forms.DataGridView();
+            this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabelProjectName = new MetroFramework.Controls.MetroLabel();
+            this.metroProjectListComboBox = new MetroFramework.Controls.MetroComboBox();
+            this.metroLabel2 = new MetroFramework.Controls.MetroLabel();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilesDifferances)).BeginInit();
             this.SuspendLayout();
             // 
@@ -59,29 +63,88 @@ namespace PullAndClassification
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridViewFilesDifferances.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridViewFilesDifferances.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
-            this.dataGridViewFilesDifferances.Location = new System.Drawing.Point(48, 73);
+            this.dataGridViewFilesDifferances.Location = new System.Drawing.Point(58, 135);
             this.dataGridViewFilesDifferances.Name = "dataGridViewFilesDifferances";
             this.dataGridViewFilesDifferances.ReadOnly = true;
-            this.dataGridViewFilesDifferances.Size = new System.Drawing.Size(796, 234);
+            this.dataGridViewFilesDifferances.Size = new System.Drawing.Size(662, 234);
             this.dataGridViewFilesDifferances.TabIndex = 0;
             this.dataGridViewFilesDifferances.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.DataGridViewFilesDifferances_CellFormatting);
+            // 
+            // metroLabel1
+            // 
+            this.metroLabel1.AutoSize = true;
+            this.metroLabel1.Location = new System.Drawing.Point(525, 94);
+            this.metroLabel1.Name = "metroLabel1";
+            this.metroLabel1.Size = new System.Drawing.Size(98, 19);
+            this.metroLabel1.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroLabel1.TabIndex = 24;
+            this.metroLabel1.Text = "Current Project";
+            this.metroLabel1.Theme = MetroFramework.MetroThemeStyle.Dark;
+            // 
+            // metroLabelProjectName
+            // 
+            this.metroLabelProjectName.AutoSize = true;
+            this.metroLabelProjectName.FontWeight = MetroFramework.MetroLabelWeight.Bold;
+            this.metroLabelProjectName.Location = new System.Drawing.Point(629, 94);
+            this.metroLabelProjectName.Name = "metroLabelProjectName";
+            this.metroLabelProjectName.Size = new System.Drawing.Size(94, 19);
+            this.metroLabelProjectName.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroLabelProjectName.TabIndex = 23;
+            this.metroLabelProjectName.Text = "metroLabel1";
+            this.metroLabelProjectName.Theme = MetroFramework.MetroThemeStyle.Dark;
+            // 
+            // metroProjectListComboBox
+            // 
+            this.metroProjectListComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.metroProjectListComboBox.FormattingEnabled = true;
+            this.metroProjectListComboBox.ItemHeight = 23;
+            this.metroProjectListComboBox.Location = new System.Drawing.Point(420, 26);
+            this.metroProjectListComboBox.Name = "metroProjectListComboBox";
+            this.metroProjectListComboBox.PromptText = "Select Project";
+            this.metroProjectListComboBox.Size = new System.Drawing.Size(189, 29);
+            this.metroProjectListComboBox.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroProjectListComboBox.TabIndex = 37;
+            this.metroProjectListComboBox.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroProjectListComboBox.UseSelectable = true;
+            this.metroProjectListComboBox.SelectedIndexChanged += new System.EventHandler(this.MetroProjectListComboBox_SelectedIndexChanged);
+            // 
+            // metroLabel2
+            // 
+            this.metroLabel2.AutoSize = true;
+            this.metroLabel2.Location = new System.Drawing.Point(316, 29);
+            this.metroLabel2.Name = "metroLabel2";
+            this.metroLabel2.Size = new System.Drawing.Size(98, 19);
+            this.metroLabel2.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroLabel2.TabIndex = 36;
+            this.metroLabel2.Text = "Current Project";
+            this.metroLabel2.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
             // CheckDiscrepancyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1397, 499);
+            this.Controls.Add(this.metroProjectListComboBox);
+            this.Controls.Add(this.metroLabel2);
+            this.Controls.Add(this.metroLabel1);
+            this.Controls.Add(this.metroLabelProjectName);
             this.Controls.Add(this.dataGridViewFilesDifferances);
             this.Name = "CheckDiscrepancyForm";
             this.Text = "Check Discrepancy Form";
             this.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.Load += new System.EventHandler(this.CheckDiscrepancyForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilesDifferances)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.DataGridView dataGridViewFilesDifferances;
+        private MetroFramework.Controls.MetroLabel metroLabel1;
+        private MetroFramework.Controls.MetroLabel metroLabelProjectName;
+        private MetroFramework.Controls.MetroComboBox metroProjectListComboBox;
+        private MetroFramework.Controls.MetroLabel metroLabel2;
     }
 }

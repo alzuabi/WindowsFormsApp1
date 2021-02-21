@@ -14,16 +14,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Utils;
+using static Utils.Temp;
 
 namespace PullAndClassification
 {
     public partial class CheckDiscrepancyForm : MetroForm
     {
+        private List<LinkedControls> controls;
+        public List<LinkedControls> Controls1 { get => controls; set => controls = value; }
+
+
         public CheckDiscrepancyForm()
         {
             InitializeComponent();
             MaximizeBox = false;
             ShadowType = MetroFormShadowType.AeroShadow;
+            Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
+
+            Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            if (Session.CurrentProject is null)
+                SummaryMessageBox("Project not found!", "Error", MessageBoxIcon.Error);
         }
         public void FillFilesDifferances(string destination)
         {
@@ -40,7 +50,7 @@ namespace PullAndClassification
                       {
                           Id = f.Path,
                           path = f.Path,
-                          p?.Properties,
+                          //p?.Properties,
                           inDatabase = p != null,
                           inFileSystem = true
                       };
@@ -52,23 +62,12 @@ namespace PullAndClassification
                     {
                         Id = p.File,
                         path = f?.Path,
-                        p.Properties,
+                        //p.Properties,
                         inDatabase = true,
                         inFileSystem = f != null
                     };
                 var fullOuterJoin = leftOuterJoin.Union(rightOuterJoin);
 
-                //var query = filtered.LeftOuterJoin(
-                //    projectFiles,
-                //    lft => lft.Path,
-                //    rgt => rgt.File,
-                //    (lft, rgt) => new ProjectFile
-                //    {
-                //        File = lft.Path,
-                //        Properties = rgt.Properties == null ? "" : rgt.Properties,
-
-                //    }
-                //    );
 
                 dataGridViewFilesDifferances.MultiSelect = true;
                 dataGridViewFilesDifferances.AllowUserToAddRows = false;
@@ -79,7 +78,7 @@ namespace PullAndClassification
                     {
                         x.Id,
                         x.path,
-                        x.Properties,
+                        //x.Properties,
                         x.inDatabase,
                         x.inFileSystem
                     }
@@ -95,7 +94,7 @@ namespace PullAndClassification
                 foreach (var t in temp)
                 {
 
-                    dtFiles.Rows.Add(t.Id, t.path,t.Properties,t.inDatabase,t.inFileSystem);
+                    dtFiles.Rows.Add(t.Id, t.path,/* t.Properties,*/ t.inDatabase, t.inFileSystem);
 
                 }
                 dataGridViewFilesDifferances.DataSource = dtFiles;
@@ -111,7 +110,7 @@ namespace PullAndClassification
                 List<Temp.FileInfo> filesFound = new List<Temp.FileInfo>();
 
                 DirectoryInfo directory = new DirectoryInfo(sourceLocalFile);
-                FileInfo[] files = directory.GetFiles("*.*", SearchOption.AllDirectories).Where(file => !file.Directory.FullName.Contains(".svn")).ToArray();
+                System.IO.FileInfo[] files = directory.GetFiles("*.*", SearchOption.AllDirectories).Where(file => !file.Directory.FullName.Contains(".svn")).ToArray();
 
                 var filtered = files
                     .Where(f => f.Attributes.HasFlag(FileAttributes.Hidden).Equals(withHidden))
@@ -151,6 +150,61 @@ namespace PullAndClassification
                     row.DefaultCellStyle.BackColor = Color.FromArgb(0, 198, 247);
                     row.DefaultCellStyle.ForeColor = Color.White;
                 }
+        }
+
+        private void CheckDiscrepancyForm_Load(object sender, EventArgs e)
+        {
+            metroProjectListComboBox.DropDownStyle = ComboBoxStyle.DropDown;
+            
+            Session.context.Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
+                new ComboboxItem()
+                {
+                    Text = project.Name,
+                    Value = project.Id
+                }
+                )
+            
+            );
+            if (Session.CurrentProjectId != -1)
+            {
+                metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
+                metroLabelProjectName.Text = Session.CurrentProject.Name;
+                try
+                {
+                    Controls1 = new PrepareControls().GetAdditionalControls(
+                       Session.CurrentProject.ProjectFileNameStructures.ToList(),
+                       778,
+                       20,
+                       60,
+                       this);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(new Form { Size = new Size(600, 800) }, "Please Check project tables", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void MetroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
+            UpdateSettings();
+            Control[]? controls = Controls.Find("Added_", true);
+            if (controls.Length > 0)
+                Array.ForEach(controls, element => Controls.Remove(element));
+
+            CheckDiscrepancyForm_Load(null, EventArgs.Empty);
+
+        }
+
+        private void UpdateSettings()
+        {
+            Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            if (Session.CurrentProject is null)
+                SummaryMessageBox("Project not found!", "Error",MessageBoxIcon.Error);
+            metroLabelProjectName.Text = Session.CurrentProject.Name;
+            UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
+            metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
         }
     }
 }

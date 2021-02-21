@@ -19,7 +19,7 @@ namespace Utils
 {
     public class Temp
     {
-        public  BackgroundWorker bgw = new BackgroundWorker();
+        public BackgroundWorker bgw = new BackgroundWorker();
         public string GetTemporaryDirectory()
         {
             string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -77,11 +77,9 @@ namespace Utils
             )
         {
             var log = Log.GetInstance();
-
-            //log.LogToFile("IN CopyAndClassify");
             List<string> summary = new List<string>();
             List<DataGridViewRow> selectedFiles = new List<DataGridViewRow>();
-           
+
             if (fromSvn)
             {
                 SvnClient client = new SvnClient();
@@ -108,10 +106,10 @@ namespace Utils
                         if (!string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
                         {
                             classification.CopyAndClassification(client, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, fromSvn);
-                            Tuple<int, string, Dictionary<string, string>> _ProjectFileproperties = (Tuple<int, string, Dictionary<string, string>>)row.Cells["_ProjectFileProperties"].Value;
+                            Tuple<int, string> _ProjectFileproperties = (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
 
-                            SaveProjectFile(_ProjectFileproperties, destination, row.Cells["_fullPath"].Value.ToString());
-
+                            int projectFileId = SaveProjectFile(_ProjectFileproperties, destination, row.Cells["_fullPath"].Value.ToString());
+                            SaveProjectFileProperties(projectFileId,row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
                             selectedFilesForm.ClassificationProgressBar.PerformStep();
                             //if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
                             //    summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
@@ -130,7 +128,7 @@ namespace Utils
                 selectedFilesForm.ClassificationProgressBar.Visible = true;
                 selectedFilesForm.ClassificationProgressBar.Minimum = 1;
                 selectedFilesForm.ClassificationProgressBar.Maximum = 100;
-                selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Where(s=> !string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString())).ToList().Count;
+                selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Where(s => !string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString())).ToList().Count;
                 try
                 {
                     using (var db = Session.GetDatabaseContext())
@@ -148,11 +146,12 @@ namespace Utils
                         if (!string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
                         {
                             classification.CopyAndClassification(null, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, false);
-                            
-                            Tuple<int, string, Dictionary<string, string>>? _ProjectFileproperties = row.Cells["_ProjectFileProperties"].Value == null ? null : (Tuple<int, string, Dictionary<string, string>>)row.Cells["_ProjectFileProperties"].Value;
-                            
-                            SaveProjectFile(_ProjectFileproperties, destination, row.Cells["_fullPath"].Value.ToString());
 
+                            Tuple<int, string>? _ProjectFileproperties = string.IsNullOrEmpty(row.Cells["_ProjectFileProperties"].Value.ToString()) ? null : (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
+
+
+                            int projectFileId = SaveProjectFile(_ProjectFileproperties, destination, row.Cells["_fullPath"].Value.ToString());
+                            SaveProjectFileProperties(projectFileId,row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
                             selectedFilesForm.ClassificationProgressBar.PerformStep();
                             //if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
                             //    summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
@@ -171,22 +170,51 @@ namespace Utils
             return summary;
         }
 
-        private static void SaveProjectFile(Tuple<int, string, Dictionary<string, string>> projectFileproperties, string destination, string file)
+        //internal static void updateSettings(Project currentProject, Form form)
+        //{
+        //    Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+        //    metroLabelProjectName.Text = Session.CurrentProject.Name;
+        //    UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
+        //    metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
+        //}
+
+        private static int SaveProjectFile(Tuple<int, string> projectFileproperties, string destination, string file)
         {
-            using (var db = Session.GetDatabaseContext())
+            using var db = Session.GetDatabaseContext();
+            ProjectFile projectFile = new ProjectFile()
             {
+                ProjectId = projectFileproperties.Item1,
 
-                ProjectFile projectFile = new ProjectFile()
+                //File = Path.Combine(destination, projectFileproperties.Item2, Path.GetFileName(file)),
+                File = Path.Combine(projectFileproperties.Item2, Path.GetFileName(file)),
+
+                //Properties = JsonConvert.SerializeObject(projectFileproperties.Item3)
+            };
+            db.ProjectFiles.Add(projectFile);
+            db.SaveChanges();
+            return projectFile.Id;
+        }
+        private static void SaveProjectFileProperties(int projectFileId, List<PropertyParts> propertyParts)
+        {
+            using var db = Session.GetDatabaseContext();
+            foreach (PropertyParts propertyParts1 in propertyParts)
+            {
+                ProjectFileProperty projectFileProperty = new ProjectFileProperty()
                 {
-                    ProjectId = projectFileproperties.Item1,
-
-                    File =Path.Combine(destination,projectFileproperties.Item2, Path.GetFileName(file)),
-                    Properties = JsonConvert.SerializeObject(projectFileproperties.Item3)
+                    ProjectFileId = projectFileId,
+                    CreateFolder = propertyParts1.CreateFolder,
+                    FolderOrder = propertyParts1.FolderOrder,
+                    Name = propertyParts1.NameType,
+                    Value = propertyParts1.Name,
+                    SortingNumber = db.ProjectFileNameStructures.Where(t => t.Id == propertyParts1.FNSId).Select(t => t.SortingNumber).FirstOrDefault()
                 };
-                db.ProjectFiles.Add(projectFile);
-                db.SaveChanges();
-
+                db.ProjectFileProperties.Add(projectFileProperty);
             }
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception e) { }
         }
 
         public class FileStructure
@@ -230,6 +258,8 @@ namespace Utils
             private bool selected = true;
             private bool validFileStrusture;
             private string pathToClassify;
+            private List<PropertyParts> propertyParts;
+            private Tuple<int, string> projectFileProperties;
 
             public string Path { get => path; set => path = value; }
             public string Name { get => name; set => name = value; }
@@ -237,6 +267,8 @@ namespace Utils
             public bool Selected { get => selected; set => selected = value; }
             public bool ValidFileStrusture { get => validFileStrusture; set => validFileStrusture = value; }
             public string PathToClassify { get => pathToClassify; set => pathToClassify = value; }
+            public List<PropertyParts> PropertyParts { get => propertyParts; set => propertyParts = value; }
+            public Tuple<int, string> ProjectFileProperties { get => projectFileProperties; set => projectFileProperties = value; }
         }
         public class PrepareControls
         {
@@ -250,7 +282,7 @@ namespace Utils
             {
                 int i = 0;
                 List<LinkedControls> controls = new List<LinkedControls>();
-                projectFileNameStructures.Where(t => t.CreateFolder).OrderBy(t => t.FolderOrder).ToList().ForEach(t =>
+                projectFileNameStructures./*Where(t => t.CreateFolder).*/OrderBy(t => t.FolderOrder).ToList().ForEach(t =>
                     {
                         if (t.NameType.Equals(FNSTypes.fns_date.Id))
                         {
@@ -261,7 +293,8 @@ namespace Utils
                                 Theme = MetroFramework.MetroThemeStyle.Dark,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250
+                                Width = 250,
+                                Name = "Added_"
                             };
                             form.Controls.Add(dateTimePicker);
                             controls.Add(new LinkedControls(t.Id, dateTimePicker));
@@ -275,17 +308,20 @@ namespace Utils
                                 Theme = MetroFramework.MetroThemeStyle.Dark,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250
+                                Width = 250,
+                                Name = "Added_"
+
+
                             };
-                            //Session.context = new DatabaseContext();
                             Session.GetDatabaseContext().LOTs.Where(lot => lot.ProjectId == Session.CurrentProjectId).ToList().ForEach(lot => metroComboBox.Items.Add(new ComboboxItem()
                             {
                                 Text = lot.Name,
                                 Value = lot.Id
                             })
                             );
+                            metroComboBox.SelectedIndex = metroComboBox.Items.Count - 1;
                             form.Controls.Add(metroComboBox);
-                            controls.Add(new LinkedControls(t.Id,metroComboBox));
+                            controls.Add(new LinkedControls(t.Id, metroComboBox));
                         }
                         else if (t.NameType.Equals(FNSTypes.fns_date_index.Id))
                         {
@@ -297,7 +333,8 @@ namespace Utils
                                 Theme = MetroFramework.MetroThemeStyle.Dark,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250
+                                Width = 250,
+                                Name = "Added_"
                             };
                             form.Controls.Add(dateTimePicker);
                             tuple = Tuple.Create<int, Control>(t.Id, dateTimePicker);
@@ -309,7 +346,8 @@ namespace Utils
                                 Theme = MetroFramework.MetroThemeStyle.Dark,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 100
+                                Width = 100,
+                                Name = "Added_"
                             };
                             form.Controls.Add(metroTextBox);
                             tuple = Tuple.Create<int, Control>(t.Id, metroTextBox);
@@ -326,17 +364,19 @@ namespace Utils
                                 Theme = MetroFramework.MetroThemeStyle.Dark,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250
+                                Width = 250,
+                                Name = "Added_"
                             };
                             form.Controls.Add(metroTextBox);
-                            controls.Add(new LinkedControls(t.Id,metroTextBox));
+                            controls.Add(new LinkedControls(t.Id, metroTextBox));
                         }
                         form.Controls.Add(new MetroLabel
                         {
 
                             Text = t.Name,
                             Location = new Point(beginX, beginY + (SepDest * i)),
-                            Theme = MetroFramework.MetroThemeStyle.Dark
+                            Theme = MetroFramework.MetroThemeStyle.Dark,
+                            Name = "Added_"
 
                         });
                     });
@@ -365,6 +405,10 @@ namespace Utils
                 linkedList.AddLast(Tuple.Create(id, control));
             }
             public LinkedControls() { }
+        }
+        public static void SummaryMessageBox(string message, string caption, MessageBoxIcon messageType )
+        {
+            MessageBox.Show(new Form { Size = new Size(600, 800) }, message, caption, MessageBoxButtons.OK, messageType);
         }
     }
 }

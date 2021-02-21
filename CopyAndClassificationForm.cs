@@ -32,13 +32,13 @@ namespace PullAndClassification.Forms
             InitializeComponent();
             MaximizeBox = false;
             ShadowType = MetroFormShadowType.AeroShadow;
-            //Session.context = new DatabaseContext();
-
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
-
-            //bgw.WorkerReportsProgress = true;
-            //bgw.WorkerSupportsCancellation = true;
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            if (Session.CurrentProject is null)
+            {
+                SummaryMessageBox("Project not found!", "Error", MessageBoxIcon.Error);
+                Close();
+            }
         }
 
         private void Select_Destination_Click(object sender, EventArgs e)
@@ -79,8 +79,14 @@ namespace PullAndClassification.Forms
         }
 
         [Obsolete]
-        private List<Temp.FileInfo> GetFolderFiles(SvnClient client, SvnTarget folderTarget, ref List<Temp.FileInfo> filesFound, SvnListArgs arg, string extention, ProjectFileNameParser projectFileNameParser)
+        private List<Temp.FileInfo> GetFolderFiles(SvnClient client,
+            SvnTarget folderTarget,
+            ref List<Temp.FileInfo> filesFound,
+            SvnListArgs arg,
+            string extention,
+            ProjectFileNameParser projectFileNameParser)
         {
+            ProjectFileNameStructure projectFileNameStructure = new ProjectFileNameStructure();
             Collection<SvnListEventArgs> listResults;
 
             if (client.GetList(folderTarget, arg, out listResults))
@@ -99,7 +105,9 @@ namespace PullAndClassification.Forms
                                 Path = item.EntryUri.AbsoluteUri,
                                 Size = item.Entry.FileSize / 1024,
                                 ValidFileStrusture = projectFileNameParser.ValiateFileName(item.Name).success,
-                                PathToClassify = projectFileNameParser.ValiateFileName(item.Name).path
+                                PathToClassify = projectFileNameParser.ValiateFileName(item.Name).path,
+                                PropertyParts = projectFileNameParser.ValiateFileName(item.Name).propertyParts
+
                             }
                                         );
                     }
@@ -116,9 +124,11 @@ namespace PullAndClassification.Forms
         {
             try
             {
-                ProjectFileNameParser projectFileNameParser = new ProjectFileNameParser(Session.GetDatabaseContext(), Session.CurrentProjectId);
 
-                List<Temp.FileInfo> filesFound = new List<Temp.FileInfo>();
+                ProjectFileNameParser? projectFileNameParser = new ProjectFileNameParser(Session.GetDatabaseContext(), Session.CurrentProjectId);
+                if (projectFileNameParser is null)
+                    SummaryMessageBox("project FileName Parser is null!", "Error", MessageBoxIcon.Error );
+                List <Temp.FileInfo> filesFound = new List<Temp.FileInfo>();
                 if (fromSvn)
                 {
                     using (SvnClient svnClient = new SvnClient())
@@ -149,7 +159,11 @@ namespace PullAndClassification.Forms
                             Path = f.FullName,
                             Size = f.Length / 1024,
                             ValidFileStrusture = projectFileNameParser.ValiateFileName(f.Name).success,
-                            PathToClassify = projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path
+                            PathToClassify = projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path,
+                            PropertyParts = projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).propertyParts,
+                            ProjectFileProperties = Tuple.Create(Session.CurrentProjectId, projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path)
+                            
+
 
                         }).ToList();
                     return filtered;
@@ -206,7 +220,7 @@ namespace PullAndClassification.Forms
             }
         }
 
-        private void metroProjectListComboBox_Validating(object sender, CancelEventArgs e)
+        private void MetroProjectListComboBox_Validating(object sender, CancelEventArgs e)
         {
             if (metroProjectListComboBox.SelectedIndex == -1)
             {
@@ -225,8 +239,6 @@ namespace PullAndClassification.Forms
         {
             if (ValidateChildren(ValidationConstraints.Enabled))
             {
-                //if (bgw.IsBusy != true)
-                //{
                 BackgroundWorker bgw = new BackgroundWorker();
                 metroProgressBar1.Visible = true;
                 metroLabel2.Visible = true;
@@ -235,16 +247,12 @@ namespace PullAndClassification.Forms
 
                 bgw.WorkerReportsProgress = true;
                 bgw.RunWorkerAsync();
-                //}
-
             }
 
         }
 
         private void Bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //if (bgw.WorkerSupportsCancellation == true)
-            //{
 
             metroProgressBar1.Visible = false;
             metroLabel2.Visible = false;
@@ -253,11 +261,7 @@ namespace PullAndClassification.Forms
                 CopyAndClassificationForm = this
             };
             selectedFilesForm.FillFilesDataGridView(filtered);
-            //bgw.RunWorkerCompleted -= new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
             selectedFilesForm.ShowDialog();
-            //bgw.CancelAsync();
-
-            //}
         }
 
         [Obsolete]
@@ -279,32 +283,30 @@ namespace PullAndClassification.Forms
         {
             metroProjectListComboBox.DropDownStyle = ComboBoxStyle.DropDown;
             Session.context.Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
-    new ComboboxItem()
-    {
-        Text = project.Name,
-        Value = project.Id
-    })
-);
+            new ComboboxItem()
+            {
+                Text = project.Name,
+                Value = project.Id
+            })
+        );
             if (Session.CurrentProjectId != -1)
-                //{
-                //    metroProjectListComboBox.Text = "-select-";
-                //    //metroProjectListComboBox.SelectedText = "Select";
-                //}
-                ////metroLabelProjectName.Text = "Select Project";
-                //else
                 metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
-            //metroLabelProjectName.Text = Session.CurrentProject.Name;
 
 
         }
 
         private void MetroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //Session.context = new DatabaseContext();
             Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
-            metroLabelProjectName.Text = Session.CurrentProject.Name;
-            UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
+            if (Session.CurrentProject is null)
+                SummaryMessageBox("Project not found!", "Error", MessageBoxIcon.Error);
+            else
+            {
+                metroLabelProjectName.Text = Session.CurrentProject.Name;
+                UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
+                destination.Text =  UserSetting.getRootDistinationPath(Session.GetDatabaseContext());
+            }
         }
 
 

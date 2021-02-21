@@ -11,8 +11,8 @@ namespace PullAndClassification.Utils
     {
         public static DatabaseContext context = new DatabaseContext();
 
-        private static Project currentProject;
-        public static Project CurrentProject { get => currentProject; set => currentProject = value; }
+        private static Project? currentProject;
+        public static Project? CurrentProject { get => currentProject; set => currentProject = value; }
         public static int CurrentProjectId { get => currentProjectId; set => currentProjectId = value; }
         public static UserSetting UserSetting { get => userSetting; set => userSetting = value; }
 
