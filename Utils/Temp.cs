@@ -168,7 +168,7 @@ namespace Utils
                             Tuple<int, string>? _ProjectFileproperties = string.IsNullOrEmpty(row.Cells["_ProjectFileProperties"].Value.ToString()) ? null : (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
 
 
-                            int projectFileId = SaveProjectFile(_ProjectFileproperties,  row.Cells["_fullPath"].Value.ToString());
+                            int projectFileId = SaveProjectFile(_ProjectFileproperties, Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name, row.Cells["_fullPath"].Value.ToString()));
                             SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
                             selectedFilesForm.ClassificationProgressBar.PerformStep();
                             //if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
@@ -204,7 +204,9 @@ namespace Utils
                 ProjectId = projectFileproperties.Item1,
 
                 
-                File = FormatPath(Path.Combine(projectFileproperties.Item2, Path.GetFileName(file)))
+                File = Path.Combine(
+                    Session.CurrentProject.Name,
+                    projectFileproperties.Item2, Path.GetFileName(file))
 
             };
             db.ProjectFiles.Add(projectFile);
@@ -382,7 +384,7 @@ namespace Utils
 
                             MetroTextBox metroTextBox = new MetroTextBox
                             {
-                                ReadOnly = t.NameType.Equals(FNSTypes.fns_text_match.Id),
+                                //ReadOnly = t.NameType.Equals(FNSTypes.fns_text_match.Id),
                                 Text = t.Name,
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
                                 Theme = MetroFramework.MetroThemeStyle.Dark,

@@ -33,9 +33,10 @@ namespace PullAndClassification
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
 
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
-            if (Session.CurrentProject is null)
-                SummaryMessageBox("Project not found!", "Error", MessageBoxIcon.Error);
-            FillFilesDifferances(Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name));
+            //if (Session.CurrentProject is null)
+            //    SummaryMessageBox("Project not found!", "Error", MessageBoxIcon.Error);
+            if (Session.CurrentProject is not null)
+                FillFilesDifferances(Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name));
         }
         public void FillFilesDifferances(string destination)
         {
@@ -115,11 +116,14 @@ namespace PullAndClassification
 
                 dataGridViewFilesDifferances.Columns["_propertyParts"].Visible = false;
                 dataGridViewFilesDifferances.Columns["_ProjectFileProperties"].Visible = false;
+                dataGridViewFilesDifferances.Columns["_fullPath"].Visible = false;
+
                 dataGridViewFilesDifferances.Update();
 
             }
-            catch {
-                dataGridViewFilesDifferances.DataSource=null;
+            catch
+            {
+                dataGridViewFilesDifferances.DataSource = null;
                 dataGridViewFilesDifferances.Update();
 
 
@@ -128,18 +132,18 @@ namespace PullAndClassification
 
         private List<PropertyParts> GetPropertyPartsFromDB(string path)
         {
-            
+
             if (string.IsNullOrEmpty(path))
                 return null;
 
             var ProjectFileId = Session.GetDatabaseContext().ProjectFiles.Where(s => s.File.Equals(path)).Select(s => s.Id).FirstOrDefault();
-            List <ProjectFileProperty> temp = Session.GetDatabaseContext().ProjectFileProperties.Where(x=>x.ProjectFileId== ProjectFileId)
+            List<ProjectFileProperty> temp = Session.GetDatabaseContext().ProjectFileProperties.Where(x => x.ProjectFileId == ProjectFileId)
                 .ToList();
-  
+
             List<PropertyParts> output = temp.ConvertAll(new Converter<ProjectFileProperty, PropertyParts>(ConvertFromProjectFilePropertyToPropertyParts));
 
             return output;
-            
+
         }
 
         private IEnumerable<Temp.FileInfo> FilterFiles(bool withHidden, string sourceLocalFile, string extention)
@@ -159,7 +163,7 @@ namespace PullAndClassification
                     .Select(f => new Temp.FileInfo
                     {
                         Name = Path.Combine(f.Name),
-                        Path = FormatPath(Path.Combine(new Uri(Path.Combine(directory.FullName + "/")).MakeRelativeUri(new Uri(Path.Combine(f.FullName))).ToString())),
+                        Path = Path.Combine(Session.CurrentProject.Name,FormatPath(Path.Combine(new Uri(Path.Combine(directory.FullName + "/")).MakeRelativeUri(new Uri(Path.Combine(f.FullName))).ToString()))),
                         Size = f.Length / 1024,
                         ValidFileStrusture = projectFileNameParser.ValiateFileName(Path.Combine(f.Name)).success,
                         PathToClassify = projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path,
@@ -209,11 +213,11 @@ namespace PullAndClassification
                 )
 
             );
-            if (Session.CurrentProjectId != -1)
+            if (Session.CurrentProjectId != -1 && Session.CurrentProject is not null)
             {
                 metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
                 metroLabelProjectName.Text = Session.CurrentProject.Name;
-               
+
             }
         }
 
@@ -473,7 +477,7 @@ namespace PullAndClassification
                 indexRow = e.RowIndex;
                 if (e.RowIndex != -1)
                 {
-                    
+
                     ClassificationButton.Visible = false;
                     DataGridViewRow newDataRow = dataGridViewFilesDifferances.Rows[indexRow];
 
@@ -489,24 +493,24 @@ namespace PullAndClassification
                         {
                             RemoveFromDB.Visible = false;
                         }
-                            Controls1 = PrepareControls.RenderAndReturnListofLinkedControlsInForm2(this, id);
-                            List<PropertyParts> propertyParts = GetPropertyPartsFromDB(file);
-                            if (propertyParts.Count > 0)
+                        Controls1 = PrepareControls.RenderAndReturnListofLinkedControlsInForm2(this, id);
+                        List<PropertyParts> propertyParts = GetPropertyPartsFromDB(file);
+                        if (propertyParts.Count > 0)
+                        {
+                            for (int i = 0; i < propertyParts.Count; i++)
                             {
-                                for (int i = 0; i < propertyParts.Count; i++)
-                                {
-                                    List<Tuple<int, Control>> tuple = GetTupleIntControlerWithId(propertyParts[i].FNSId);
-                                    if (tuple is not null)
-                                        if (tuple.Count == 1)
-                                            tuple.First().Item2.Text = propertyParts[i].Name;
-                                        else if (tuple.Count == 2)
-                                        {
-                                            tuple[0].Item2.Text = propertyParts[i].Name.Split('_')[0]; ;
-                                            tuple[1].Item2.Text = propertyParts[+i].Name.Split('_')[1];
-                                        }
-                                }
+                                List<Tuple<int, Control>> tuple = GetTupleIntControlerWithId(propertyParts[i].FNSId);
+                                if (tuple is not null)
+                                    if (tuple.Count == 1)
+                                        tuple.First().Item2.Text = propertyParts[i].Name;
+                                    else if (tuple.Count == 2)
+                                    {
+                                        tuple[0].Item2.Text = propertyParts[i].Name.Split('_')[0]; ;
+                                        tuple[1].Item2.Text = propertyParts[+i].Name.Split('_')[1];
+                                    }
                             }
-                        
+                        }
+
                     }
                     else
                     {
@@ -590,10 +594,10 @@ namespace PullAndClassification
         private void Classification_Click(object sender, EventArgs e)
         {
             DataGridViewRow newDataRow = dataGridViewFilesDifferances.Rows[indexRow];
-          //  IEnumerable<DataGridViewRow> emptyFileClassificationPath = GetSelectedFiles(FilesDataGridView).Where(s => string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString()));
+            //  IEnumerable<DataGridViewRow> emptyFileClassificationPath = GetSelectedFiles(FilesDataGridView).Where(s => string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString()));
             if (string.IsNullOrEmpty(newDataRow.Cells["ClassificationPath"].Value.ToString()))
             {
-                SummaryMessageBox("Classificatio path for below files is not valid\n" +  newDataRow.Cells["Id"].Value, "Error", MessageBoxIcon.Error);
+                SummaryMessageBox("Classificatio path for below files is not valid\n" + newDataRow.Cells["Id"].Value, "Error", MessageBoxIcon.Error);
             }
             else
             {
@@ -601,7 +605,7 @@ namespace PullAndClassification
 
                 classification.CopyAndClassification(null,
                      Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name, newDataRow.Cells["Id"].Value.ToString()),
-                    Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name,newDataRow.Cells["ClassificationPath"].Value.ToString()),
+                    Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name, newDataRow.Cells["ClassificationPath"].Value.ToString()),
                     "",
                     false,
                     true);
@@ -611,7 +615,7 @@ namespace PullAndClassification
                 SaveProjectFileProperties(projectFileId, newDataRow.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
                 FillFilesDifferances(Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name));
 
-               
+
             }
         }
 

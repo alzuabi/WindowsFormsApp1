@@ -34,11 +34,11 @@ namespace PullAndClassification.Forms
             ShadowType = MetroFormShadowType.AeroShadow;
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
-            if (Session.CurrentProject is null)
-            {
-                SummaryMessageBox("Project not found!", "Error", MessageBoxIcon.Error);
-                Close();
-            }
+            //if (Session.CurrentProject is null)
+            //{
+            //    SummaryMessageBox("Project not found!", "Error", MessageBoxIcon.Error);
+            //    Close();
+            //}
         }
 
         private void Select_Destination_Click(object sender, EventArgs e)
@@ -289,7 +289,7 @@ namespace PullAndClassification.Forms
                 Value = project.Id
             })
         );
-            if (Session.CurrentProjectId != -1)
+            if (Session.CurrentProjectId != -1 && Session.CurrentProject is not null)
                 metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
 
 
