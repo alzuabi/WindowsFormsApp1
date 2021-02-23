@@ -87,7 +87,7 @@ namespace PullAndClassification.Forms
             this.buttonSelectedFilesOk.Name = "buttonSelectedFilesOk";
             this.buttonSelectedFilesOk.Size = new System.Drawing.Size(61, 30);
             this.buttonSelectedFilesOk.TabIndex = 27;
-            this.buttonSelectedFilesOk.Text = "OK";
+            this.buttonSelectedFilesOk.Text = "Close";
             this.buttonSelectedFilesOk.UseVisualStyleBackColor = true;
             this.buttonSelectedFilesOk.Visible = false;
             this.buttonSelectedFilesOk.Click += new System.EventHandler(this.buttonSelectedFilesOk_Click);

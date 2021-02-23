@@ -14,11 +14,29 @@ using MetroFramework.Controls;
 using System.ComponentModel;
 using Classification.Utils;
 using Newtonsoft.Json;
+using PullAndClassification;
 
 namespace Utils
 {
     public class Temp
     {
+        public static PropertyParts ConvertFromProjectFilePropertyToPropertyParts(ProjectFileProperty projectFileProperty)
+        {
+            return new PropertyParts()
+            {
+                CreateFolder = projectFileProperty.CreateFolder,
+                FolderOrder = projectFileProperty.FolderOrder,
+                Name = projectFileProperty.Value,
+                NameType = projectFileProperty.Name,
+                FNSId = projectFileProperty.Id
+            };
+        }
+        public static string FormatPath(string path)
+        {
+            string result = path.Replace("/", "\\");
+            //result = result.TrimStart("\\");
+            return result;
+        }
         public BackgroundWorker bgw = new BackgroundWorker();
         public string GetTemporaryDirectory()
         {
@@ -67,7 +85,7 @@ namespace Utils
         }
         public static List<string> CopyAndClassify(
             bool checkBoxClassification,
-            SelectFileForm selectedFilesForm,
+            SelectFileForm? selectedFilesForm,
             string destination,
             bool fromSvn,
             string UserName,
@@ -108,8 +126,8 @@ namespace Utils
                             classification.CopyAndClassification(client, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, fromSvn);
                             Tuple<int, string> _ProjectFileproperties = (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
 
-                            int projectFileId = SaveProjectFile(_ProjectFileproperties, destination, row.Cells["_fullPath"].Value.ToString());
-                            SaveProjectFileProperties(projectFileId,row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
+                            int projectFileId = SaveProjectFile(_ProjectFileproperties,  row.Cells["_fullPath"].Value.ToString());
+                            SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
                             selectedFilesForm.ClassificationProgressBar.PerformStep();
                             //if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
                             //    summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
@@ -124,7 +142,7 @@ namespace Utils
             else
             {
                 var classification = Classification.Service.Classification.GetInstance();
-                selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles(selectedFilesForm.FilesDataGridView));
+                selectedFiles.AddRange(selectedFilesForm?.GetSelectedFiles(selectedFilesForm?.FilesDataGridView));
                 selectedFilesForm.ClassificationProgressBar.Visible = true;
                 selectedFilesForm.ClassificationProgressBar.Minimum = 1;
                 selectedFilesForm.ClassificationProgressBar.Maximum = 100;
@@ -150,8 +168,8 @@ namespace Utils
                             Tuple<int, string>? _ProjectFileproperties = string.IsNullOrEmpty(row.Cells["_ProjectFileProperties"].Value.ToString()) ? null : (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
 
 
-                            int projectFileId = SaveProjectFile(_ProjectFileproperties, destination, row.Cells["_fullPath"].Value.ToString());
-                            SaveProjectFileProperties(projectFileId,row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
+                            int projectFileId = SaveProjectFile(_ProjectFileproperties,  row.Cells["_fullPath"].Value.ToString());
+                            SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
                             selectedFilesForm.ClassificationProgressBar.PerformStep();
                             //if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
                             //    summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
@@ -178,23 +196,22 @@ namespace Utils
         //    metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
         //}
 
-        private static int SaveProjectFile(Tuple<int, string> projectFileproperties, string destination, string file)
+        public static int SaveProjectFile(Tuple<int, string> projectFileproperties, string file)
         {
             using var db = Session.GetDatabaseContext();
             ProjectFile projectFile = new ProjectFile()
             {
                 ProjectId = projectFileproperties.Item1,
 
-                //File = Path.Combine(destination, projectFileproperties.Item2, Path.GetFileName(file)),
-                File = Path.Combine(projectFileproperties.Item2, Path.GetFileName(file)),
+                
+                File = FormatPath(Path.Combine(projectFileproperties.Item2, Path.GetFileName(file)))
 
-                //Properties = JsonConvert.SerializeObject(projectFileproperties.Item3)
             };
             db.ProjectFiles.Add(projectFile);
             db.SaveChanges();
             return projectFile.Id;
         }
-        private static void SaveProjectFileProperties(int projectFileId, List<PropertyParts> propertyParts)
+        public static void SaveProjectFileProperties(int projectFileId, List<PropertyParts> propertyParts)
         {
             using var db = Session.GetDatabaseContext();
             foreach (PropertyParts propertyParts1 in propertyParts)
@@ -270,10 +287,16 @@ namespace Utils
             public List<PropertyParts> PropertyParts { get => propertyParts; set => propertyParts = value; }
             public Tuple<int, string> ProjectFileProperties { get => projectFileProperties; set => projectFileProperties = value; }
         }
-        public class PrepareControls
+        public static class PrepareControls
         {
+            public static List<LinkedControls> RenderAndReturnListofLinkedControlsInForm(Form form) => GetAdditionalControls(
+                       Session.CurrentProject.ProjectFileNameStructures.ToList(),
+                       778,
+                       20,
+                       60,
+                       form);
 
-            public List<LinkedControls> GetAdditionalControls(
+            public static List<LinkedControls> GetAdditionalControls(
                 List<ProjectFileNameStructure> projectFileNameStructures,
                 int beginX,
                 int beginY,
@@ -359,6 +382,7 @@ namespace Utils
 
                             MetroTextBox metroTextBox = new MetroTextBox
                             {
+                                ReadOnly = t.NameType.Equals(FNSTypes.fns_text_match.Id),
                                 Text = t.Name,
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
                                 Theme = MetroFramework.MetroThemeStyle.Dark,
@@ -383,6 +407,127 @@ namespace Utils
                 return controls;
             }
 
+            public static List<LinkedControls> RenderAndReturnListofLinkedControlsInForm2(CheckDiscrepancyForm checkDiscrepancyForm, int fileid)
+   => GetAdditionalControls2(
+                       Session.GetDatabaseContext().ProjectFileProperties.Where(s=>s.ProjectFileId==fileid).ToList(),
+                       778,
+                       20,
+                       60,
+                       checkDiscrepancyForm);
+
+                public static List<LinkedControls> GetAdditionalControls2(
+                List<ProjectFileProperty> projectFileProperties,
+                int beginX,
+                int beginY,
+                int SepDest,
+                Form form)
+                {
+                    int i = 0;
+                    List<LinkedControls> controls = new List<LinkedControls>();
+                projectFileProperties./*Where(t => t.CreateFolder).*/OrderBy(t => t.FolderOrder).ToList().ForEach(t =>
+                    {
+                        if (t.Name.Equals(FNSTypes.fns_date.Id))
+                        {
+
+                            DateTimePicker dateTimePicker = new MetroDateTime
+                            {
+                                //Text = t.Name,
+                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
+                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Style = MetroFramework.MetroColorStyle.Blue,
+                                Height = 20,
+                                Width = 250,
+                                Name = "Added_"
+                            };
+                            form.Controls.Add(dateTimePicker);
+                            controls.Add(new LinkedControls(t.Id, dateTimePicker));
+                        }
+                        else if (t.Name.Equals(FNSTypes.fns_lot.Id))
+                        {
+                            MetroComboBox metroComboBox = new MetroComboBox
+                            {
+                                Text = t.Name,
+                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
+                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Style = MetroFramework.MetroColorStyle.Blue,
+                                Height = 20,
+                                Width = 250,
+                                Name = "Added_"
+
+
+                            };
+                            Session.GetDatabaseContext().LOTs.Where(lot => lot.ProjectId == Session.CurrentProjectId).ToList().ForEach(lot => metroComboBox.Items.Add(new ComboboxItem()
+                            {
+                                Text = lot.Name,
+                                Value = lot.Id
+                            })
+                            );
+                            metroComboBox.SelectedIndex = metroComboBox.FindStringExact(t.Value);
+                            metroComboBox.SelectedText = metroComboBox.SelectedItem.ToString();
+                            form.Controls.Add(metroComboBox);
+                            controls.Add(new LinkedControls(t.Id, metroComboBox));
+                        }
+                        else if (t.Name.Equals(FNSTypes.fns_date_index.Id))
+                        {
+                            LinkedControls linkedControls = new LinkedControls();
+                            Tuple<int, Control> tuple;
+                            DateTimePicker dateTimePicker = new MetroDateTime
+                            {
+                                Text = t.Value.Split('_')[0],
+                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
+                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Style = MetroFramework.MetroColorStyle.Blue,
+                                Height = 20,
+                                Width = 250,
+                                Name = "Added_"
+                            };
+                            form.Controls.Add(dateTimePicker);
+                            tuple = Tuple.Create<int, Control>(t.Id, dateTimePicker);
+                            linkedControls.LinkedList.AddFirst(tuple);
+                            MetroTextBox metroTextBox = new MetroTextBox
+                            {
+                                Text = t.Value.Split('_')[1],
+                                Location = new Point(beginX + 380, beginY + (SepDest * i)),
+                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Style = MetroFramework.MetroColorStyle.Blue,
+                                Height = 20,
+                                Width = 100,
+                                Name = "Added_"
+                            };
+                            form.Controls.Add(metroTextBox);
+                            tuple = Tuple.Create<int, Control>(t.Id, metroTextBox);
+                            linkedControls.LinkedList.AddLast(tuple);
+                            controls.Add(linkedControls);
+                        }
+                        else
+                        {
+
+                            MetroTextBox metroTextBox = new MetroTextBox
+                            {
+                                ReadOnly = t.Name.Equals(FNSTypes.fns_text_match.Id),
+                                Text = t.Name,
+                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
+                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Style = MetroFramework.MetroColorStyle.Blue,
+                                Height = 20,
+                                Width = 250,
+                                Name = "Added_"
+                            };
+                            form.Controls.Add(metroTextBox);
+                            controls.Add(new LinkedControls(t.Id, metroTextBox));
+                        }
+                        form.Controls.Add(new MetroLabel
+                        {
+
+                            Text = t.Name,
+                            Location = new Point(beginX, beginY + (SepDest * i)),
+                            Theme = MetroFramework.MetroThemeStyle.Dark,
+                            Name = "Added_"
+
+                        });
+                    });
+                    return controls;
+            }
         }
         public class ComboboxItem
         {
@@ -406,9 +551,21 @@ namespace Utils
             }
             public LinkedControls() { }
         }
-        public static void SummaryMessageBox(string message, string caption, MessageBoxIcon messageType )
+        public static void SummaryMessageBox(string message, string caption, MessageBoxIcon messageType)
         {
             MessageBox.Show(new Form { Size = new Size(600, 800) }, message, caption, MessageBoxButtons.OK, messageType);
         }
     }
+    public class Tempjoin
+    {
+        public string Id { get; set; }
+        public bool inDatabase { get; set; }
+
+        public bool inFileSystem { get; set; }
+
+        public List<ProjectFileProperty> PropertyParts { get; set; }
+
+
+    }
+
 }

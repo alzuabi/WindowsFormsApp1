@@ -122,7 +122,7 @@ namespace PullAndClassification.Forms
                 {
                     for (int i = 0; i < propertyParts.Count; i++)
                     {
-                        List<Tuple<int, Control>> tuple = getTupleIntControlerWithId(propertyParts[i].FNSId);
+                        List<Tuple<int, Control>> tuple = GetTupleIntControlerWithId(propertyParts[i].FNSId);
                         if (tuple is not null)
                             if (tuple.Count == 1)
                                 tuple.First().Item2.Text = propertyParts[i].Name;
@@ -158,7 +158,7 @@ namespace PullAndClassification.Forms
             }
         }
 
-        private List<Tuple<int, Control>> getTupleIntControlerWithId(int fNSId)
+        private List<Tuple<int, Control>> GetTupleIntControlerWithId(int fNSId)
         {
             List<Tuple<int, Control>> tuples = new List<Tuple<int, Control>>();
             foreach (LinkedControls linkedControls in Controls1)
@@ -228,12 +228,13 @@ namespace PullAndClassification.Forms
             metroLabelProjectName.Text = Session.CurrentProject.Name;
             try
             {
-                Controls1 = new PrepareControls().GetAdditionalControls(
-                   Session.CurrentProject.ProjectFileNameStructures.ToList(),
-                   778,
-                   20,
-                   60,
-                   this);
+                Controls1 = PrepareControls.RenderAndReturnListofLinkedControlsInForm(this);
+                //Controls1 = new PrepareControls().GetAdditionalControls(
+                //   Session.CurrentProject.ProjectFileNameStructures.ToList(),
+                //   778,
+                //   20,
+                //   60,
+                //   this);
             }
             catch (Exception ex)
             {
@@ -347,6 +348,11 @@ namespace PullAndClassification.Forms
             //CheckDiscrepancyForm checkForm = new CheckDiscrepancyForm();
             //checkForm.FillFilesDifferances(copyAndClassificationForm.Destination.Text);
             //checkForm.ShowDialog();
+        }
+
+        private void metroButtonFinish_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

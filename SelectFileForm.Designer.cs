@@ -41,7 +41,7 @@ namespace PullAndClassification.Forms
             this.classificationProgressBar = new MetroFramework.Controls.MetroProgressBar();
             this.metroLabelProjectName = new MetroFramework.Controls.MetroLabel();
             this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
-            this.metroButtonCheck = new MetroFramework.Controls.MetroButton();
+            this.metroButtonFinish = new MetroFramework.Controls.MetroButton();
             ((System.ComponentModel.ISupportInitialize)(this.filesDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -58,9 +58,9 @@ namespace PullAndClassification.Forms
             this.Classification.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.Classification.IconSize = 30;
             this.Classification.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.Classification.Location = new System.Drawing.Point(275, 404);
+            this.Classification.Location = new System.Drawing.Point(275, 421);
             this.Classification.Name = "Classification";
-            this.Classification.Size = new System.Drawing.Size(120, 53);
+            this.Classification.Size = new System.Drawing.Size(120, 33);
             this.Classification.TabIndex = 3;
             this.Classification.Text = "Classification";
             this.Classification.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -71,7 +71,7 @@ namespace PullAndClassification.Forms
             // 
             this.metroUpdateProjectButton.Location = new System.Drawing.Point(959, 16);
             this.metroUpdateProjectButton.Name = "metroUpdateProjectButton";
-            this.metroUpdateProjectButton.Size = new System.Drawing.Size(105, 35);
+            this.metroUpdateProjectButton.Size = new System.Drawing.Size(75, 23);
             this.metroUpdateProjectButton.TabIndex = 18;
             this.metroUpdateProjectButton.Text = "Update";
             this.metroUpdateProjectButton.Theme = MetroFramework.MetroThemeStyle.Dark;
@@ -101,11 +101,11 @@ namespace PullAndClassification.Forms
             this.filesDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.filesDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.Transparent;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             dataGridViewCellStyle3.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.Transparent;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Blue;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(198)))), ((int)(((byte)(247)))));
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.filesDataGridView.DefaultCellStyle = dataGridViewCellStyle3;
             this.filesDataGridView.EnableHeadersVisualStyles = false;
@@ -168,24 +168,24 @@ namespace PullAndClassification.Forms
             this.metroLabel1.Text = "Current Project";
             this.metroLabel1.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
-            // metroButtonCheck
+            // metroButtonFinish
             // 
-            this.metroButtonCheck.Location = new System.Drawing.Point(275, 474);
-            this.metroButtonCheck.Name = "metroButtonCheck";
-            this.metroButtonCheck.Size = new System.Drawing.Size(120, 35);
-            this.metroButtonCheck.Style = MetroFramework.MetroColorStyle.Blue;
-            this.metroButtonCheck.TabIndex = 23;
-            this.metroButtonCheck.Text = "Check Discrepancy";
-            this.metroButtonCheck.Theme = MetroFramework.MetroThemeStyle.Dark;
-            this.metroButtonCheck.UseSelectable = true;
-            this.metroButtonCheck.Click += new System.EventHandler(this.MetroButton1_Click);
+            this.metroButtonFinish.Location = new System.Drawing.Point(1233, 431);
+            this.metroButtonFinish.Name = "metroButtonFinish";
+            this.metroButtonFinish.Size = new System.Drawing.Size(75, 23);
+            this.metroButtonFinish.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroButtonFinish.TabIndex = 24;
+            this.metroButtonFinish.Text = "Close";
+            this.metroButtonFinish.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroButtonFinish.UseSelectable = true;
+            this.metroButtonFinish.Click += new System.EventHandler(this.metroButtonFinish_Click);
             // 
             // SelectFileForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1331, 532);
-            this.Controls.Add(this.metroButtonCheck);
+            this.ClientSize = new System.Drawing.Size(1331, 471);
+            this.Controls.Add(this.metroButtonFinish);
             this.Controls.Add(this.metroLabel1);
             this.Controls.Add(this.metroLabelProjectName);
             this.Controls.Add(this.classificationProgressBar);
@@ -213,7 +213,7 @@ namespace PullAndClassification.Forms
         private MetroFramework.Controls.MetroProgressBar classificationProgressBar;
         private MetroFramework.Controls.MetroLabel metroLabelProjectName;
         private MetroFramework.Controls.MetroLabel metroLabel1;
-        private MetroFramework.Controls.MetroButton metroButtonCheck;
+        private MetroFramework.Controls.MetroButton metroButtonFinish;
 
         public MetroFramework.Controls.MetroGrid FilesDataGridView { get => filesDataGridView; set => filesDataGridView = value; }
         public MetroFramework.Controls.MetroProgressBar ClassificationProgressBar { get => classificationProgressBar; set => classificationProgressBar = value; }

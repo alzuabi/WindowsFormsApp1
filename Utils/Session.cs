@@ -20,7 +20,9 @@ namespace PullAndClassification.Utils
 
         private static int currentProjectId = UserSetting.getCurrentProjectId(context);
 
-
+        private static string getRootDestination() {
+            return UserSetting.getRootDistinationPath(GetDatabaseContext());
+        }
         //private static int? defaultProjectId = context.Projects.OrderByDescending(p => p.CreatedAt).FirstOrDefault()?.Id;
         private static UserSetting userSetting;
 

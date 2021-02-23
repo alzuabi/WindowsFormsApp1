@@ -58,6 +58,7 @@ namespace PullAndClassification.Forms
             this.metroProjectListComboBox = new MetroFramework.Controls.MetroComboBox();
             this.metroLabel3 = new MetroFramework.Controls.MetroLabel();
             this.errorProviderSelectProject = new System.Windows.Forms.ErrorProvider(this.components);
+            this.metroButtonFinish = new MetroFramework.Controls.MetroButton();
             ((System.ComponentModel.ISupportInitialize)(this.errorProviderSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProviderDestination)).BeginInit();
             this.panel4.SuspendLayout();
@@ -88,7 +89,7 @@ namespace PullAndClassification.Forms
             this.panel4.Controls.Add(this.groupBox1);
             this.panel4.Location = new System.Drawing.Point(38, 98);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(717, 292);
+            this.panel4.Size = new System.Drawing.Size(720, 292);
             this.panel4.TabIndex = 19;
             // 
             // metroLabel2
@@ -522,6 +523,18 @@ namespace PullAndClassification.Forms
             // 
             this.errorProviderSelectProject.ContainerControl = this;
             // 
+            // metroButtonFinish
+            // 
+            this.metroButtonFinish.Location = new System.Drawing.Point(894, 378);
+            this.metroButtonFinish.Name = "metroButtonFinish";
+            this.metroButtonFinish.Size = new System.Drawing.Size(75, 23);
+            this.metroButtonFinish.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroButtonFinish.TabIndex = 37;
+            this.metroButtonFinish.Text = "Close";
+            this.metroButtonFinish.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroButtonFinish.UseSelectable = true;
+            this.metroButtonFinish.Click += new System.EventHandler(this.metroButtonFinish_Click);
+            // 
             // CopyAndClassificationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -529,6 +542,7 @@ namespace PullAndClassification.Forms
             this.AutoSize = true;
             this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
             this.ClientSize = new System.Drawing.Size(992, 424);
+            this.Controls.Add(this.metroButtonFinish);
             this.Controls.Add(this.metroLabel3);
             this.Controls.Add(this.metroProjectListComboBox);
             this.Controls.Add(this.metroLabel1);
@@ -587,6 +601,7 @@ namespace PullAndClassification.Forms
         private MetroFramework.Controls.MetroComboBox metroProjectListComboBox;
         private MetroFramework.Controls.MetroLabel metroLabel3;
         private ErrorProvider errorProviderSelectProject;
+        private MetroFramework.Controls.MetroButton metroButtonFinish;
     }
 }
 

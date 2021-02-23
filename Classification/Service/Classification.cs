@@ -35,7 +35,7 @@ namespace Classification.Service
             }
             return _instance;
         }
-        public void CopyAndClassification(SvnClient client, string s, string d,string dir, bool fromSvn)
+        public void CopyAndClassification(SvnClient client, string s, string d,string dir, bool fromSvn, bool move=false)
         {
             var log = Log.GetInstance();
             try
@@ -60,8 +60,10 @@ namespace Classification.Service
                     string dest = Path.Combine(dir, d);
                     Directory.CreateDirectory(dest);
                     dest = Path.Combine(dest, Path.GetFileName(s));
-
-                    File.Copy(s, dest, true);
+                    if (move == true)
+                        File.Move(s, dest);
+                    else
+                        File.Copy(s, dest, true);
 
                     //using (var db = new DatabaseContext())
                     //{

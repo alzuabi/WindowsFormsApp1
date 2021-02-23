@@ -47,7 +47,7 @@ namespace PullAndClassification.Forms
 
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
-                destination.Text = folderBrowserDialog.SelectedPath;
+                destination.Text = Path.Combine(folderBrowserDialog.SelectedPath);
             }
         }
 
@@ -73,7 +73,7 @@ namespace PullAndClassification.Forms
 
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
-                sourceLocalFile.Text = folderBrowserDialog.SelectedPath;
+                sourceLocalFile.Text = Path.Combine(folderBrowserDialog.SelectedPath);
             }
 
         }
@@ -92,8 +92,8 @@ namespace PullAndClassification.Forms
             if (client.GetList(folderTarget, arg, out listResults))
             {
                 foreach (SvnListEventArgs item in listResults
-                    .Where(item => !string.IsNullOrEmpty(item.Name) &&
-                    !item.EntryUri.AbsoluteUri.ToString().Equals(folderTarget.TargetName.ToString() + "/")))
+                    .Where(item => !string.IsNullOrEmpty(Path.Combine(item.Name)) &&
+                    !item.EntryUri.AbsoluteUri.ToString().Equals(Path.Combine(folderTarget.TargetName).ToString() + "/")))
                 {
 
                     if (item.Entry.NodeKind == SvnNodeKind.File)
@@ -101,12 +101,12 @@ namespace PullAndClassification.Forms
                         if (Path.GetExtension(item.Name).Equals(extention))
                             filesFound.Add(new Temp.FileInfo
                             {
-                                Name = item.Name,
+                                Name = Path.Combine(item.Name),
                                 Path = item.EntryUri.AbsoluteUri,
                                 Size = item.Entry.FileSize / 1024,
-                                ValidFileStrusture = projectFileNameParser.ValiateFileName(item.Name).success,
-                                PathToClassify = projectFileNameParser.ValiateFileName(item.Name).path,
-                                PropertyParts = projectFileNameParser.ValiateFileName(item.Name).propertyParts
+                                ValidFileStrusture = projectFileNameParser.ValiateFileName(Path.Combine(item.Name)).success,
+                                PathToClassify = projectFileNameParser.ValiateFileName(Path.Combine(item.Name)).path,
+                                PropertyParts = projectFileNameParser.ValiateFileName(Path.Combine(item.Name)).propertyParts
 
                             }
                                         );
@@ -155,10 +155,10 @@ namespace PullAndClassification.Forms
                         .Where(f => Path.GetExtension(f.Name).Equals(extention))
                         .Select(f => new Temp.FileInfo
                         {
-                            Name = f.Name,
-                            Path = f.FullName,
+                            Name = Path.Combine(f.Name),
+                            Path = Path.Combine(f.FullName),
                             Size = f.Length / 1024,
-                            ValidFileStrusture = projectFileNameParser.ValiateFileName(f.Name).success,
+                            ValidFileStrusture = projectFileNameParser.ValiateFileName(Path.Combine(f.Name)).success,
                             PathToClassify = projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path,
                             PropertyParts = projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).propertyParts,
                             ProjectFileProperties = Tuple.Create(Session.CurrentProjectId, projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path)
@@ -178,7 +178,7 @@ namespace PullAndClassification.Forms
         {
             SyncWithSvnForm pullAndPushForm = new SyncWithSvnForm
             {
-                Destination = destination.Text
+                Destination = Path.Combine(destination.Text)
             };
 
             pullAndPushForm.ShowDialog();
@@ -188,7 +188,7 @@ namespace PullAndClassification.Forms
 
         private void Source_Validating(object sender, CancelEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(metroSourceSVNTextBox.Text) && string.IsNullOrWhiteSpace(sourceLocalFile.Text))
+            if (string.IsNullOrWhiteSpace(Path.Combine(metroSourceSVNTextBox.Text)) && string.IsNullOrWhiteSpace(Path.Combine(sourceLocalFile.Text)))
             {
                 e.Cancel = true;
                 metroSourceSVNTextBox.Focus();
@@ -207,7 +207,7 @@ namespace PullAndClassification.Forms
 
         private void Destination_Validating(object sender, CancelEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(destination.Text))
+            if (string.IsNullOrWhiteSpace(Path.Combine(destination.Text)))
             {
                 e.Cancel = true;
                 destination.Focus();
@@ -269,7 +269,7 @@ namespace PullAndClassification.Forms
         {
             try
             {
-                filtered = FilterFiles(false, fromSvn, metroSourceSVNTextBox.Text, sourceLocalFile.Text, ".rvt");
+                filtered = FilterFiles(false, fromSvn, Path.Combine(metroSourceSVNTextBox.Text), Path.Combine(sourceLocalFile.Text), ".rvt");
             }
 
             catch (Exception ex)
@@ -285,7 +285,7 @@ namespace PullAndClassification.Forms
             Session.context.Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
             new ComboboxItem()
             {
-                Text = project.Name,
+                Text = Path.Combine(project.Name),
                 Value = project.Id
             })
         );
@@ -305,10 +305,13 @@ namespace PullAndClassification.Forms
             {
                 metroLabelProjectName.Text = Session.CurrentProject.Name;
                 UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
-                destination.Text =  UserSetting.getRootDistinationPath(Session.GetDatabaseContext());
+                destination.Text =  Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name);
             }
         }
 
-
+        private void metroButtonFinish_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
     }
 }
