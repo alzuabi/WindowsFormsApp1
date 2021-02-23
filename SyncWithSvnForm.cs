@@ -31,13 +31,17 @@ namespace PullAndClassification.Forms
 
         private void PushToSvn_Click(object sender, EventArgs e)
         {
-            BackgroundWorker bgw = new BackgroundWorker();
-            metroProgressBar1.Visible = true;
+            if (string.IsNullOrEmpty(metroDestinationTextBox.Text))
+                MessageBox.Show("Please set Destination in user settings", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            else
+            {
+                BackgroundWorker bgw = new BackgroundWorker();
+                metroProgressBar1.Visible = true;
                 bgw.DoWork += new DoWorkEventHandler(Bgw_DoPush);
                 bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
                 bgw.WorkerReportsProgress = true;
                 bgw.RunWorkerAsync();
-
+            }
         }
 
         private void Bgw_DoPush(object sender, DoWorkEventArgs e)
@@ -94,8 +98,7 @@ namespace PullAndClassification.Forms
                     Value = project.Id
                 })
             );
-            if (Session.CurrentProjectId != -1)
-
+            if (Session.CurrentProjectId != -1 && Session.CurrentProject is not null)
                 metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
         }
 
@@ -111,17 +114,23 @@ namespace PullAndClassification.Forms
 
         private void IconCloneButton_Click(object sender, EventArgs e)
         {
-            BackgroundWorker bgw = new BackgroundWorker();
-            metroProgressBar1.Visible = true;
+            if (string.IsNullOrEmpty(metroDestinationTextBox.Text))
+                MessageBox.Show("Please set Destination in user settings", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            else
+            {
+                BackgroundWorker bgw = new BackgroundWorker();
+                metroProgressBar1.Visible = true;
                 bgw.DoWork += new DoWorkEventHandler(Bgw_DoClone);
                 bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
                 bgw.WorkerReportsProgress = true;
                 bgw.RunWorkerAsync();
-            
+            }
         }
 
         private void Bgw_DoClone(object sender, DoWorkEventArgs e)
         {
+           
+
             Destination = metroDestinationTextBox.Text;
             Temp temp = new Temp();
             string d = temp.GetTemporaryDirectory();

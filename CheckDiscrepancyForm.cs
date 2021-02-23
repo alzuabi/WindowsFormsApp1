@@ -35,7 +35,7 @@ namespace PullAndClassification
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
             //if (Session.CurrentProject is null)
             //    SummaryMessageBox("Project not found!", "Error", MessageBoxIcon.Error);
-            if (Session.CurrentProject is not null)
+            if (Session.CurrentProject is not null && UserSetting.getRootDistinationPath(Session.GetDatabaseContext()) is not null)
                 FillFilesDifferances(Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name));
         }
         public void FillFilesDifferances(string destination)
@@ -239,7 +239,7 @@ namespace PullAndClassification
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(new Form { Size = new Size(600, 800) }, "Please Check project tables", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(new Form { Size = new Size(600, 800) }, "Some Data is missing", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 

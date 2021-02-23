@@ -60,15 +60,15 @@
   <ItemGroup>
     <Reference Include="MULTISYSDbContext, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SharedDlls\MULTISYSDbContext.dll</HintPath>
+      <HintPath>..\SharedDlls\24-2\MULTISYSDbContext.dll</HintPath>
     </Reference>
     <Reference Include="MULTISYSSettings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SharedDlls\MULTISYSSettings.dll</HintPath>
+      <HintPath>..\SharedDlls\24-2\MULTISYSSettings.dll</HintPath>
     </Reference>
     <Reference Include="MULTISYSUtilities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SharedDlls\18\MULTISYSUtilities.dll</HintPath>
+      <HintPath>..\SharedDlls\24-2\MULTISYSUtilities.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />

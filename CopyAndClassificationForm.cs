@@ -211,7 +211,7 @@ namespace PullAndClassification.Forms
             {
                 e.Cancel = true;
                 destination.Focus();
-                errorProviderSource.SetError(destination, "Destination should not be left blank!");
+                errorProviderSource.SetError(destination, "Please set Destination path in user settings");
             }
             else
             {
@@ -305,7 +305,8 @@ namespace PullAndClassification.Forms
             {
                 metroLabelProjectName.Text = Session.CurrentProject.Name;
                 UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
-                destination.Text =  Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name);
+                if (UserSetting.getRootDistinationPath(Session.GetDatabaseContext()) is not null)
+                    destination.Text =  Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name);
             }
         }
 
