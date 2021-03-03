@@ -139,7 +139,7 @@ namespace PullAndClassification.Forms
             // 
             this.classificationProgressBar.Location = new System.Drawing.Point(46, 378);
             this.classificationProgressBar.Name = "classificationProgressBar";
-            this.classificationProgressBar.Size = new System.Drawing.Size(662, 10);
+            this.classificationProgressBar.Size = new System.Drawing.Size(662, 5);
             this.classificationProgressBar.Style = MetroFramework.MetroColorStyle.Blue;
             this.classificationProgressBar.TabIndex = 20;
             this.classificationProgressBar.Theme = MetroFramework.MetroThemeStyle.Dark;

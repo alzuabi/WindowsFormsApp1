@@ -20,6 +20,7 @@ namespace Utils
 {
     public class Temp
     {
+        public const string prefexFolder = "Reception";
         public static PropertyParts ConvertFromProjectFilePropertyToPropertyParts(ProjectFileProperty projectFileProperty)
         {
             return new PropertyParts()
@@ -110,29 +111,28 @@ namespace Utils
                 selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Where(s => !string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString())).ToList().Count;
                 try
                 {
-                    using (var db = Session.GetDatabaseContext())
-                    {
-                        var rowsToDelete = db.ProjectFiles.AsEnumerable()
-                                    .Where(r => r.ProjectId == Session.CurrentProjectId)
-                                    .ToList();
-                        foreach (var row in rowsToDelete)
-                            db.ProjectFiles.Remove(row);
-                        db.SaveChanges();
-                    }
+                    //using (var db = Session.GetDatabaseContext())
+                    //{
+                    //    var rowsToDelete = db.ProjectFiles.AsEnumerable()
+                    //                .Where(r => r.ProjectId == Session.CurrentProjectId)
+                    //                .ToList();
+                    //    foreach (var row in rowsToDelete)
+                    //        db.ProjectFiles.Remove(row);
+                    //    db.SaveChanges();
+                    //}
                     selectedFiles.ForEach(row =>
                     {
                         if (!string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
                         {
-                            classification.CopyAndClassification(client, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, fromSvn);
-                            Tuple<int, string> _ProjectFileproperties = (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
+                            if (classification.CopyAndClassification(client, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, fromSvn))
+                            {
+                                Tuple<int, string> _ProjectFileproperties = (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
 
-                            int projectFileId = SaveProjectFile(_ProjectFileproperties,  row.Cells["_fullPath"].Value.ToString());
-                            SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
-                            selectedFilesForm.ClassificationProgressBar.PerformStep();
-                            //if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
-                            //    summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
-                            //else
-                            summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
+                                int projectFileId = SaveProjectFile(_ProjectFileproperties, row.Cells["_fullPath"].Value.ToString());
+                                SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
+                                selectedFilesForm.ClassificationProgressBar.PerformStep();
+                                summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
+                            }
                         }
                     }
                     );
@@ -149,32 +149,34 @@ namespace Utils
                 selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Where(s => !string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString())).ToList().Count;
                 try
                 {
-                    using (var db = Session.GetDatabaseContext())
-                    {
-                        var rowsToDelete = db.ProjectFiles.AsEnumerable()
-                                    .Where(r => r.ProjectId == Session.CurrentProjectId)
-                                    .ToList();
-                        foreach (var row in rowsToDelete)
-                            db.ProjectFiles.Remove(row);
-                        db.SaveChanges();
-                    }
+                    //using (var db = Session.GetDatabaseContext())
+                    //{
+                    //    var rowsToDelete = db.ProjectFiles.AsEnumerable()
+                    //                .Where(r => r.ProjectId == Session.CurrentProjectId)
+                    //                .ToList();
+                    //    foreach (var row in rowsToDelete)
+                    //        db.ProjectFiles.Remove(row);
+                    //    db.SaveChanges();
+                    //}
                     selectedFiles.ForEach(row =>
                     {
 
                         if (!string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
                         {
-                            classification.CopyAndClassification(null, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, false);
+                            if (classification.CopyAndClassification(null, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, false))
+                            {
 
-                            Tuple<int, string>? _ProjectFileproperties = string.IsNullOrEmpty(row.Cells["_ProjectFileProperties"].Value.ToString()) ? null : (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
+                                Tuple<int, string>? _ProjectFileproperties = string.IsNullOrEmpty(row.Cells["_ProjectFileProperties"].Value.ToString()) ? null : (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
 
 
-                            int projectFileId = SaveProjectFile(_ProjectFileproperties, Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name, row.Cells["_fullPath"].Value.ToString()));
-                            SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
-                            selectedFilesForm.ClassificationProgressBar.PerformStep();
-                            //if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
-                            //    summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
-                            //else
-                            summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
+                                int projectFileId = SaveProjectFile(_ProjectFileproperties, Path.Combine(/*UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name, */row.Cells["_fullPath"].Value.ToString()));
+                                SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
+                                selectedFilesForm.ClassificationProgressBar.PerformStep();
+                                //if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
+                                //    summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
+                                //else
+                                summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
+                            }
                         }
                     }
                     );
@@ -203,12 +205,33 @@ namespace Utils
             {
                 ProjectId = projectFileproperties.Item1,
 
-                
-                File = Path.Combine(
-                    Session.CurrentProject.Name,
-                    projectFileproperties.Item2, Path.GetFileName(file))
 
+                File = FormatPath(Path.Combine(
+                    //Temp.prefexFolder,
+                    projectFileproperties.Item2, Path.GetFileName(file))
+                )
             };
+            var ProjectFiles = db.ProjectFiles.AsEnumerable()
+                .Where(s => Path.GetFullPath(s.File).Equals(Path.GetFullPath(projectFile.File)))
+                .Where(s => s.ProjectId == projectFileproperties.Item1)
+                .ToList();
+            if (ProjectFiles.Count !=0)
+            {
+                foreach (var row in ProjectFiles)
+                {
+                    db.ProjectFiles.Remove(row);
+                    var projectProps = db.ProjectFileProperties.AsEnumerable().Where(s => s.ProjectFileId == row.Id).ToList();
+                    if (projectProps.Count != 0) {
+                        foreach (var r in projectProps)
+                            db.ProjectFileProperties.Remove(r);
+
+                        db.SaveChanges();
+
+                    }
+                }
+                db.SaveChanges();
+
+            }
             db.ProjectFiles.Add(projectFile);
             db.SaveChanges();
             return projectFile.Id;
@@ -216,7 +239,15 @@ namespace Utils
         public static void SaveProjectFileProperties(int projectFileId, List<PropertyParts> propertyParts)
         {
             using var db = Session.GetDatabaseContext();
-            foreach (PropertyParts propertyParts1 in propertyParts)
+            var projectProps = db.ProjectFileProperties.AsEnumerable().Where(s => s.ProjectFileId == projectFileId).ToList();
+            if (projectProps.Count !=0)
+            {
+                foreach (var r in projectProps)
+                    db.ProjectFileProperties.Remove(r);
+
+                db.SaveChanges();
+            }
+                foreach (PropertyParts propertyParts1 in propertyParts)
             {
                 ProjectFileProperty projectFileProperty = new ProjectFileProperty()
                 {
@@ -553,21 +584,23 @@ namespace Utils
             }
             public LinkedControls() { }
         }
-        public static void SummaryMessageBox(string message, string caption, MessageBoxIcon messageType)
+        public static DialogResult SummaryMessageBox(string message, string caption, MessageBoxIcon messageType, MessageBoxButtons messageBox = MessageBoxButtons.OK)
         {
-            MessageBox.Show(new Form { Size = new Size(600, 800) }, message, caption, MessageBoxButtons.OK, messageType);
+            return MessageBox.Show(new Form { Size = new Size(600, 800) }, message, caption, messageBox, messageType);
+        }
+
+        public static void refreshComboBox(MetroComboBox metroComboBox) {
+            metroComboBox.Items.Clear();
+            Session.GetDatabaseContext().Projects.ToList().ForEach(project => metroComboBox.Items.Add(
+            new ComboboxItem()
+            {
+                Text = Path.Combine(project.Name),
+                Value = project.Id
+            })
+        );
         }
     }
-    public class Tempjoin
-    {
-        public string Id { get; set; }
-        public bool inDatabase { get; set; }
-
-        public bool inFileSystem { get; set; }
-
-        public List<ProjectFileProperty> PropertyParts { get; set; }
-
-
-    }
+   
+    
 
 }

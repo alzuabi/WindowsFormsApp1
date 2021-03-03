@@ -48,7 +48,6 @@ namespace PullAndClassification.Forms
             this.metroLabel4 = new MetroFramework.Controls.MetroLabel();
             this.metroProjectListComboBox = new MetroFramework.Controls.MetroComboBox();
             this.metroProgressBar1 = new MetroFramework.Controls.MetroProgressBar();
-            this.metroLabel5 = new MetroFramework.Controls.MetroLabel();
             this.metroLabel6 = new MetroFramework.Controls.MetroLabel();
             this.groupBox1.SuspendLayout();
             this.Push.SuspendLayout();
@@ -405,35 +404,28 @@ namespace PullAndClassification.Forms
             this.metroProjectListComboBox.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroProjectListComboBox.UseSelectable = true;
             this.metroProjectListComboBox.SelectedIndexChanged += new System.EventHandler(this.MetroProjectListComboBox_SelectedIndexChanged);
+            this.metroProjectListComboBox.Click += new System.EventHandler(this.metroProjectListComboBox_Click);
             // 
             // metroProgressBar1
             // 
-            this.metroProgressBar1.Location = new System.Drawing.Point(40, 295);
+            this.metroProgressBar1.Location = new System.Drawing.Point(40, 298);
             this.metroProgressBar1.Name = "metroProgressBar1";
             this.metroProgressBar1.ProgressBarStyle = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.metroProgressBar1.Size = new System.Drawing.Size(612, 5);
+            this.metroProgressBar1.Size = new System.Drawing.Size(530, 3);
             this.metroProgressBar1.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroProgressBar1.TabIndex = 41;
             this.metroProgressBar1.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroProgressBar1.Visible = false;
             // 
-            // metroLabel5
-            // 
-            this.metroLabel5.AutoSize = true;
-            this.metroLabel5.Location = new System.Drawing.Point(61, 152);
-            this.metroLabel5.Name = "metroLabel5";
-            this.metroLabel5.Size = new System.Drawing.Size(0, 0);
-            this.metroLabel5.TabIndex = 42;
-            // 
             // metroLabel6
             // 
             this.metroLabel6.AutoSize = true;
-            this.metroLabel6.Location = new System.Drawing.Point(150, 155);
+            this.metroLabel6.Location = new System.Drawing.Point(566, 288);
             this.metroLabel6.Name = "metroLabel6";
-            this.metroLabel6.Size = new System.Drawing.Size(83, 19);
+            this.metroLabel6.Size = new System.Drawing.Size(0, 0);
+            this.metroLabel6.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroLabel6.TabIndex = 43;
-            this.metroLabel6.Text = "metroLabel6";
-            this.metroLabel6.Visible = false;
+            this.metroLabel6.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
             // SyncWithSvnForm
             // 
@@ -441,7 +433,6 @@ namespace PullAndClassification.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(708, 464);
             this.Controls.Add(this.metroLabel6);
-            this.Controls.Add(this.metroLabel5);
             this.Controls.Add(this.metroProgressBar1);
             this.Controls.Add(this.metroProjectListComboBox);
             this.Controls.Add(this.metroLabel1);
@@ -458,7 +449,7 @@ namespace PullAndClassification.Forms
             this.Name = "SyncWithSvnForm";
             this.Opacity = 0.95D;
             this.Resizable = false;
-            this.Text = "`";
+            this.Text = "Sync SVN Form";
             this.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.Load += new System.EventHandler(this.PullAndPushForm_Load);
             this.groupBox1.ResumeLayout(false);
@@ -488,7 +479,6 @@ namespace PullAndClassification.Forms
         private FontAwesome.Sharp.IconButton buttonFrom;
         private MetroFramework.Controls.MetroComboBox metroProjectListComboBox;
         private MetroFramework.Controls.MetroProgressBar metroProgressBar1;
-        public MetroFramework.Controls.MetroLabel metroLabel5;
         public MetroFramework.Controls.MetroLabel metroLabel6;
     }
 }

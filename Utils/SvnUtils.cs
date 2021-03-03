@@ -134,7 +134,7 @@ namespace Utils
         private static void client_Progress(object sender, SvnProgressEventArgs e)
         {
             Console.WriteLine("Complete {0} {1}", e.Progress/ 1024, e.TotalProgress);
-            //SyncWithSvnForm.metroLabel5.Text = (e.Progress / 1024).ToString();
+            SyncWithSvnForm.SpeedLabel.BeginInvoke(new Action(()=> SyncWithSvnForm.SpeedLabel.Text = (e.Progress / 1024).ToString("0.00") + " KB")); 
         }
 
         private static bool UrlsMatch(string url1, string url2)

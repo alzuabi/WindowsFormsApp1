@@ -125,6 +125,7 @@ namespace PullAndClassification
             this.metroProjectListComboBox.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroProjectListComboBox.UseSelectable = true;
             this.metroProjectListComboBox.SelectedIndexChanged += new System.EventHandler(this.MetroProjectListComboBox_SelectedIndexChanged);
+            this.metroProjectListComboBox.Click += new System.EventHandler(this.metroProjectListComboBox_Click);
             // 
             // metroLabel2
             // 

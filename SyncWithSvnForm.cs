@@ -4,6 +4,7 @@ using PullAndClassification.Utils;
 using SharpSvn;
 using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -15,7 +16,11 @@ namespace PullAndClassification.Forms
 {
     public partial class SyncWithSvnForm : MetroForm
     {
-       
+        //public static MetroFramework.Controls.MetroLabel GetMetroLabel()
+        //{
+        //    return metroLabel6;
+        //}
+        public static MetroFramework.Controls.MetroLabel SpeedLabel;
         public string Destination { get; set; }
         public string Url { get; set; }
         public SyncWithSvnForm(/*int currentProjectId = -1*/)
@@ -27,10 +32,21 @@ namespace PullAndClassification.Forms
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
             metroDestinationTextBox.Text = metroFromTextBox.Text = UserSetting.getRootDistinationPath(Session.GetDatabaseContext());
+            SpeedLabel = new MetroFramework.Controls.MetroLabel
+            {
+                Location = new System.Drawing.Point { X = 566, Y = 288 },
+                Style = MetroFramework.MetroColorStyle.Blue,
+                BackColor = Color.FromArgb(17, 17, 17),
+                Theme = MetroFramework.MetroThemeStyle.Dark
+
+
+            };
+
         }
 
         private void PushToSvn_Click(object sender, EventArgs e)
         {
+            metroLabel6.Text = 0.ToString();
             if (string.IsNullOrEmpty(metroDestinationTextBox.Text))
                 MessageBox.Show("Please set Destination in user settings", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
@@ -54,7 +70,7 @@ namespace PullAndClassification.Forms
             parameters = new Parameters()
             {
                 Cleanup = true,
-                Command = Command.CheckoutUpdate,
+                Command = Command.CompleteSync,
                 DeleteUnversioned = true,
                 Message = "Adding new directory for my project",
                 Mkdir = true,
@@ -69,14 +85,14 @@ namespace PullAndClassification.Forms
 
             };
             SvnUtils.CheckoutUpdate(parameters);
-            Temp.CloneDirectory(Path.Combine(d, ".svn"), Path.Combine(Destination, ".svn"));
+            CloneDirectory(Path.Combine(d, ".svn"), Path.Combine(Destination, ".svn"));
 
             //Temp.CloneDirectory(d + "/.svn", Destination + "/.svn");
 
             parameters.Path = Destination;
             parameters.Command = Command.CompleteSync;
             SvnUtils.CompleteSync(parameters);
-            Temp.DeleteDirectory(d);
+            DeleteDirectory(d);
         }
 
         private void ButtonFrom_Click(object sender, EventArgs e)
@@ -91,7 +107,16 @@ namespace PullAndClassification.Forms
 
         private void PullAndPushForm_Load(object sender, EventArgs e)
         {
-                Session.context.Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
+            SpeedLabel = new MetroFramework.Controls.MetroLabel
+            {
+                Location = new System.Drawing.Point { X = 566, Y = 288 },
+                Style = MetroFramework.MetroColorStyle.Blue,
+                BackColor = Color.FromArgb(17, 17, 17),
+                Theme = MetroFramework.MetroThemeStyle.Dark
+
+
+            };
+            Session.GetDatabaseContext().Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
                 new ComboboxItem()
                 {
                     Text = project.Name,
@@ -114,6 +139,7 @@ namespace PullAndClassification.Forms
 
         private void IconCloneButton_Click(object sender, EventArgs e)
         {
+            metroLabel6.Text = 0.ToString();
             if (string.IsNullOrEmpty(metroDestinationTextBox.Text))
                 MessageBox.Show("Please set Destination in user settings", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
@@ -121,17 +147,25 @@ namespace PullAndClassification.Forms
                 BackgroundWorker bgw = new BackgroundWorker();
                 metroProgressBar1.Visible = true;
                 bgw.DoWork += new DoWorkEventHandler(Bgw_DoClone);
+                //bgw.DoWork += new DoWorkEventHandler(Bgw_DoDowenload);
                 bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
+                //bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_DownloadCompleted);
+
                 bgw.WorkerReportsProgress = true;
                 bgw.RunWorkerAsync();
             }
         }
 
+        private void Bgw_DoDowenload(object sender, DoWorkEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         private void Bgw_DoClone(object sender, DoWorkEventArgs e)
         {
-           
 
-            Destination = metroDestinationTextBox.Text;
+
+            Destination = Path.Combine(metroDestinationTextBox.Text);
             Temp temp = new Temp();
             string d = temp.GetTemporaryDirectory();
             Parameters parameters = new Parameters()
@@ -152,12 +186,13 @@ namespace PullAndClassification.Forms
 
             };
             SvnUtils.CheckoutUpdate(parameters);
-            Temp.CloneDirectory(Path.Combine(d, ".svn"), Path.Combine(Destination, ".svn"));
+            CloneDirectory(Path.Combine(d, ".svn"), Path.Combine(Destination, ".svn"));
+            File.SetAttributes(Path.Combine(Destination, ".svn"), File.GetAttributes(Path.Combine(Destination, ".svn")) | FileAttributes.Hidden);
 
             parameters.Path = Destination;
             parameters.Command = Command.CompleteSync;
             SvnUtils.CompleteSync(parameters);
-            Temp.DeleteDirectory(d);
+            DeleteDirectory(d);
         }
 
         private void Bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -167,11 +202,11 @@ namespace PullAndClassification.Forms
 
         private void MetroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            
             Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
-            Session.CurrentProject = Session.context.Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
             metroLabelProjectName.Text = Session.CurrentProject.Name;
-            UserSetting.setCurrentProjectId(Session.context, Session.CurrentProjectId);
+            UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
 
             metroLabelRepoUrl.Text = Session.CurrentProject.RepoUrl;
         }
@@ -187,6 +222,11 @@ namespace PullAndClassification.Forms
         private void buttonSelectedFilesOk_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void metroProjectListComboBox_Click(object sender, EventArgs e)
+        {
+            refreshComboBox(metroProjectListComboBox);
         }
     }
 }

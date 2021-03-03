@@ -63,7 +63,7 @@ namespace Classification.Utils
 
         public void LogToDataBase(string name = "test", string Desc = "test")
         {
-            using (var db = Session.context)
+            using (var db = Session.GetDatabaseContext())
             {
                 var ev = new Event()
                 {

@@ -9,6 +9,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using Utils;
 
 namespace Classification.Service
 {
@@ -35,7 +37,7 @@ namespace Classification.Service
             }
             return _instance;
         }
-        public void CopyAndClassification(SvnClient client, string s, string d,string dir, bool fromSvn, bool move=false)
+        public bool CopyAndClassification(SvnClient client, string s, string d,string dir, bool fromSvn, bool move=false)
         {
             var log = Log.GetInstance();
             try
@@ -47,24 +49,64 @@ namespace Classification.Service
                     string dest = Path.Combine(dir, d);
                     Directory.CreateDirectory(dest);
                     dest = Path.Combine(dest, Path.GetFileName(s));
-                    using (FileStream outputFileStream = new FileStream(Path.Combine(dest), FileMode.OpenOrCreate, FileAccess.Write))
+                    if (File.Exists(dest))
                     {
-                        stream.WriteTo(outputFileStream);
+                        DialogResult dialogResult = Temp.SummaryMessageBox("the file" + dest + " is exist Do you want to overwrite it", "Info", MessageBoxIcon.Question, MessageBoxButtons.YesNo);
+                        if (dialogResult == DialogResult.Yes)
+                        {
+                            using (FileStream outputFileStream = new FileStream(Path.Combine(dest), FileMode.OpenOrCreate, FileAccess.Write))
+                            {
+                                stream.WriteTo(outputFileStream);
+                            }
+                            log.LogToFile("Move File, " + s + " ,to " + dest + " ,at " + DateTime.Now);
+                            //log.LogToDataBase("Move", "Move File " + s + " to " + dest);
+                            return true;
+                        }
+                        else if (dialogResult == DialogResult.No)
+                        {
+                            return false;
+                        }
+                        else return false;
                     }
-                    log.LogToFile("Move File, " + s + " ,to " + dest + " ,at " + DateTime.Now);
-                    //log.LogToDataBase("Move", "Move File " + s + " to " + dest);
-
+                    else
+                    {
+                        using (FileStream outputFileStream = new FileStream(Path.Combine(dest), FileMode.OpenOrCreate, FileAccess.Write))
+                        {
+                            stream.WriteTo(outputFileStream);
+                        }
+                        log.LogToFile("Move File, " + s + " ,to " + dest + " ,at " + DateTime.Now);
+                        //log.LogToDataBase("Move", "Move File " + s + " to " + dest);
+                        return true;
+                    }
+                    
                 }
                 else
                 {
                     string dest = Path.Combine(dir, d);
                     Directory.CreateDirectory(dest);
                     dest = Path.Combine(dest, Path.GetFileName(s));
-                    if (move == true)
-                        File.Move(s, dest);
+                    if (File.Exists(dest))
+                    {
+                        DialogResult dialogResult = Temp.SummaryMessageBox("the file" + dest + " is exist Do you want to overwrite it", "Info", MessageBoxIcon.Question,  MessageBoxButtons.YesNo);
+                        if (dialogResult == DialogResult.Yes)
+                        {
+                            File.Copy(s, dest, true);
+                            return true;
+                        }
+                        else if (dialogResult == DialogResult.No)
+                        {
+                            return false;
+                        }
+                        else return false;
+                    }
                     else
-                        File.Copy(s, dest, true);
-
+                    {
+                        if (move == true)
+                            File.Move(s, dest);
+                        else
+                            File.Copy(s, dest);
+                        return true;
+                    }
                     //using (var db = new DatabaseContext())
                     //{
                     //    ProjectFile projectFile = new ProjectFile()
@@ -80,11 +122,13 @@ namespace Classification.Service
                     log.LogToFile("Move File, " + s + " ,to " + dest + " ,at " + DateTime.Now);
                     //log.LogToDataBase("Move", "Move File " + s + " to " + dest);
                     //}
+                    return true;
                 }
             }
             catch (Exception ex)
             {
                 log.LogToFile(ex.Message);
+                return false;
             }
         }
     }

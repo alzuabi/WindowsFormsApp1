@@ -52,7 +52,6 @@ namespace PullAndClassification.Forms
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.localFiles = new System.Windows.Forms.RadioButton();
             this.svn = new System.Windows.Forms.RadioButton();
-            this.buttonPullAndPush = new FontAwesome.Sharp.IconButton();
             this.metroLabelProjectName = new MetroFramework.Controls.MetroLabel();
             this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
             this.metroProjectListComboBox = new MetroFramework.Controls.MetroComboBox();
@@ -444,29 +443,6 @@ namespace PullAndClassification.Forms
             this.svn.UseVisualStyleBackColor = true;
             this.svn.CheckedChanged += new System.EventHandler(this.Svn_CheckedChanged);
             // 
-            // buttonPullAndPush
-            // 
-            this.buttonPullAndPush.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
-            this.buttonPullAndPush.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
-            this.buttonPullAndPush.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonPullAndPush.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonPullAndPush.ForeColor = System.Drawing.Color.Gainsboro;
-            this.buttonPullAndPush.IconChar = FontAwesome.Sharp.IconChar.SyncAlt;
-            this.buttonPullAndPush.IconColor = System.Drawing.Color.Gainsboro;
-            this.buttonPullAndPush.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.buttonPullAndPush.IconSize = 30;
-            this.buttonPullAndPush.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buttonPullAndPush.Location = new System.Drawing.Point(84, 63);
-            this.buttonPullAndPush.Name = "buttonPullAndPush";
-            this.buttonPullAndPush.Size = new System.Drawing.Size(90, 41);
-            this.buttonPullAndPush.TabIndex = 31;
-            this.buttonPullAndPush.Text = "SVN Ops";
-            this.buttonPullAndPush.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.buttonPullAndPush.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.buttonPullAndPush.UseVisualStyleBackColor = true;
-            this.buttonPullAndPush.Visible = false;
-            this.buttonPullAndPush.Click += new System.EventHandler(this.ButtonPullAndPush_Click);
-            // 
             // metroLabelProjectName
             // 
             this.metroLabelProjectName.AutoSize = true;
@@ -505,6 +481,7 @@ namespace PullAndClassification.Forms
             this.metroProjectListComboBox.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroProjectListComboBox.UseSelectable = true;
             this.metroProjectListComboBox.SelectedIndexChanged += new System.EventHandler(this.MetroProjectListComboBox_SelectedIndexChanged);
+            this.metroProjectListComboBox.Click += new System.EventHandler(this.MetroProjectListComboBox_Click);
             this.metroProjectListComboBox.Validating += new System.ComponentModel.CancelEventHandler(this.MetroProjectListComboBox_Validating);
             // 
             // metroLabel3
@@ -525,7 +502,7 @@ namespace PullAndClassification.Forms
             // 
             // metroButtonFinish
             // 
-            this.metroButtonFinish.Location = new System.Drawing.Point(894, 378);
+            this.metroButtonFinish.Location = new System.Drawing.Point(813, 378);
             this.metroButtonFinish.Name = "metroButtonFinish";
             this.metroButtonFinish.Size = new System.Drawing.Size(75, 23);
             this.metroButtonFinish.Style = MetroFramework.MetroColorStyle.Blue;
@@ -541,14 +518,13 @@ namespace PullAndClassification.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
-            this.ClientSize = new System.Drawing.Size(992, 424);
+            this.ClientSize = new System.Drawing.Size(908, 424);
             this.Controls.Add(this.metroButtonFinish);
             this.Controls.Add(this.metroLabel3);
             this.Controls.Add(this.metroProjectListComboBox);
             this.Controls.Add(this.metroLabel1);
             this.Controls.Add(this.metroLabelProjectName);
             this.Controls.Add(this.panel4);
-            this.Controls.Add(this.buttonPullAndPush);
             this.Name = "CopyAndClassificationForm";
             this.Opacity = 0.95D;
             this.Resizable = false;
@@ -588,7 +564,6 @@ namespace PullAndClassification.Forms
         public MetroFramework.Controls.MetroTextBox Destination { get => destination; set => destination = value; }
         private FontAwesome.Sharp.IconButton selectDestination;
         private FontAwesome.Sharp.IconButton buttonGetFiles;
-        private FontAwesome.Sharp.IconButton buttonPullAndPush;
         private MetroFramework.Controls.MetroProgressBar metroProgressBar1;
         private MetroFramework.Controls.MetroTextBox metroSourceSVNTextBox;
         private MetroFramework.Controls.MetroTextBox metroUsernameTextBox;

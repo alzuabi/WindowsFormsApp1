@@ -34,11 +34,6 @@ namespace PullAndClassification.Forms
             ShadowType = MetroFormShadowType.AeroShadow;
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
-            //if (Session.CurrentProject is null)
-            //{
-            //    SummaryMessageBox("Project not found!", "Error", MessageBoxIcon.Error);
-            //    Close();
-            //}
         }
 
         private void Select_Destination_Click(object sender, EventArgs e)
@@ -79,7 +74,8 @@ namespace PullAndClassification.Forms
         }
 
         [Obsolete]
-        private List<Temp.FileInfo> GetFolderFiles(SvnClient client,
+        private List<Temp.FileInfo> GetFolderFiles(
+            SvnClient client,
             SvnTarget folderTarget,
             ref List<Temp.FileInfo> filesFound,
             SvnListArgs arg,
@@ -92,8 +88,8 @@ namespace PullAndClassification.Forms
             if (client.GetList(folderTarget, arg, out listResults))
             {
                 foreach (SvnListEventArgs item in listResults
-                    .Where(item => !string.IsNullOrEmpty(Path.Combine(item.Name)) &&
-                    !item.EntryUri.AbsoluteUri.ToString().Equals(Path.Combine(folderTarget.TargetName).ToString() + "/")))
+                    .Where(item => !string.IsNullOrEmpty(Path.Combine(item.Name)) && //skip empty paths
+                    !item.EntryUri.AbsoluteUri.ToString().Equals(Path.Combine(folderTarget.TargetName).ToString() + "/"))) // skip checked dirctories
                 {
 
                     if (item.Entry.NodeKind == SvnNodeKind.File)
@@ -109,7 +105,7 @@ namespace PullAndClassification.Forms
                                 PropertyParts = projectFileNameParser.ValiateFileName(Path.Combine(item.Name)).propertyParts
 
                             }
-                                        );
+                            );
                     }
                     else
                         GetFolderFiles(client, item.EntryUri, ref filesFound, arg, extention, projectFileNameParser);
@@ -159,9 +155,14 @@ namespace PullAndClassification.Forms
                             Path = Path.Combine(f.FullName),
                             Size = f.Length / 1024,
                             ValidFileStrusture = projectFileNameParser.ValiateFileName(Path.Combine(f.Name)).success,
-                            PathToClassify = projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path,
+                            PathToClassify = string.IsNullOrEmpty (projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path)?
+                                 projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path:
+                               FormatPath( Path.Combine(prefexFolder, projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path)),
                             PropertyParts = projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).propertyParts,
-                            ProjectFileProperties = Tuple.Create(Session.CurrentProjectId, projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path)
+                            ProjectFileProperties = Tuple.Create(Session.CurrentProjectId,
+                             string.IsNullOrEmpty(projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path) ?
+                                projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path :
+                                Path.Combine(prefexFolder, projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path))
                             
 
 
@@ -272,7 +273,7 @@ namespace PullAndClassification.Forms
                 filtered = FilterFiles(false, fromSvn, Path.Combine(metroSourceSVNTextBox.Text), Path.Combine(sourceLocalFile.Text), ".rvt");
             }
 
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -281,8 +282,9 @@ namespace PullAndClassification.Forms
 
         private void CopyAndClassificationForm_Load(object sender, EventArgs e)
         {
+
             metroProjectListComboBox.DropDownStyle = ComboBoxStyle.DropDown;
-            Session.context.Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
+            Session.GetDatabaseContext().Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
             new ComboboxItem()
             {
                 Text = Path.Combine(project.Name),
@@ -297,6 +299,7 @@ namespace PullAndClassification.Forms
 
         private void MetroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+
             Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
             if (Session.CurrentProject is null)
@@ -306,13 +309,23 @@ namespace PullAndClassification.Forms
                 metroLabelProjectName.Text = Session.CurrentProject.Name;
                 UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
                 if (UserSetting.getRootDistinationPath(Session.GetDatabaseContext()) is not null)
-                    destination.Text =  Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name);
+                    destination.Text =  Path.Combine(
+                        UserSetting.getRootDistinationPath(Session.GetDatabaseContext()),
+                        Session.CurrentProject.Name
+                        );
             }
         }
 
         private void metroButtonFinish_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+       
+
+        private void MetroProjectListComboBox_Click(object sender, EventArgs e)
+        {
+            refreshComboBox(metroProjectListComboBox);
         }
     }
 }

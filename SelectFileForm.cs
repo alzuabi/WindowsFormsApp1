@@ -229,12 +229,6 @@ namespace PullAndClassification.Forms
             try
             {
                 Controls1 = PrepareControls.RenderAndReturnListofLinkedControlsInForm(this);
-                //Controls1 = new PrepareControls().GetAdditionalControls(
-                //   Session.CurrentProject.ProjectFileNameStructures.ToList(),
-                //   778,
-                //   20,
-                //   60,
-                //   this);
             }
             catch (Exception ex)
             {
@@ -256,7 +250,7 @@ namespace PullAndClassification.Forms
                     }
             }
                 List<PropertyParts> propertyParts = new List<PropertyParts>();
-            newDataRow.Cells["ClassificationPath"].Value = Path.Combine(Controls1.Select(linkedControls =>
+            newDataRow.Cells["ClassificationPath"].Value = Path.Combine(prefexFolder, Path.Combine(Controls1.Select(linkedControls =>
             {
                 string finalText = "";
                 
@@ -339,7 +333,7 @@ namespace PullAndClassification.Forms
                 return finalText;
             }
 
-            ).ToArray());
+            ).ToArray()));
             newDataRow.Cells["_ProjectFileProperties"].Value = Tuple.Create(Session.CurrentProjectId, newDataRow.Cells["ClassificationPath"].Value.ToString());
         }
 
