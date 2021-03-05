@@ -10,7 +10,7 @@ namespace Utils
 {
     public class SvnUtils
     {
-        //
+        public static SyncWithSvnForm syncWithSvnForm = new SyncWithSvnForm();
         public static void CheckoutUpdate(Parameters parameters)
         {
             using (var client = new SvnClient())
@@ -134,7 +134,7 @@ namespace Utils
         private static void client_Progress(object sender, SvnProgressEventArgs e)
         {
             Console.WriteLine("Complete {0} {1}", e.Progress/ 1024, e.TotalProgress);
-            SyncWithSvnForm.SpeedLabel.BeginInvoke(new Action(()=> SyncWithSvnForm.SpeedLabel.Text = (e.Progress / 1024).ToString("0.00") + " KB")); 
+            SyncWithSvnForm.metroLabel6.BeginInvoke(new Action(()=> SyncWithSvnForm.metroLabel6.Text = (e.Progress / 1024).ToString("0.00") + " KB")); 
         }
 
         private static bool UrlsMatch(string url1, string url2)

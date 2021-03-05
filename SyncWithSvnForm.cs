@@ -16,10 +16,10 @@ namespace PullAndClassification.Forms
 {
     public partial class SyncWithSvnForm : MetroForm
     {
-        //public static MetroFramework.Controls.MetroLabel GetMetroLabel()
-        //{
-        //    return metroLabel6;
-        //}
+        
+
+
+
         public static MetroFramework.Controls.MetroLabel SpeedLabel;
         public string Destination { get; set; }
         public string Url { get; set; }
@@ -46,7 +46,7 @@ namespace PullAndClassification.Forms
 
         private void PushToSvn_Click(object sender, EventArgs e)
         {
-            metroLabel6.Text = 0.ToString();
+            //metroLabel6.Text = "";
             if (string.IsNullOrEmpty(metroDestinationTextBox.Text))
                 MessageBox.Show("Please set Destination in user settings", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
@@ -64,9 +64,6 @@ namespace PullAndClassification.Forms
         {
             Destination = metroFromTextBox.Text;
             Parameters parameters;
-
-            Temp temp = new Temp();
-            string d = temp.GetTemporaryDirectory();
             parameters = new Parameters()
             {
                 Cleanup = true,
@@ -75,24 +72,47 @@ namespace PullAndClassification.Forms
                 Message = "Adding new directory for my project",
                 Mkdir = true,
                 Password = metroPasswordTextBox.Text != "" ? metroPasswordTextBox.Text : null,
-                Path = d,
-                Revert = true,
+                Path = Destination,
+                Revert = false,
                 TrustServerCert = true,
-                UpdateBeforeCompleteSync = true,
+                UpdateBeforeCompleteSync = false,
                 Url = metroLabelRepoUrl.Text,
                 Username = metroUserNameTextBox.Text == "" ? null : metroUserNameTextBox.Text,
                 Verbose = true,
 
             };
-            SvnUtils.CheckoutUpdate(parameters);
-            CloneDirectory(Path.Combine(d, ".svn"), Path.Combine(Destination, ".svn"));
+           
+                    SvnUtils.CompleteSync(parameters);
+                   
+               
+            //Temp temp = new Temp();
+            //string d = temp.GetTemporaryDirectory();
+            //parameters = new Parameters()
+            //{
+            //    Cleanup = true,
+            //    Command = Command.CompleteSync,
+            //    DeleteUnversioned = true,
+            //    Message = "Adding new directory for my project",
+            //    Mkdir = true,
+            //    Password = metroPasswordTextBox.Text != "" ? metroPasswordTextBox.Text : null,
+            //    Path = Destination,
+            //    Revert = true,
+            //    TrustServerCert = true,
+            //    UpdateBeforeCompleteSync = true,
+            //    Url = metroLabelRepoUrl.Text,
+            //    Username = metroUserNameTextBox.Text == "" ? null : metroUserNameTextBox.Text,
+            //    Verbose = true,
 
-            //Temp.CloneDirectory(d + "/.svn", Destination + "/.svn");
+            //};
+            //SvnUtils.CompleteSync(parameters);
+            //CloneDirectory(Path.Combine(d, ".svn"), Path.Combine(Destination, ".svn"));
 
-            parameters.Path = Destination;
-            parameters.Command = Command.CompleteSync;
-            SvnUtils.CompleteSync(parameters);
-            DeleteDirectory(d);
+            ////Temp.CloneDirectory(d + "/.svn", Destination + "/.svn");
+
+            //parameters.Path = Destination;
+            //parameters.Command = Command.CompleteSync;
+            //SvnUtils.CompleteSync(parameters);
+            //DeleteDirectory(d);
         }
 
         private void ButtonFrom_Click(object sender, EventArgs e)
@@ -139,7 +159,7 @@ namespace PullAndClassification.Forms
 
         private void IconCloneButton_Click(object sender, EventArgs e)
         {
-            metroLabel6.Text = 0.ToString();
+            //metroLabel6.Text = "";
             if (string.IsNullOrEmpty(metroDestinationTextBox.Text))
                 MessageBox.Show("Please set Destination in user settings", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else

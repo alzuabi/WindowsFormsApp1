@@ -97,7 +97,6 @@ namespace PullAndClassification
             this.metroLabel1.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroLabel1.TabIndex = 24;
             this.metroLabel1.Text = "Current Project";
-            this.metroLabel1.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
             // metroLabelProjectName
             // 
@@ -109,7 +108,6 @@ namespace PullAndClassification
             this.metroLabelProjectName.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroLabelProjectName.TabIndex = 23;
             this.metroLabelProjectName.Text = "metroLabel1";
-            this.metroLabelProjectName.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
             // metroProjectListComboBox
             // 
@@ -122,7 +120,6 @@ namespace PullAndClassification
             this.metroProjectListComboBox.Size = new System.Drawing.Size(189, 29);
             this.metroProjectListComboBox.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroProjectListComboBox.TabIndex = 37;
-            this.metroProjectListComboBox.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroProjectListComboBox.UseSelectable = true;
             this.metroProjectListComboBox.SelectedIndexChanged += new System.EventHandler(this.MetroProjectListComboBox_SelectedIndexChanged);
             this.metroProjectListComboBox.Click += new System.EventHandler(this.metroProjectListComboBox_Click);
@@ -136,7 +133,6 @@ namespace PullAndClassification
             this.metroLabel2.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroLabel2.TabIndex = 36;
             this.metroLabel2.Text = "Current Project";
-            this.metroLabel2.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
             // metroUpdateProjectButton
             // 
@@ -145,7 +141,6 @@ namespace PullAndClassification
             this.metroUpdateProjectButton.Size = new System.Drawing.Size(75, 23);
             this.metroUpdateProjectButton.TabIndex = 38;
             this.metroUpdateProjectButton.Text = "Update";
-            this.metroUpdateProjectButton.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroUpdateProjectButton.UseSelectable = true;
             this.metroUpdateProjectButton.Click += new System.EventHandler(this.MetroUpdateProjectButton_Click);
             // 
@@ -157,7 +152,6 @@ namespace PullAndClassification
             this.metroButtonFinish.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroButtonFinish.TabIndex = 39;
             this.metroButtonFinish.Text = "Close";
-            this.metroButtonFinish.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroButtonFinish.UseSelectable = true;
             this.metroButtonFinish.Click += new System.EventHandler(this.metroButtonFinish_Click);
             // 
@@ -168,9 +162,9 @@ namespace PullAndClassification
             this.ClassificationButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.ClassificationButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ClassificationButton.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ClassificationButton.ForeColor = System.Drawing.Color.Gainsboro;
+            this.ClassificationButton.ForeColor = System.Drawing.Color.DimGray;
             this.ClassificationButton.IconChar = FontAwesome.Sharp.IconChar.Copy;
-            this.ClassificationButton.IconColor = System.Drawing.Color.Gainsboro;
+            this.ClassificationButton.IconColor = System.Drawing.Color.Black;
             this.ClassificationButton.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.ClassificationButton.IconSize = 30;
             this.ClassificationButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -191,9 +185,9 @@ namespace PullAndClassification
             this.RemoveFromDB.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.RemoveFromDB.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RemoveFromDB.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.RemoveFromDB.ForeColor = System.Drawing.Color.Gainsboro;
+            this.RemoveFromDB.ForeColor = System.Drawing.Color.DimGray;
             this.RemoveFromDB.IconChar = FontAwesome.Sharp.IconChar.Trash;
-            this.RemoveFromDB.IconColor = System.Drawing.Color.Gainsboro;
+            this.RemoveFromDB.IconColor = System.Drawing.Color.Black;
             this.RemoveFromDB.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.RemoveFromDB.IconSize = 30;
             this.RemoveFromDB.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -223,7 +217,7 @@ namespace PullAndClassification
             this.Controls.Add(this.dataGridViewFilesDifferances);
             this.Name = "CheckDiscrepancyForm";
             this.Text = "Check Discrepancy Form";
-            this.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.Theme = MetroFramework.MetroThemeStyle.Default;
             this.Load += new System.EventHandler(this.CheckDiscrepancyForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilesDifferances)).EndInit();
             this.ResumeLayout(false);

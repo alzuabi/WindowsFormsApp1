@@ -163,7 +163,7 @@ namespace PullAndClassification
                     .Select(f => new Temp.FileInfo
                     {
                         Name = Path.Combine(f.Name),
-                        Path = Path.Combine(FormatPath(Path.Combine(new Uri(Path.Combine(directory.FullName + "/")).MakeRelativeUri(new Uri(Path.Combine(f.FullName))).ToString()))),
+                        Path = Uri.UnescapeDataString(Path.Combine(FormatPath(Path.Combine(new Uri(Path.Combine(directory.FullName + "/")).MakeRelativeUri(new Uri(Path.Combine(f.FullName))).ToString())))),
                         Size = f.Length / 1024,
                         ValidFileStrusture = projectFileNameParser.ValiateFileName(Path.Combine(f.Name)).success,
                         PathToClassify = projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path,
@@ -391,79 +391,7 @@ namespace PullAndClassification
                         }
                     }
                 }
-                //        switch (tubleControl.Item2)
-                //        {
-                //            case DateTimePicker picker:
-                //                {
-                //                    if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date.Id))
-                //                    {
-                //                        text = picker.Value.ToString(projectFileNameStructures.Description);
-                //                        propertyParts.Add(new PropertyParts()
-                //                        {
-                //                            CreateFolder = projectFileNameStructures.CreateFolder,
-                //                            FNSId = projectFileNameStructures.Id,
-                //                            FolderOrder = projectFileNameStructures.FolderOrder,
-                //                            Name = picker.Value.ToString(projectFileNameStructures.Description),
-                //                            NameType = projectFileNameStructures.NameType
 
-                //                        });
-                //                        break;
-                //                    }
-                //                    else if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date_index.Id))
-                //                    {
-                //                        propertyParts.Add(new PropertyParts()
-                //                        {
-                //                            CreateFolder = projectFileNameStructures.CreateFolder,
-                //                            FNSId = projectFileNameStructures.Id,
-                //                            FolderOrder = projectFileNameStructures.FolderOrder,
-                //                            Name = picker.Value.ToString(projectFileNameStructures.Description),
-                //                            NameType = projectFileNameStructures.NameType
-
-                //                        });
-                //                        text = picker.Value.ToString(projectFileNameStructures.Description) + "_";
-                //                    }
-                //                    break;
-                //                }
-                //            default:
-                //                //if (_properties.ContainsKey(projectFileNameStructures.NameType))
-                //                //    _properties[projectFileNameStructures.NameType] = _properties[projectFileNameStructures.NameType] + "_" + tubleControl.Item2.Text;
-                //                //else
-                //                //    _properties.Add(projectFileNameStructures.NameType, tubleControl.Item2.Text);
-                //                if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date_index.Id))
-                //                {
-                //                    propertyParts.FindLast(s => s.NameType.Equals(projectFileNameStructures.NameType)).Name += "_" + tubleControl.Item2.Text;
-                //                    text = tubleControl.Item2.Text;
-                //                    break;
-                //                }
-                //                else
-                //                {
-                //                    propertyParts.Add(
-                //                                  new PropertyParts()
-                //                                  {
-                //                                      CreateFolder = projectFileNameStructures.CreateFolder,
-                //                                      FNSId = projectFileNameStructures.Id,
-                //                                      FolderOrder = projectFileNameStructures.FolderOrder,
-                //                                      Name = tubleControl.Item2.Text,
-                //                                      NameType = projectFileNameStructures.NameType
-                //                                  }
-                //                                  );
-                //                    text = tubleControl.Item2.Text;
-                //                    break;
-                //                }
-                //        }
-                //        if (projectFileNameStructures.CreateFolder)
-                //            finalText += text;
-                //        //}
-                //        //else {
-                //        //    SummaryMessageBox("Please fill all feilds!", "Error", MessageBoxIcon.Error);
-                //        //}
-                //    }
-                //    newDataRow.Cells["_propertyParts"].Value = propertyParts;
-                //    return finalText;
-                //}
-
-                //).ToArray());
-                //newDataRow.Cells["_ProjectFileProperties"].Value = Tuple.Create(Session.CurrentProjectId, newDataRow.Cells["ClassificationPath"].Value.ToString());
             }
 
         }

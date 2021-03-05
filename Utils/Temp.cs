@@ -466,7 +466,7 @@ namespace Utils
                             {
                                 //Text = t.Name,
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
                                 Width = 250,
@@ -481,7 +481,7 @@ namespace Utils
                             {
                                 Text = t.Name,
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
                                 Width = 250,
@@ -508,7 +508,7 @@ namespace Utils
                             {
                                 Text = t.Value.Split('_')[0],
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
                                 Width = 250,
@@ -521,7 +521,7 @@ namespace Utils
                             {
                                 Text = t.Value.Split('_')[1],
                                 Location = new Point(beginX + 380, beginY + (SepDest * i)),
-                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
                                 Width = 100,
@@ -540,7 +540,7 @@ namespace Utils
                                 ReadOnly = t.Name.Equals(FNSTypes.fns_text_match.Id),
                                 Text = t.Name,
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
                                 Width = 250,
@@ -554,7 +554,7 @@ namespace Utils
 
                             Text = t.Name,
                             Location = new Point(beginX, beginY + (SepDest * i)),
-                            Theme = MetroFramework.MetroThemeStyle.Dark,
+                            Theme = MetroFramework.MetroThemeStyle.Default,
                             Name = "Added_"
 
                         });

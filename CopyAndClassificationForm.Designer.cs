@@ -58,12 +58,20 @@ namespace PullAndClassification.Forms
             this.metroLabel3 = new MetroFramework.Controls.MetroLabel();
             this.errorProviderSelectProject = new System.Windows.Forms.ErrorProvider(this.components);
             this.metroButtonFinish = new MetroFramework.Controls.MetroButton();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.metroTextBox1 = new MetroFramework.Controls.MetroTextBox();
+            this.metroTextBox2 = new MetroFramework.Controls.MetroTextBox();
+            this.metroTextBox3 = new MetroFramework.Controls.MetroTextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.errorProviderSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProviderDestination)).BeginInit();
             this.panel4.SuspendLayout();
             this.SVNconf.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProviderSelectProject)).BeginInit();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // errorProviderSource
@@ -84,6 +92,7 @@ namespace PullAndClassification.Forms
             this.panel4.Controls.Add(this.buttonGetFiles);
             this.panel4.Controls.Add(this.selectDestination);
             this.panel4.Controls.Add(this.selectSourceLocalFile);
+            this.panel4.Controls.Add(this.groupBox2);
             this.panel4.Controls.Add(this.SVNconf);
             this.panel4.Controls.Add(this.groupBox1);
             this.panel4.Location = new System.Drawing.Point(38, 98);
@@ -100,7 +109,6 @@ namespace PullAndClassification.Forms
             this.metroLabel2.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroLabel2.TabIndex = 40;
             this.metroLabel2.Text = "Loading...";
-            this.metroLabel2.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroLabel2.Visible = false;
             // 
             // destination
@@ -131,7 +139,6 @@ namespace PullAndClassification.Forms
             this.destination.Size = new System.Drawing.Size(298, 23);
             this.destination.Style = MetroFramework.MetroColorStyle.Blue;
             this.destination.TabIndex = 38;
-            this.destination.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.destination.UseSelectable = true;
             this.destination.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
             this.destination.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
@@ -164,7 +171,6 @@ namespace PullAndClassification.Forms
             this.sourceLocalFile.Size = new System.Drawing.Size(298, 23);
             this.sourceLocalFile.Style = MetroFramework.MetroColorStyle.Blue;
             this.sourceLocalFile.TabIndex = 37;
-            this.sourceLocalFile.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.sourceLocalFile.UseSelectable = true;
             this.sourceLocalFile.Visible = false;
             this.sourceLocalFile.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
@@ -179,7 +185,6 @@ namespace PullAndClassification.Forms
             this.metroProgressBar1.Size = new System.Drawing.Size(492, 5);
             this.metroProgressBar1.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroProgressBar1.TabIndex = 33;
-            this.metroProgressBar1.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroProgressBar1.Visible = false;
             // 
             // buttonGetFiles
@@ -189,9 +194,9 @@ namespace PullAndClassification.Forms
             this.buttonGetFiles.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.buttonGetFiles.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonGetFiles.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonGetFiles.ForeColor = System.Drawing.Color.Gainsboro;
+            this.buttonGetFiles.ForeColor = System.Drawing.Color.DimGray;
             this.buttonGetFiles.IconChar = FontAwesome.Sharp.IconChar.CheckSquare;
-            this.buttonGetFiles.IconColor = System.Drawing.Color.Gainsboro;
+            this.buttonGetFiles.IconColor = System.Drawing.Color.Black;
             this.buttonGetFiles.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.buttonGetFiles.IconSize = 30;
             this.buttonGetFiles.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -213,9 +218,9 @@ namespace PullAndClassification.Forms
             this.selectDestination.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.selectDestination.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.selectDestination.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.selectDestination.ForeColor = System.Drawing.Color.Gainsboro;
+            this.selectDestination.ForeColor = System.Drawing.Color.DimGray;
             this.selectDestination.IconChar = FontAwesome.Sharp.IconChar.Folder;
-            this.selectDestination.IconColor = System.Drawing.Color.Gainsboro;
+            this.selectDestination.IconColor = System.Drawing.Color.Black;
             this.selectDestination.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.selectDestination.IconSize = 30;
             this.selectDestination.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -237,9 +242,9 @@ namespace PullAndClassification.Forms
             this.selectSourceLocalFile.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.selectSourceLocalFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.selectSourceLocalFile.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.selectSourceLocalFile.ForeColor = System.Drawing.Color.Gainsboro;
+            this.selectSourceLocalFile.ForeColor = System.Drawing.Color.DimGray;
             this.selectSourceLocalFile.IconChar = FontAwesome.Sharp.IconChar.FolderPlus;
-            this.selectSourceLocalFile.IconColor = System.Drawing.Color.Gainsboro;
+            this.selectSourceLocalFile.IconColor = System.Drawing.Color.Black;
             this.selectSourceLocalFile.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.selectSourceLocalFile.IconSize = 30;
             this.selectSourceLocalFile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -301,7 +306,6 @@ namespace PullAndClassification.Forms
             this.metroPasswordTextBox.Size = new System.Drawing.Size(141, 23);
             this.metroPasswordTextBox.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroPasswordTextBox.TabIndex = 36;
-            this.metroPasswordTextBox.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroPasswordTextBox.UseSelectable = true;
             this.metroPasswordTextBox.UseSystemPasswordChar = true;
             this.metroPasswordTextBox.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
@@ -334,7 +338,6 @@ namespace PullAndClassification.Forms
             this.metroUsernameTextBox.Size = new System.Drawing.Size(141, 23);
             this.metroUsernameTextBox.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroUsernameTextBox.TabIndex = 35;
-            this.metroUsernameTextBox.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroUsernameTextBox.UseSelectable = true;
             this.metroUsernameTextBox.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
             this.metroUsernameTextBox.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
@@ -366,7 +369,6 @@ namespace PullAndClassification.Forms
             this.metroSourceSVNTextBox.Size = new System.Drawing.Size(391, 23);
             this.metroSourceSVNTextBox.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroSourceSVNTextBox.TabIndex = 34;
-            this.metroSourceSVNTextBox.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroSourceSVNTextBox.UseSelectable = true;
             this.metroSourceSVNTextBox.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
             this.metroSourceSVNTextBox.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
@@ -409,7 +411,7 @@ namespace PullAndClassification.Forms
             this.groupBox1.Controls.Add(this.svn);
             this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBox1.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.ForeColor = System.Drawing.Color.Gainsboro;
+            this.groupBox1.ForeColor = System.Drawing.Color.DimGray;
             this.groupBox1.Location = new System.Drawing.Point(46, 7);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(113, 137);
@@ -420,7 +422,7 @@ namespace PullAndClassification.Forms
             // localFiles
             // 
             this.localFiles.AutoSize = true;
-            this.localFiles.ForeColor = System.Drawing.Color.Gainsboro;
+            this.localFiles.ForeColor = System.Drawing.Color.DimGray;
             this.localFiles.Location = new System.Drawing.Point(19, 109);
             this.localFiles.Name = "localFiles";
             this.localFiles.Size = new System.Drawing.Size(71, 17);
@@ -433,7 +435,7 @@ namespace PullAndClassification.Forms
             // svn
             // 
             this.svn.AutoSize = true;
-            this.svn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.svn.ForeColor = System.Drawing.Color.DimGray;
             this.svn.Location = new System.Drawing.Point(40, 28);
             this.svn.Name = "svn";
             this.svn.Size = new System.Drawing.Size(44, 17);
@@ -453,7 +455,6 @@ namespace PullAndClassification.Forms
             this.metroLabelProjectName.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroLabelProjectName.TabIndex = 20;
             this.metroLabelProjectName.Text = "metroLabel1";
-            this.metroLabelProjectName.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroLabelProjectName.Visible = false;
             // 
             // metroLabel1
@@ -465,7 +466,6 @@ namespace PullAndClassification.Forms
             this.metroLabel1.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroLabel1.TabIndex = 21;
             this.metroLabel1.Text = "Current Project";
-            this.metroLabel1.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
             // metroProjectListComboBox
             // 
@@ -478,7 +478,6 @@ namespace PullAndClassification.Forms
             this.metroProjectListComboBox.Size = new System.Drawing.Size(189, 29);
             this.metroProjectListComboBox.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroProjectListComboBox.TabIndex = 35;
-            this.metroProjectListComboBox.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroProjectListComboBox.UseSelectable = true;
             this.metroProjectListComboBox.SelectedIndexChanged += new System.EventHandler(this.MetroProjectListComboBox_SelectedIndexChanged);
             this.metroProjectListComboBox.Click += new System.EventHandler(this.MetroProjectListComboBox_Click);
@@ -493,7 +492,6 @@ namespace PullAndClassification.Forms
             this.metroLabel3.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroLabel3.TabIndex = 36;
             this.metroLabel3.Text = "Please Select Project: ";
-            this.metroLabel3.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroLabel3.Visible = false;
             // 
             // errorProviderSelectProject
@@ -512,6 +510,151 @@ namespace PullAndClassification.Forms
             this.metroButtonFinish.UseSelectable = true;
             this.metroButtonFinish.Click += new System.EventHandler(this.metroButtonFinish_Click);
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.metroTextBox1);
+            this.groupBox2.Controls.Add(this.metroTextBox2);
+            this.groupBox2.Controls.Add(this.metroTextBox3);
+            this.groupBox2.Controls.Add(this.label1);
+            this.groupBox2.Controls.Add(this.label2);
+            this.groupBox2.Controls.Add(this.label3);
+            this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.groupBox2.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox2.ForeColor = System.Drawing.Color.DimGray;
+            this.groupBox2.Location = new System.Drawing.Point(199, 14);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(477, 88);
+            this.groupBox2.TabIndex = 23;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "SVN";
+            this.groupBox2.Visible = false;
+            // 
+            // metroTextBox1
+            // 
+            // 
+            // 
+            // 
+            this.metroTextBox1.CustomButton.Image = null;
+            this.metroTextBox1.CustomButton.Location = new System.Drawing.Point(119, 1);
+            this.metroTextBox1.CustomButton.Name = "";
+            this.metroTextBox1.CustomButton.Size = new System.Drawing.Size(21, 21);
+            this.metroTextBox1.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroTextBox1.CustomButton.TabIndex = 1;
+            this.metroTextBox1.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.metroTextBox1.CustomButton.UseSelectable = true;
+            this.metroTextBox1.CustomButton.Visible = false;
+            this.metroTextBox1.Lines = new string[0];
+            this.metroTextBox1.Location = new System.Drawing.Point(326, 53);
+            this.metroTextBox1.MaxLength = 32767;
+            this.metroTextBox1.Name = "metroTextBox1";
+            this.metroTextBox1.PasswordChar = '●';
+            this.metroTextBox1.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this.metroTextBox1.SelectedText = "";
+            this.metroTextBox1.SelectionLength = 0;
+            this.metroTextBox1.SelectionStart = 0;
+            this.metroTextBox1.ShortcutsEnabled = true;
+            this.metroTextBox1.Size = new System.Drawing.Size(141, 23);
+            this.metroTextBox1.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroTextBox1.TabIndex = 36;
+            this.metroTextBox1.UseSelectable = true;
+            this.metroTextBox1.UseSystemPasswordChar = true;
+            this.metroTextBox1.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
+            this.metroTextBox1.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
+            // 
+            // metroTextBox2
+            // 
+            // 
+            // 
+            // 
+            this.metroTextBox2.CustomButton.Image = null;
+            this.metroTextBox2.CustomButton.Location = new System.Drawing.Point(119, 1);
+            this.metroTextBox2.CustomButton.Name = "";
+            this.metroTextBox2.CustomButton.Size = new System.Drawing.Size(21, 21);
+            this.metroTextBox2.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroTextBox2.CustomButton.TabIndex = 1;
+            this.metroTextBox2.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.metroTextBox2.CustomButton.UseSelectable = true;
+            this.metroTextBox2.CustomButton.Visible = false;
+            this.metroTextBox2.Lines = new string[0];
+            this.metroTextBox2.Location = new System.Drawing.Point(76, 53);
+            this.metroTextBox2.MaxLength = 32767;
+            this.metroTextBox2.Name = "metroTextBox2";
+            this.metroTextBox2.PasswordChar = '\0';
+            this.metroTextBox2.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this.metroTextBox2.SelectedText = "";
+            this.metroTextBox2.SelectionLength = 0;
+            this.metroTextBox2.SelectionStart = 0;
+            this.metroTextBox2.ShortcutsEnabled = true;
+            this.metroTextBox2.Size = new System.Drawing.Size(141, 23);
+            this.metroTextBox2.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroTextBox2.TabIndex = 35;
+            this.metroTextBox2.UseSelectable = true;
+            this.metroTextBox2.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
+            this.metroTextBox2.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
+            // 
+            // metroTextBox3
+            // 
+            // 
+            // 
+            // 
+            this.metroTextBox3.CustomButton.Image = null;
+            this.metroTextBox3.CustomButton.Location = new System.Drawing.Point(369, 1);
+            this.metroTextBox3.CustomButton.Name = "";
+            this.metroTextBox3.CustomButton.Size = new System.Drawing.Size(21, 21);
+            this.metroTextBox3.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroTextBox3.CustomButton.TabIndex = 1;
+            this.metroTextBox3.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.metroTextBox3.CustomButton.UseSelectable = true;
+            this.metroTextBox3.CustomButton.Visible = false;
+            this.metroTextBox3.Lines = new string[0];
+            this.metroTextBox3.Location = new System.Drawing.Point(76, 15);
+            this.metroTextBox3.MaxLength = 32767;
+            this.metroTextBox3.Name = "metroTextBox3";
+            this.metroTextBox3.PasswordChar = '\0';
+            this.metroTextBox3.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this.metroTextBox3.SelectedText = "";
+            this.metroTextBox3.SelectionLength = 0;
+            this.metroTextBox3.SelectionStart = 0;
+            this.metroTextBox3.ShortcutsEnabled = true;
+            this.metroTextBox3.Size = new System.Drawing.Size(391, 23);
+            this.metroTextBox3.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroTextBox3.TabIndex = 34;
+            this.metroTextBox3.UseSelectable = true;
+            this.metroTextBox3.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
+            this.metroTextBox3.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
+            this.metroTextBox3.Validating += new System.ComponentModel.CancelEventHandler(this.Source_Validating);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.label1.ForeColor = System.Drawing.Color.DimGray;
+            this.label1.Location = new System.Drawing.Point(44, 17);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(26, 13);
+            this.label1.TabIndex = 12;
+            this.label1.Text = "URL";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.ForeColor = System.Drawing.Color.DimGray;
+            this.label2.Location = new System.Drawing.Point(267, 57);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(53, 13);
+            this.label2.TabIndex = 10;
+            this.label2.Text = "Password";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.ForeColor = System.Drawing.Color.DimGray;
+            this.label3.Location = new System.Drawing.Point(11, 57);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(59, 13);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "User Name";
+            // 
             // CopyAndClassificationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -529,7 +672,7 @@ namespace PullAndClassification.Forms
             this.Opacity = 0.95D;
             this.Resizable = false;
             this.Text = "Copy And Classification Form";
-            this.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.Theme = MetroFramework.MetroThemeStyle.Default;
             this.Load += new System.EventHandler(this.CopyAndClassificationForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.errorProviderSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProviderDestination)).EndInit();
@@ -540,6 +683,8 @@ namespace PullAndClassification.Forms
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProviderSelectProject)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -577,6 +722,13 @@ namespace PullAndClassification.Forms
         private MetroFramework.Controls.MetroLabel metroLabel3;
         private ErrorProvider errorProviderSelectProject;
         private MetroFramework.Controls.MetroButton metroButtonFinish;
+        private GroupBox groupBox2;
+        private MetroFramework.Controls.MetroTextBox metroTextBox1;
+        private MetroFramework.Controls.MetroTextBox metroTextBox2;
+        private MetroFramework.Controls.MetroTextBox metroTextBox3;
+        private Label label1;
+        private Label label2;
+        private Label label3;
     }
 }
 
