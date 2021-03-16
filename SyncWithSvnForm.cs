@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Utils;
 using static Utils.Temp;
@@ -16,11 +15,7 @@ namespace PullAndClassification.Forms
 {
     public partial class SyncWithSvnForm : MetroForm
     {
-        
 
-
-
-        public static MetroFramework.Controls.MetroLabel SpeedLabel;
         public string Destination { get; set; }
         public string Url { get; set; }
         public SyncWithSvnForm(/*int currentProjectId = -1*/)
@@ -32,21 +27,13 @@ namespace PullAndClassification.Forms
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
             metroDestinationTextBox.Text = metroFromTextBox.Text = UserSetting.getRootDistinationPath(Session.GetDatabaseContext());
-            SpeedLabel = new MetroFramework.Controls.MetroLabel
-            {
-                Location = new System.Drawing.Point { X = 566, Y = 288 },
-                Style = MetroFramework.MetroColorStyle.Blue,
-                BackColor = Color.FromArgb(17, 17, 17),
-                Theme = MetroFramework.MetroThemeStyle.Dark
 
-
-            };
 
         }
 
         private void PushToSvn_Click(object sender, EventArgs e)
         {
-            //metroLabel6.Text = "";
+            metroLabel6.Text = "";
             if (string.IsNullOrEmpty(metroDestinationTextBox.Text))
                 MessageBox.Show("Please set Destination in user settings", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
@@ -81,10 +68,10 @@ namespace PullAndClassification.Forms
                 Verbose = true,
 
             };
-           
-                    SvnUtils.CompleteSync(parameters);
-                   
-               
+
+            SvnUtils.CompleteSync(parameters);
+
+
             //Temp temp = new Temp();
             //string d = temp.GetTemporaryDirectory();
             //parameters = new Parameters()
@@ -127,15 +114,6 @@ namespace PullAndClassification.Forms
 
         private void PullAndPushForm_Load(object sender, EventArgs e)
         {
-            SpeedLabel = new MetroFramework.Controls.MetroLabel
-            {
-                Location = new System.Drawing.Point { X = 566, Y = 288 },
-                Style = MetroFramework.MetroColorStyle.Blue,
-                BackColor = Color.FromArgb(17, 17, 17),
-                Theme = MetroFramework.MetroThemeStyle.Dark
-
-
-            };
             Session.GetDatabaseContext().Projects.ToList().ForEach(project => metroProjectListComboBox.Items.Add(
                 new ComboboxItem()
                 {
@@ -159,36 +137,30 @@ namespace PullAndClassification.Forms
 
         private void IconCloneButton_Click(object sender, EventArgs e)
         {
-            //metroLabel6.Text = "";
+            metroLabel6.Text = "";
             if (string.IsNullOrEmpty(metroDestinationTextBox.Text))
                 MessageBox.Show("Please set Destination in user settings", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
             {
-                BackgroundWorker bgw = new BackgroundWorker();
+                BackgroundWorker bgw = new();
                 metroProgressBar1.Visible = true;
                 bgw.DoWork += new DoWorkEventHandler(Bgw_DoClone);
-                //bgw.DoWork += new DoWorkEventHandler(Bgw_DoDowenload);
                 bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
-                //bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_DownloadCompleted);
 
                 bgw.WorkerReportsProgress = true;
                 bgw.RunWorkerAsync();
             }
         }
 
-        private void Bgw_DoDowenload(object sender, DoWorkEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
 
         private void Bgw_DoClone(object sender, DoWorkEventArgs e)
         {
 
 
             Destination = Path.Combine(metroDestinationTextBox.Text);
-            Temp temp = new Temp();
+            Temp temp = new();
             string d = temp.GetTemporaryDirectory();
-            Parameters parameters = new Parameters()
+            Parameters parameters = new()
             {
                 Cleanup = true,
                 Command = Command.CheckoutUpdate,
@@ -217,12 +189,12 @@ namespace PullAndClassification.Forms
 
         private void Bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-                metroProgressBar1.Visible = false;
+            metroProgressBar1.Visible = false;
         }
 
         private void MetroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+
             Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
             metroLabelProjectName.Text = Session.CurrentProject.Name;
@@ -239,14 +211,10 @@ namespace PullAndClassification.Forms
 
         }
 
-        private void buttonSelectedFilesOk_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
+        private void ButtonSelectedFilesOk_Click(object sender, EventArgs e) => Close();
 
-        private void metroProjectListComboBox_Click(object sender, EventArgs e)
-        {
-            refreshComboBox(metroProjectListComboBox);
-        }
+        private void MetroProjectListComboBox_Click(object sender, EventArgs e) => RefreshComboBox(metroProjectListComboBox);
+
     }
+    
 }

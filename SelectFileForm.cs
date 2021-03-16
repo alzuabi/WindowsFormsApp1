@@ -1,10 +1,8 @@
-﻿using Classification.Utils;
-using MetroFramework.Forms;
+﻿using MetroFramework.Forms;
 using MULTISYSDbContext.Models;
 using MULTISYSUtilities;
 using PullAndClassification.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -14,6 +12,7 @@ using System.Text;
 using System.Windows.Forms;
 using Utils;
 using static Utils.Temp;
+using FileInfo = Utils.Temp.FileInfo;
 
 namespace PullAndClassification.Forms
 {
@@ -28,7 +27,7 @@ namespace PullAndClassification.Forms
             set { copyAndClassificationForm = value; }
         }
 
-        public List<LinkedControls> Controls1 { get => controls; set => controls = value; }
+        public List<LinkedControls> listLinkedControls { get => controls; set => controls = value; }
 
         public SelectFileForm()
         {
@@ -41,7 +40,7 @@ namespace PullAndClassification.Forms
             if (Session.CurrentProject is null)
                 SummaryMessageBox("Project not found!", "Error", MessageBoxIcon.Error);
         }
-        public void FillFilesDataGridView(IEnumerable<Temp.FileInfo> filtered)
+        public void FillFilesDataGridView(IEnumerable<FileInfo> filtered)
         {
             try
             {
@@ -128,14 +127,14 @@ namespace PullAndClassification.Forms
                                 tuple.First().Item2.Text = propertyParts[i].Name;
                             else
                             {
-                                tuple[0].Item2.Text = propertyParts[i].Name.Split('_')[0]; ;
-                                tuple[1].Item2.Text = propertyParts[+i].Name.Split('_')[1];
+                                tuple[0].Item2.Text = GetDateFromDateIndex(propertyParts[i].Name);
+                                tuple[1].Item2.Text = GetPart(propertyParts[i].Name, "_", 1);
                             }
                     }
                 }
                 else
                 {
-                    foreach (var l in Controls1)
+                    foreach (var l in listLinkedControls)
                     {
                         foreach (Tuple<int, Control> tubleControl in l.LinkedList)
                         {
@@ -161,7 +160,7 @@ namespace PullAndClassification.Forms
         private List<Tuple<int, Control>> GetTupleIntControlerWithId(int fNSId)
         {
             List<Tuple<int, Control>> tuples = new List<Tuple<int, Control>>();
-            foreach (LinkedControls linkedControls in Controls1)
+            foreach (LinkedControls linkedControls in listLinkedControls)
             {
                 foreach (Tuple<int, Control> tuple in linkedControls.LinkedList)
                 {
@@ -179,28 +178,33 @@ namespace PullAndClassification.Forms
 
         private void Classification_Click(object sender, EventArgs e)
         {
-            IEnumerable<DataGridViewRow> emptyFileClassificationPath = GetSelectedFiles(FilesDataGridView).Where(s => string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString()));
-            if (emptyFileClassificationPath.Count() > 0)
-            {
-                SummaryMessageBox("Classificatio path for below files is not valid\n" + string.Join(Environment.NewLine, emptyFileClassificationPath.Select(s => s.Cells["Name"].Value)), "Error", MessageBoxIcon.Error);
-            }
-            else
-            {
-                classificationProgressBar.Visible = true;
-                List<string> summary = CopyAndClassify(
-                    true,
-                    this,
-                    copyAndClassificationForm.Destination.Text,
-                    copyAndClassificationForm.FromSvn,
-                    copyAndClassificationForm.UserNameTextBox1.Text,
-                    copyAndClassificationForm.PasswordTestBox1.Text,
-                    copyAndClassificationForm.MetroSourceSVNTextBox.Text,
-                    copyAndClassificationForm.SourceLocalFile.Text
-                    );
-                SummaryMessageBox(summary.Aggregate(new StringBuilder(),
-                                                   (sb, val) => sb.AppendLine(val),
-                                                   sb => sb.ToString()), "Summary", MessageBoxIcon.Information);
-            }
+            if (GetSelectedFiles(FilesDataGridView).Count == 0)
+                SummaryMessageBox("Please check the files", "", MessageBoxIcon.Information);
+            else {
+                IEnumerable<DataGridViewRow> emptyFileClassificationPath = GetSelectedFiles(FilesDataGridView).Where(s => string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString()));
+
+                            if (emptyFileClassificationPath.Count() > 0)
+                            {
+                                SummaryMessageBox("Classificatio path for below files is not valid\n" + string.Join(Environment.NewLine, emptyFileClassificationPath.Select(s => s.Cells["Name"].Value)), "Error", MessageBoxIcon.Error);
+                            }
+                            else
+                            {
+                                classificationProgressBar.Visible = true;
+                                List<string> summary = CopyAndClassify(
+                                    true,
+                                    this,
+                                    copyAndClassificationForm.Destination.Text,
+                                    copyAndClassificationForm.FromSvn,
+                                    copyAndClassificationForm.UserNameTextBox1.Text,
+                                    copyAndClassificationForm.PasswordTestBox1.Text,
+                                    copyAndClassificationForm.MetroSourceSVNTextBox.Text,
+                                    copyAndClassificationForm.SourceLocalFile.Text
+                                    );
+                                SummaryMessageBox(summary.Aggregate(new StringBuilder(),
+                                                                   (sb, val) => sb.AppendLine(val),
+                                                                   sb => sb.ToString()), "Summary", MessageBoxIcon.Information);
+                            }
+                        }
         }
 
 
@@ -228,7 +232,7 @@ namespace PullAndClassification.Forms
             metroLabelProjectName.Text = Session.CurrentProject.Name;
             try
             {
-                Controls1 = PrepareControls.RenderAndReturnListofLinkedControlsInForm(this);
+                listLinkedControls = PrepareControls.RenderAndReturnListofLinkedControlsInForm(this);
             }
             catch (Exception ex)
             {
@@ -238,34 +242,33 @@ namespace PullAndClassification.Forms
 
         private void MetroUpdateProjectButton_Click(object sender, EventArgs e)
         {
-            DataGridViewRow newDataRow = filesDataGridView.Rows[indexRow];
-            //Dictionary<string, string> _properties = new Dictionary<string, string>();
-            foreach (var c in Controls1)
+
+            try
             {
-                foreach (Tuple<int, Control> tubleControl in c.LinkedList)
-                    if (string.IsNullOrEmpty(tubleControl.Item2.Text))
-                    {
-                        SummaryMessageBox("Please fill all feilds!", "Error", MessageBoxIcon.Error);
-                        return;
-                    }
-            }
-                List<PropertyParts> propertyParts = new List<PropertyParts>();
-            newDataRow.Cells["ClassificationPath"].Value = Path.Combine(prefexFolder, Path.Combine(Controls1.Select(linkedControls =>
-            {
-                string finalText = "";
-                
-                foreach (Tuple<int, Control> tubleControl in linkedControls.LinkedList)
+                DataGridViewRow newDataRow = filesDataGridView.Rows[indexRow];
+                foreach (var c in listLinkedControls)
                 {
-                    var projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures.Where(s => s.Id == tubleControl.Item1).FirstOrDefault();
-                    string text = "";
-                    //if (!string.IsNullOrEmpty(tubleControl.Item2.Text))
-                    //{
+                    foreach (Tuple<int, Control> tubleControl in c.LinkedList)
+                        if (string.IsNullOrEmpty(tubleControl.Item2.Text))
+                        {
+                            SummaryMessageBox("Please fill all feilds!", "", MessageBoxIcon.Error);
+                            return;
+                        }
+                }
+                List<PropertyParts> propertyParts = new List<PropertyParts>();
+                newDataRow.Cells["ClassificationPath"].Value = Path.Combine(PREFEXFolder, Path.Combine(listLinkedControls.Select(linkedControls =>
+                {
+                    string finalText = "";
+
+                    foreach (Tuple<int, Control> tubleControl in linkedControls.LinkedList)
+                    {
+                        var projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures.Where(s => s.Id == tubleControl.Item1).FirstOrDefault();
+                        string text = "";
                         switch (tubleControl.Item2)
                         {
 
                             case DateTimePicker picker:
                                 {
-                                    //_properties.Add(projectFileNameStructures.NameType, picker.Value.ToString(projectFileNameStructures.Description));
                                     if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date.Id))
                                     {
                                         text = picker.Value.ToString(projectFileNameStructures.Description);
@@ -296,10 +299,7 @@ namespace PullAndClassification.Forms
                                     break;
                                 }
                             default:
-                                //if (_properties.ContainsKey(projectFileNameStructures.NameType))
-                                //    _properties[projectFileNameStructures.NameType] = _properties[projectFileNameStructures.NameType] + "_" + tubleControl.Item2.Text;
-                                //else
-                                //    _properties.Add(projectFileNameStructures.NameType, tubleControl.Item2.Text);
+                               
                                 if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date_index.Id))
                                 {
                                     propertyParts.FindLast(s => s.NameType.Equals(projectFileNameStructures.NameType)).Name += "_" + tubleControl.Item2.Text;
@@ -309,42 +309,38 @@ namespace PullAndClassification.Forms
                                 else
                                 {
                                     propertyParts.Add(
-                                                  new PropertyParts()
-                                                  {
-                                                      CreateFolder = projectFileNameStructures.CreateFolder,
-                                                      FNSId = projectFileNameStructures.Id,
-                                                      FolderOrder = projectFileNameStructures.FolderOrder,
-                                                      Name = tubleControl.Item2.Text,
-                                                      NameType = projectFileNameStructures.NameType
-                                                  }
-                                                  );
+                                              new PropertyParts()
+                                              {
+                                                  CreateFolder = projectFileNameStructures.CreateFolder,
+                                                  FNSId = projectFileNameStructures.Id,
+                                                  FolderOrder = projectFileNameStructures.FolderOrder,
+                                                  Name = tubleControl.Item2.Text,
+                                                  NameType = projectFileNameStructures.NameType
+                                              }
+                                              );
                                     text = tubleControl.Item2.Text;
                                     break;
                                 }
                         }
                         if (projectFileNameStructures.CreateFolder)
                             finalText += text;
-                    //}
-                    //else {
-                    //    SummaryMessageBox("Please fill all feilds!", "Error", MessageBoxIcon.Error);
-                    //}
+                    }
+                    newDataRow.Cells["_propertyParts"].Value = propertyParts;
+                    return finalText;
                 }
-                newDataRow.Cells["_propertyParts"].Value = propertyParts;
-                return finalText;
+
+                ).ToArray()));
+                newDataRow.Cells["_ProjectFileProperties"].Value = Tuple.Create(Session.CurrentProjectId, newDataRow.Cells["ClassificationPath"].Value.ToString());
             }
-
-            ).ToArray()));
-            newDataRow.Cells["_ProjectFileProperties"].Value = Tuple.Create(Session.CurrentProjectId, newDataRow.Cells["ClassificationPath"].Value.ToString());
+            catch (Exception ex)
+            {
+                SummaryMessageBox("Please check the files!", "Error", MessageBoxIcon.Information);
+            }
         }
 
-        private void MetroButton1_Click(object sender, EventArgs e)
-        {
-            //CheckDiscrepancyForm checkForm = new CheckDiscrepancyForm();
-            //checkForm.FillFilesDifferances(copyAndClassificationForm.Destination.Text);
-            //checkForm.ShowDialog();
-        }
+   
 
-        private void metroButtonFinish_Click(object sender, EventArgs e)
+        private void MetroButtonFinish_Click(object sender, EventArgs e)
         {
             Close();
         }

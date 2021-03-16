@@ -88,8 +88,7 @@ namespace PullAndClassification.Forms
             this.buttonSelectedFilesOk.TabIndex = 27;
             this.buttonSelectedFilesOk.Text = "Close";
             this.buttonSelectedFilesOk.UseVisualStyleBackColor = true;
-            this.buttonSelectedFilesOk.Visible = false;
-            this.buttonSelectedFilesOk.Click += new System.EventHandler(this.buttonSelectedFilesOk_Click);
+            this.buttonSelectedFilesOk.Click += new System.EventHandler(this.ButtonSelectedFilesOk_Click);
             // 
             // iconCloneButton
             // 
@@ -393,7 +392,7 @@ namespace PullAndClassification.Forms
             this.metroProjectListComboBox.TabIndex = 40;
             this.metroProjectListComboBox.UseSelectable = true;
             this.metroProjectListComboBox.SelectedIndexChanged += new System.EventHandler(this.MetroProjectListComboBox_SelectedIndexChanged);
-            this.metroProjectListComboBox.Click += new System.EventHandler(this.metroProjectListComboBox_Click);
+            this.metroProjectListComboBox.Click += new System.EventHandler(this.MetroProjectListComboBox_Click);
             // 
             // metroProgressBar1
             // 
@@ -408,7 +407,9 @@ namespace PullAndClassification.Forms
             // metroLabel6
             // 
             metroLabel6.AutoSize = true;
-            metroLabel6.Location = new System.Drawing.Point(566, 288);
+            metroLabel6.BackColor = System.Drawing.Color.Transparent;
+            metroLabel6.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            metroLabel6.Location = new System.Drawing.Point(576, 285);
             metroLabel6.Name = "metroLabel6";
             metroLabel6.Size = new System.Drawing.Size(0, 0);
             metroLabel6.Style = MetroFramework.MetroColorStyle.Blue;
@@ -418,7 +419,7 @@ namespace PullAndClassification.Forms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(708, 464);
+            this.ClientSize = new System.Drawing.Size(722, 464);
             this.Controls.Add(metroLabel6);
             this.Controls.Add(this.metroProgressBar1);
             this.Controls.Add(this.metroProjectListComboBox);

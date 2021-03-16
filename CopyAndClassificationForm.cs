@@ -5,8 +5,6 @@ using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows.Forms;
 using MetroFramework.Forms;
 using MULTISYSDbContext.Models;
@@ -15,25 +13,53 @@ using PullAndClassification.Utils;
 using SharpSvn;
 using Utils;
 using static Utils.Temp;
+using FileInfo = Utils.Temp.FileInfo;
 
 namespace PullAndClassification.Forms
 {
     public partial class CopyAndClassificationForm : MetroForm
     {
 
+
         private SelectFileForm selectedFilesForm;
-        IEnumerable<Temp.FileInfo> filtered = null;
+        IEnumerable<FileInfo> filtered = null;
         private bool fromSvn = false;
 
         public bool FromSvn { get => fromSvn; set => fromSvn = value; }
 
         public CopyAndClassificationForm()
         {
+
             InitializeComponent();
             MaximizeBox = false;
             ShadowType = MetroFormShadowType.AeroShadow;
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            FillAutoComplete();
+        }
+
+        private void FillAutoComplete()
+        {
+            string lastSvnUrl = GetLast(LASTSVNURL);
+            AutoCompleteStringCollection svnUrlsource = new()
+            {
+                lastSvnUrl
+            };
+            metroSourceSVNTextBox.AutoCompleteCustomSource = svnUrlsource;
+            metroSourceSVNTextBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            metroSourceSVNTextBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+
+
+            string lastLocalFile = GetLast(LASTLOCALFILE);
+            AutoCompleteStringCollection sourceLocalFile = new()
+            {
+                lastLocalFile
+            };
+            SourceLocalFile.AutoCompleteCustomSource = sourceLocalFile;
+            SourceLocalFile.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            SourceLocalFile.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+
+
         }
 
         private void Select_Destination_Click(object sender, EventArgs e)
@@ -74,10 +100,10 @@ namespace PullAndClassification.Forms
         }
 
         [Obsolete]
-        private List<Temp.FileInfo> GetFolderFiles(
+        private List<FileInfo> GeFiltterFilesFromSVN(
             SvnClient client,
             SvnTarget folderTarget,
-            ref List<Temp.FileInfo> filesFound,
+            ref List<FileInfo> filesFound,
             SvnListArgs arg,
             string extention,
             ProjectFileNameParser projectFileNameParser)
@@ -87,15 +113,19 @@ namespace PullAndClassification.Forms
 
             if (client.GetList(folderTarget, arg, out listResults))
             {
-                foreach (SvnListEventArgs item in listResults
-                    .Where(item => !string.IsNullOrEmpty(Path.Combine(item.Name)) && //skip empty paths
-                    !item.EntryUri.AbsoluteUri.ToString().Equals(Path.Combine(folderTarget.TargetName).ToString() + "/"))) // skip checked dirctories
+
+                List<SvnListEventArgs> svnListEventArgs = listResults
+                    .Where(item => !string.IsNullOrEmpty(Path.Combine(item.Name))) //skip empty paths
+                    .Where(item => !item.EntryUri.AbsoluteUri.ToString().Equals(Path.Combine(folderTarget.TargetName).ToString() + "/")) //skip checked ones
+                    .ToList();
+
+                foreach (SvnListEventArgs item in svnListEventArgs)
                 {
 
-                    if (item.Entry.NodeKind == SvnNodeKind.File)
+                    if (item.Entry.NodeKind == SvnNodeKind.File) // find file
                     {
                         if (Path.GetExtension(item.Name).Equals(extention))
-                            filesFound.Add(new Temp.FileInfo
+                            filesFound.Add(new FileInfo
                             {
                                 Name = Path.Combine(item.Name),
                                 Path = item.EntryUri.AbsoluteUri,
@@ -108,7 +138,7 @@ namespace PullAndClassification.Forms
                             );
                     }
                     else
-                        GetFolderFiles(client, item.EntryUri, ref filesFound, arg, extention, projectFileNameParser);
+                        GeFiltterFilesFromSVN(client, item.EntryUri, ref filesFound, arg, extention, projectFileNameParser);
                 }
             }
             return filesFound;
@@ -116,15 +146,17 @@ namespace PullAndClassification.Forms
 
 
         [Obsolete]
-        private IEnumerable<Temp.FileInfo> FilterFiles(bool withHidden, bool fromSvn, string sourceSVN, string sourceLocalFile, string extention)
+        private IEnumerable<FileInfo> FilterFiles(bool withHidden, bool fromSvn, string sourceSVN, string sourceLocalFile, string extention)
         {
             try
             {
 
                 ProjectFileNameParser? projectFileNameParser = new ProjectFileNameParser(Session.GetDatabaseContext(), Session.CurrentProjectId);
                 if (projectFileNameParser is null)
-                    SummaryMessageBox("project FileName Parser is null!", "Error", MessageBoxIcon.Error );
-                List <Temp.FileInfo> filesFound = new List<Temp.FileInfo>();
+                    SummaryMessageBox("project FileName Parser is null!", "Error", MessageBoxIcon.Error);
+
+                List<FileInfo> filesFound = new List<FileInfo>();
+
                 if (fromSvn)
                 {
                     using (SvnClient svnClient = new SvnClient())
@@ -135,12 +167,12 @@ namespace PullAndClassification.Forms
                             RetrieveEntries = SvnDirEntryItems.Size
 
                         };
-                        GetFolderFiles(svnClient, sourceSVN, ref filesFound, arg, extention, projectFileNameParser);
+                        GeFiltterFilesFromSVN(svnClient, sourceSVN, ref filesFound, arg, extention, projectFileNameParser);
 
                     }
                     return filesFound;
-
                 }
+
                 else
                 {
                     DirectoryInfo directory = new DirectoryInfo(sourceLocalFile);
@@ -149,21 +181,24 @@ namespace PullAndClassification.Forms
                     var filtered = files
                         .Where(f => f.Attributes.HasFlag(FileAttributes.Hidden).Equals(withHidden))
                         .Where(f => Path.GetExtension(f.Name).Equals(extention))
-                        .Select(f => new Temp.FileInfo
+                        .Select(f => new FileInfo
                         {
                             Name = Path.Combine(f.Name),
                             Path = Path.Combine(f.FullName),
                             Size = f.Length / 1024,
                             ValidFileStrusture = projectFileNameParser.ValiateFileName(Path.Combine(f.Name)).success,
-                            PathToClassify = string.IsNullOrEmpty (projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path)?
-                                 projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path:
-                               FormatPath( Path.Combine(prefexFolder, projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path)),
+
+                            PathToClassify = string.IsNullOrEmpty(projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path) ?
+                                             "" :
+                                             FormatPath(Path.Combine(PREFEXFolder, projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path)),
+
                             PropertyParts = projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).propertyParts,
+
                             ProjectFileProperties = Tuple.Create(Session.CurrentProjectId,
-                             string.IsNullOrEmpty(projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path) ?
-                                projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path :
-                                Path.Combine(prefexFolder, projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path))
-                            
+                                                                                          string.IsNullOrEmpty(projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path) ?
+                                                                                          "" :
+                                                                                          Path.Combine(PREFEXFolder, projectFileNameParser.ValiateFileName(Path.GetFileNameWithoutExtension(f.Name)).path))
+
 
 
                         }).ToList();
@@ -236,13 +271,14 @@ namespace PullAndClassification.Forms
             }
         }
 
+        [Obsolete]
         private void ButtonGetFiles_Click(object sender, EventArgs e)
         {
             if (ValidateChildren(ValidationConstraints.Enabled))
             {
-                BackgroundWorker bgw = new BackgroundWorker();
-                metroProgressBar1.Visible = true;
-                metroLabel2.Visible = true;
+                BackgroundWorker bgw = new();
+                metroProgressBar.Visible = true;
+                metroLabelLoading.Visible = true;
                 bgw.DoWork += new DoWorkEventHandler(Bgw_DoWork);
                 bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
 
@@ -255,12 +291,14 @@ namespace PullAndClassification.Forms
         private void Bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
 
-            metroProgressBar1.Visible = false;
-            metroLabel2.Visible = false;
+            metroProgressBar.Visible = false;
+            metroLabelLoading.Visible = false;
             selectedFilesForm = new SelectFileForm()
             {
                 CopyAndClassificationForm = this
             };
+            SetLast(LASTSVNURL,metroSourceSVNTextBox.Text);
+            SetLast(LASTLOCALFILE, sourceLocalFile.Text);
             selectedFilesForm.FillFilesDataGridView(filtered);
             selectedFilesForm.ShowDialog();
         }
@@ -309,23 +347,22 @@ namespace PullAndClassification.Forms
                 metroLabelProjectName.Text = Session.CurrentProject.Name;
                 UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
                 if (UserSetting.getRootDistinationPath(Session.GetDatabaseContext()) is not null)
-                    destination.Text =  Path.Combine(
+                    destination.Text = Path.Combine(
                         UserSetting.getRootDistinationPath(Session.GetDatabaseContext()),
-                        Session.CurrentProject.Name
-                        );
+                        Session.CurrentProject.Name);
             }
         }
 
-        private void metroButtonFinish_Click(object sender, EventArgs e)
+        private void MetroButtonFinish_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-       
+
 
         private void MetroProjectListComboBox_Click(object sender, EventArgs e)
         {
-            refreshComboBox(metroProjectListComboBox);
+            RefreshComboBox(metroProjectListComboBox);
         }
     }
 }

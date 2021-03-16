@@ -5,17 +5,17 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
+using System.Windows.Forms;
 
 namespace Utils
 {
     public class SvnUtils
     {
-        public static SyncWithSvnForm syncWithSvnForm = new SyncWithSvnForm();
         public static void CheckoutUpdate(Parameters parameters)
         {
             using (var client = new SvnClient())
             {
-                client.Progress += new EventHandler<SvnProgressEventArgs>(client_Progress);
+                client.Progress += new EventHandler<SvnProgressEventArgs>(Client_Progress);
                 SetUpClient(parameters, client);
 
                 var target = SvnTarget.FromString(parameters.Path);
@@ -131,12 +131,17 @@ namespace Utils
             }
         }
 
-        private static void client_Progress(object sender, SvnProgressEventArgs e)
+        private static void Client_Progress(object sender, SvnProgressEventArgs e)
         {
-            Console.WriteLine("Complete {0} {1}", e.Progress/ 1024, e.TotalProgress);
-            SyncWithSvnForm.metroLabel6.BeginInvoke(new Action(()=> SyncWithSvnForm.metroLabel6.Text = (e.Progress / 1024).ToString("0.00") + " KB")); 
-        }
+            Console.WriteLine("Complete {0} {1}", e.Progress / 1024, e.TotalProgress);
+            try
+            {
+                //MetroFramework.Controls.MetroTextBox textBox = Application.OpenForms["SyncWithSvnForm"].Controls["metroLabel6"] as MetroFramework.Controls.MetroTextBox;
+                SyncWithSvnForm.metroLabel6.BeginInvoke(new Action(() => SyncWithSvnForm.metroLabel6.Text = (e.Progress / 1024).ToString("0.00") + " KB"));
+            }
+            catch { }
 
+        }
         private static bool UrlsMatch(string url1, string url2)
         {
             if (url1 == url2) return true;
@@ -160,8 +165,9 @@ namespace Utils
 
         public static void CompleteSync(Parameters parameters)
         {
-            using (var client = new SharpSvn.SvnClient())
+            using (var client = new SvnClient())
             {
+                client.Progress += new EventHandler<SvnProgressEventArgs>(Client_Progress);
                 SetUpClient(parameters, client);
 
                 if (parameters.UpdateBeforeCompleteSync)

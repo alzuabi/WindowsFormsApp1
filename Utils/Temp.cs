@@ -20,7 +20,44 @@ namespace Utils
 {
     public class Temp
     {
-        public const string prefexFolder = "Reception";
+        public const string PREFEXFolder = "Reception";
+        public const string LASTSVNURL = "last_svn_url";
+        public const string LASTLOCALFILE = "last_local_file";
+
+
+        public static string GetDateFromDateIndex(string date)
+        {
+            string res = "";
+            ProjectFileNameStructure? projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures
+                .Where(s => s.NameType.Equals(FNSTypes.fns_date_index.Id))
+                .FirstOrDefault();
+            if (projectFileNameStructures is not null)
+            {
+                DateTimePicker dateTimePicker = new()
+                {
+                    Value = DateTime.ParseExact(GetPart(date, "_", 0), projectFileNameStructures.Description, null),
+                    CustomFormat = projectFileNameStructures.Description,
+                    Format = DateTimePickerFormat.Custom
+                };
+                res = dateTimePicker.Value.ToString();
+            }
+            return res;
+        }
+        public static string GetPart(string str, string sep, int i)
+        {
+            int idx = str.LastIndexOf(sep);
+            string res = "";
+            if (idx != -1)
+            {
+                if (i == 0)
+                    res = str.Substring(0, idx);
+                else if (i == 1)
+                    res = str.Substring(idx + 1);
+            }
+            return res;
+        }
+
+
         public static PropertyParts ConvertFromProjectFilePropertyToPropertyParts(ProjectFileProperty projectFileProperty)
         {
             return new PropertyParts()
@@ -35,10 +72,9 @@ namespace Utils
         public static string FormatPath(string path)
         {
             string result = path.Replace("/", "\\");
-            //result = result.TrimStart("\\");
             return result;
         }
-        public BackgroundWorker bgw = new BackgroundWorker();
+        public BackgroundWorker bgw = new();
         public string GetTemporaryDirectory()
         {
             string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -96,14 +132,14 @@ namespace Utils
             )
         {
             var log = Log.GetInstance();
-            List<string> summary = new List<string>();
-            List<DataGridViewRow> selectedFiles = new List<DataGridViewRow>();
-
+            List<string> summary = new();
+            List<DataGridViewRow> selectedFiles = new();
+            var classification = Classification.Service.Classification.GetInstance();
             if (fromSvn)
             {
-                SvnClient client = new SvnClient();
+                SvnClient client = new();
                 client.Authentication.DefaultCredentials = new NetworkCredential(UserName, Password);
-                var classification = Classification.Service.Classification.GetInstance();
+               
                 selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles(selectedFilesForm.FilesDataGridView));
                 selectedFilesForm.ClassificationProgressBar.Visible = true;
                 selectedFilesForm.ClassificationProgressBar.Minimum = 1;
@@ -111,15 +147,6 @@ namespace Utils
                 selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Where(s => !string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString())).ToList().Count;
                 try
                 {
-                    //using (var db = Session.GetDatabaseContext())
-                    //{
-                    //    var rowsToDelete = db.ProjectFiles.AsEnumerable()
-                    //                .Where(r => r.ProjectId == Session.CurrentProjectId)
-                    //                .ToList();
-                    //    foreach (var row in rowsToDelete)
-                    //        db.ProjectFiles.Remove(row);
-                    //    db.SaveChanges();
-                    //}
                     selectedFiles.ForEach(row =>
                     {
                         if (!string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
@@ -129,7 +156,7 @@ namespace Utils
                                 Tuple<int, string> _ProjectFileproperties = (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
 
                                 int projectFileId = SaveProjectFile(_ProjectFileproperties, row.Cells["_fullPath"].Value.ToString());
-                                SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
+                                SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>);
                                 selectedFilesForm.ClassificationProgressBar.PerformStep();
                                 summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
                             }
@@ -141,7 +168,6 @@ namespace Utils
             }
             else
             {
-                var classification = Classification.Service.Classification.GetInstance();
                 selectedFiles.AddRange(selectedFilesForm?.GetSelectedFiles(selectedFilesForm?.FilesDataGridView));
                 selectedFilesForm.ClassificationProgressBar.Visible = true;
                 selectedFilesForm.ClassificationProgressBar.Minimum = 1;
@@ -149,15 +175,7 @@ namespace Utils
                 selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Where(s => !string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString())).ToList().Count;
                 try
                 {
-                    //using (var db = Session.GetDatabaseContext())
-                    //{
-                    //    var rowsToDelete = db.ProjectFiles.AsEnumerable()
-                    //                .Where(r => r.ProjectId == Session.CurrentProjectId)
-                    //                .ToList();
-                    //    foreach (var row in rowsToDelete)
-                    //        db.ProjectFiles.Remove(row);
-                    //    db.SaveChanges();
-                    //}
+
                     selectedFiles.ForEach(row =>
                     {
 
@@ -169,12 +187,9 @@ namespace Utils
                                 Tuple<int, string>? _ProjectFileproperties = string.IsNullOrEmpty(row.Cells["_ProjectFileProperties"].Value.ToString()) ? null : (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
 
 
-                                int projectFileId = SaveProjectFile(_ProjectFileproperties, Path.Combine(/*UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name, */row.Cells["_fullPath"].Value.ToString()));
-                                SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
+                                int projectFileId = SaveProjectFile(_ProjectFileproperties, Path.Combine(row.Cells["_fullPath"].Value.ToString()));
+                                SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>);
                                 selectedFilesForm.ClassificationProgressBar.PerformStep();
-                                //if (string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
-                                //    summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + destination);
-                                //else
                                 summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
                             }
                         }
@@ -190,14 +205,6 @@ namespace Utils
             return summary;
         }
 
-        //internal static void updateSettings(Project currentProject, Form form)
-        //{
-        //    Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
-        //    metroLabelProjectName.Text = Session.CurrentProject.Name;
-        //    UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
-        //    metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
-        //}
-
         public static int SaveProjectFile(Tuple<int, string> projectFileproperties, string file)
         {
             using var db = Session.GetDatabaseContext();
@@ -207,7 +214,6 @@ namespace Utils
 
 
                 File = FormatPath(Path.Combine(
-                    //Temp.prefexFolder,
                     projectFileproperties.Item2, Path.GetFileName(file))
                 )
             };
@@ -215,13 +221,14 @@ namespace Utils
                 .Where(s => Path.GetFullPath(s.File).Equals(Path.GetFullPath(projectFile.File)))
                 .Where(s => s.ProjectId == projectFileproperties.Item1)
                 .ToList();
-            if (ProjectFiles.Count !=0)
+            if (ProjectFiles.Count != 0)
             {
                 foreach (var row in ProjectFiles)
                 {
                     db.ProjectFiles.Remove(row);
                     var projectProps = db.ProjectFileProperties.AsEnumerable().Where(s => s.ProjectFileId == row.Id).ToList();
-                    if (projectProps.Count != 0) {
+                    if (projectProps.Count != 0)
+                    {
                         foreach (var r in projectProps)
                             db.ProjectFileProperties.Remove(r);
 
@@ -240,14 +247,14 @@ namespace Utils
         {
             using var db = Session.GetDatabaseContext();
             var projectProps = db.ProjectFileProperties.AsEnumerable().Where(s => s.ProjectFileId == projectFileId).ToList();
-            if (projectProps.Count !=0)
+            if (projectProps.Count != 0)
             {
                 foreach (var r in projectProps)
                     db.ProjectFileProperties.Remove(r);
 
                 db.SaveChanges();
             }
-                foreach (PropertyParts propertyParts1 in propertyParts)
+            foreach (PropertyParts propertyParts1 in propertyParts)
             {
                 ProjectFileProperty projectFileProperty = new ProjectFileProperty()
                 {
@@ -324,7 +331,7 @@ namespace Utils
         {
             public static List<LinkedControls> RenderAndReturnListofLinkedControlsInForm(Form form) => GetAdditionalControls(
                        Session.CurrentProject.ProjectFileNameStructures.ToList(),
-                       778,
+                       700,
                        20,
                        60,
                        form);
@@ -337,19 +344,20 @@ namespace Utils
                 Form form)
             {
                 int i = 0;
-                List<LinkedControls> controls = new List<LinkedControls>();
+                List<LinkedControls> controls = new();
                 projectFileNameStructures./*Where(t => t.CreateFolder).*/OrderBy(t => t.FolderOrder).ToList().ForEach(t =>
                     {
+
                         if (t.NameType.Equals(FNSTypes.fns_date.Id))
                         {
 
                             DateTimePicker dateTimePicker = new MetroDateTime
                             {
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250,
+                                Width = 200,
                                 Name = "Added_"
                             };
                             form.Controls.Add(dateTimePicker);
@@ -357,14 +365,14 @@ namespace Utils
                         }
                         else if (t.NameType.Equals(FNSTypes.fns_lot.Id))
                         {
-                            MetroComboBox metroComboBox = new MetroComboBox
+                            MetroComboBox metroComboBox = new()
                             {
                                 Text = t.Name,
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250,
+                                Width = 200,
                                 Name = "Added_"
 
 
@@ -381,28 +389,28 @@ namespace Utils
                         }
                         else if (t.NameType.Equals(FNSTypes.fns_date_index.Id))
                         {
-                            LinkedControls linkedControls = new LinkedControls();
+                            LinkedControls linkedControls = new();
                             Tuple<int, Control> tuple;
                             DateTimePicker dateTimePicker = new MetroDateTime
                             {
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250,
+                                Width = 200,
                                 Name = "Added_"
                             };
                             form.Controls.Add(dateTimePicker);
                             tuple = Tuple.Create<int, Control>(t.Id, dateTimePicker);
                             linkedControls.LinkedList.AddFirst(tuple);
-                            MetroTextBox metroTextBox = new MetroTextBox
+                            MetroTextBox metroTextBox = new()
                             {
                                 Text = "index",
-                                Location = new Point(beginX + 380, beginY + (SepDest * i)),
-                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Location = new Point(beginX + 300, beginY + (SepDest * i)),
+                                Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 100,
+                                Width = 50,
                                 Name = "Added_"
                             };
                             form.Controls.Add(metroTextBox);
@@ -413,15 +421,15 @@ namespace Utils
                         else
                         {
 
-                            MetroTextBox metroTextBox = new MetroTextBox
+                            MetroTextBox metroTextBox = new()
                             {
                                 //ReadOnly = t.NameType.Equals(FNSTypes.fns_text_match.Id),
                                 Text = t.Name,
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Dark,
+                                Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250,
+                                Width = 200,
                                 Name = "Added_"
                             };
                             form.Controls.Add(metroTextBox);
@@ -432,7 +440,7 @@ namespace Utils
 
                             Text = t.Name,
                             Location = new Point(beginX, beginY + (SepDest * i)),
-                            Theme = MetroFramework.MetroThemeStyle.Dark,
+                            Theme = MetroFramework.MetroThemeStyle.Default,
                             Name = "Added_"
 
                         });
@@ -442,34 +450,41 @@ namespace Utils
 
             public static List<LinkedControls> RenderAndReturnListofLinkedControlsInForm2(CheckDiscrepancyForm checkDiscrepancyForm, int fileid)
    => GetAdditionalControls2(
-                       Session.GetDatabaseContext().ProjectFileProperties.Where(s=>s.ProjectFileId==fileid).ToList(),
-                       778,
+                       Session.GetDatabaseContext().ProjectFileProperties.Where(s => s.ProjectFileId == fileid).ToList(),
+                       700,
                        20,
                        60,
                        checkDiscrepancyForm);
 
-                public static List<LinkedControls> GetAdditionalControls2(
-                List<ProjectFileProperty> projectFileProperties,
-                int beginX,
-                int beginY,
-                int SepDest,
-                Form form)
-                {
-                    int i = 0;
-                    List<LinkedControls> controls = new List<LinkedControls>();
+            public static List<LinkedControls> GetAdditionalControls2(
+            List<ProjectFileProperty> projectFileProperties,
+            int beginX,
+            int beginY,
+            int SepDest,
+            Form form)
+            {
+                int i = 0;
+                List<LinkedControls> controls = new();
                 projectFileProperties./*Where(t => t.CreateFolder).*/OrderBy(t => t.FolderOrder).ToList().ForEach(t =>
                     {
                         if (t.Name.Equals(FNSTypes.fns_date.Id))
                         {
 
                             DateTimePicker dateTimePicker = new MetroDateTime
+                            //GetControl<MetroDateTime>(MetroFramework.MetroThemeStyle.Default,
+                            //                                                          MetroFramework.MetroColorStyle.Blue,
+                            //                                                          20,
+                            //                                                          200,
+                            //                                                          "Added_",
+                            //                                                          new Point(beginX + 100, beginY + (SepDest * ++i)));
+                            //dateTimePicker
                             {
                                 //Text = t.Name,
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
                                 Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250,
+                                Width = 200,
                                 Name = "Added_"
                             };
                             form.Controls.Add(dateTimePicker);
@@ -484,7 +499,7 @@ namespace Utils
                                 Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250,
+                                Width = 200,
                                 Name = "Added_"
 
 
@@ -502,16 +517,16 @@ namespace Utils
                         }
                         else if (t.Name.Equals(FNSTypes.fns_date_index.Id))
                         {
-                            LinkedControls linkedControls = new LinkedControls();
+                            LinkedControls linkedControls = new();
                             Tuple<int, Control> tuple;
                             DateTimePicker dateTimePicker = new MetroDateTime
                             {
-                                Text = t.Value.Split('_')[0],
+                                Text = GetDateFromDateIndex(t.Value),
                                 Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
                                 Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250,
+                                Width = 200,
                                 Name = "Added_"
                             };
                             form.Controls.Add(dateTimePicker);
@@ -519,12 +534,12 @@ namespace Utils
                             linkedControls.LinkedList.AddFirst(tuple);
                             MetroTextBox metroTextBox = new MetroTextBox
                             {
-                                Text = t.Value.Split('_')[1],
-                                Location = new Point(beginX + 380, beginY + (SepDest * i)),
+                                Text = GetPart(t.Value, "_", 1),
+                                Location = new Point(beginX + 300, beginY + (SepDest * i)),
                                 Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 100,
+                                Width = 50,
                                 Name = "Added_"
                             };
                             form.Controls.Add(metroTextBox);
@@ -535,7 +550,7 @@ namespace Utils
                         else
                         {
 
-                            MetroTextBox metroTextBox = new MetroTextBox
+                            MetroTextBox metroTextBox = new()
                             {
                                 ReadOnly = t.Name.Equals(FNSTypes.fns_text_match.Id),
                                 Text = t.Name,
@@ -543,7 +558,7 @@ namespace Utils
                                 Theme = MetroFramework.MetroThemeStyle.Default,
                                 Style = MetroFramework.MetroColorStyle.Blue,
                                 Height = 20,
-                                Width = 250,
+                                Width = 200,
                                 Name = "Added_"
                             };
                             form.Controls.Add(metroTextBox);
@@ -559,7 +574,7 @@ namespace Utils
 
                         });
                     });
-                    return controls;
+                return controls;
             }
         }
         public class ComboboxItem
@@ -574,7 +589,7 @@ namespace Utils
         }
         public class LinkedControls
         {
-            private LinkedList<Tuple<int, Control>> linkedList = new LinkedList<Tuple<int, Control>>();
+            private LinkedList<Tuple<int, Control>> linkedList = new();
 
             public LinkedList<Tuple<int, Control>> LinkedList { get => linkedList; set => linkedList = value; }
 
@@ -589,7 +604,8 @@ namespace Utils
             return MessageBox.Show(new Form { Size = new Size(600, 800) }, message, caption, messageBox, messageType);
         }
 
-        public static void refreshComboBox(MetroComboBox metroComboBox) {
+        public static void RefreshComboBox(MetroComboBox metroComboBox)
+        {
             metroComboBox.Items.Clear();
             Session.GetDatabaseContext().Projects.ToList().ForEach(project => metroComboBox.Items.Add(
             new ComboboxItem()
@@ -599,8 +615,46 @@ namespace Utils
             })
         );
         }
+        public static Control GetControl<T>(MetroFramework.MetroThemeStyle metroThemeStyle,
+                                            MetroFramework.MetroColorStyle metroColorStyle,
+                                            int height,
+                                            int width,
+                                            string name,
+                                            Point location) where T : new()
+        {
+            Control control = new T() as Control;
+            control.Height = height;
+            control.Width = width;
+            control.Name = name;
+            control.Location = location;
+
+            return control;
+        }
+
+        public static void SetLast(string kye, string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return;
+            using var db = Session.GetDatabaseContext();
+            var res = db.UserSettings.FirstOrDefault(s => s.Name.Equals(kye));
+            if (res is not null)
+                res.Value = value;
+            else
+                db.UserSettings.Add(new UserSetting
+                {
+                    Name = kye,
+                    Value = value
+                }
+                );
+            db.SaveChanges();
+        }
+        public static string? GetLast(string key)
+        {
+            using var db = Session.GetDatabaseContext();
+            return db.UserSettings.FirstOrDefault(s => s.Name.Equals(key))?.Value;
+        }
     }
-   
-    
+
+
 
 }
