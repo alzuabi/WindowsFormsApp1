@@ -57,9 +57,8 @@ namespace PullAndClassification.Forms
             // 
             this.syncWithSvn.FlatAppearance.BorderSize = 0;
             this.syncWithSvn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
-            this.syncWithSvn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.syncWithSvn.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.syncWithSvn.ForeColor = System.Drawing.Color.DimGray;
+            this.syncWithSvn.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.syncWithSvn.IconChar = FontAwesome.Sharp.IconChar.FileUpload;
             this.syncWithSvn.IconColor = System.Drawing.Color.Black;
             this.syncWithSvn.IconFont = FontAwesome.Sharp.IconFont.Auto;
@@ -79,9 +78,8 @@ namespace PullAndClassification.Forms
             // 
             this.buttonSelectedFilesOk.FlatAppearance.BorderSize = 0;
             this.buttonSelectedFilesOk.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
-            this.buttonSelectedFilesOk.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSelectedFilesOk.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonSelectedFilesOk.ForeColor = System.Drawing.Color.DimGray;
+            this.buttonSelectedFilesOk.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.buttonSelectedFilesOk.Location = new System.Drawing.Point(594, 420);
             this.buttonSelectedFilesOk.Name = "buttonSelectedFilesOk";
             this.buttonSelectedFilesOk.Size = new System.Drawing.Size(61, 30);
@@ -94,9 +92,8 @@ namespace PullAndClassification.Forms
             // 
             this.iconCloneButton.FlatAppearance.BorderSize = 0;
             this.iconCloneButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
-            this.iconCloneButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.iconCloneButton.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.iconCloneButton.ForeColor = System.Drawing.Color.DimGray;
+            this.iconCloneButton.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.iconCloneButton.IconChar = FontAwesome.Sharp.IconChar.FileDownload;
             this.iconCloneButton.IconColor = System.Drawing.Color.Black;
             this.iconCloneButton.IconFont = FontAwesome.Sharp.IconFont.Auto;
@@ -166,7 +163,7 @@ namespace PullAndClassification.Forms
             this.selectDestination.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.selectDestination.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.selectDestination.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.selectDestination.ForeColor = System.Drawing.Color.DimGray;
+            this.selectDestination.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.selectDestination.IconChar = FontAwesome.Sharp.IconChar.Folder;
             this.selectDestination.IconColor = System.Drawing.Color.Black;
             this.selectDestination.IconFont = FontAwesome.Sharp.IconFont.Auto;
@@ -342,7 +339,7 @@ namespace PullAndClassification.Forms
             this.buttonFrom.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.buttonFrom.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonFrom.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonFrom.ForeColor = System.Drawing.Color.DimGray;
+            this.buttonFrom.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.buttonFrom.IconChar = FontAwesome.Sharp.IconChar.FileExport;
             this.buttonFrom.IconColor = System.Drawing.Color.Black;
             this.buttonFrom.IconFont = FontAwesome.Sharp.IconFont.Auto;
@@ -396,10 +393,10 @@ namespace PullAndClassification.Forms
             // 
             // metroProgressBar1
             // 
-            this.metroProgressBar1.Location = new System.Drawing.Point(40, 298);
+            this.metroProgressBar1.Location = new System.Drawing.Point(40, 293);
             this.metroProgressBar1.Name = "metroProgressBar1";
             this.metroProgressBar1.ProgressBarStyle = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.metroProgressBar1.Size = new System.Drawing.Size(530, 5);
+            this.metroProgressBar1.Size = new System.Drawing.Size(530, 10);
             this.metroProgressBar1.Style = MetroFramework.MetroColorStyle.Teal;
             this.metroProgressBar1.TabIndex = 41;
             this.metroProgressBar1.Visible = false;

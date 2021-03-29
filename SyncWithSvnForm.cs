@@ -26,7 +26,10 @@ namespace PullAndClassification.Forms
             //Session.context = new DatabaseContext();
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
-            metroDestinationTextBox.Text = metroFromTextBox.Text = UserSetting.getRootDistinationPath(Session.GetDatabaseContext());
+            metroDestinationTextBox.Text = metroFromTextBox.Text = Path.Combine(
+                UserSetting.getRootDistinationPath(Session.GetDatabaseContext()),
+                Session.CurrentProject.Name,
+                UserSetting.getReceptionFolderName(Session.GetDatabaseContext()).ToString());
 
 
         }
@@ -38,7 +41,7 @@ namespace PullAndClassification.Forms
                 MessageBox.Show("Please set Destination in user settings", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
             {
-                BackgroundWorker bgw = new BackgroundWorker();
+                BackgroundWorker bgw = new();
                 metroProgressBar1.Visible = true;
                 bgw.DoWork += new DoWorkEventHandler(Bgw_DoPush);
                 bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Bgw_RunWorkerCompleted);
@@ -68,9 +71,13 @@ namespace PullAndClassification.Forms
                 Verbose = true,
 
             };
-
-            SvnUtils.CompleteSync(parameters);
-
+            try
+            {
+                SvnUtils.CompleteSync(parameters);
+            }
+            catch (Exception ex) {
+                MessageBox.Show("SVNerro\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
 
             //Temp temp = new Temp();
             //string d = temp.GetTemporaryDirectory();
@@ -177,14 +184,21 @@ namespace PullAndClassification.Forms
                 Verbose = true,
 
             };
-            SvnUtils.CheckoutUpdate(parameters);
-            CloneDirectory(Path.Combine(d, ".svn"), Path.Combine(Destination, ".svn"));
-            File.SetAttributes(Path.Combine(Destination, ".svn"), File.GetAttributes(Path.Combine(Destination, ".svn")) | FileAttributes.Hidden);
+            try
+            {
+                SvnUtils.CheckoutUpdate(parameters);
+                CloneDirectory(Path.Combine(d, ".svn"), Path.Combine(Destination, ".svn"));
+                File.SetAttributes(Path.Combine(Destination, ".svn"), File.GetAttributes(Path.Combine(Destination, ".svn")) | FileAttributes.Hidden);
 
-            parameters.Path = Destination;
-            parameters.Command = Command.CompleteSync;
-            SvnUtils.CompleteSync(parameters);
-            DeleteDirectory(d);
+                parameters.Path = Destination;
+                parameters.Command = Command.CompleteSync;
+                SvnUtils.CompleteSync(parameters);
+                DeleteDirectory(d);
+            }
+            catch (Exception ex) {
+                MessageBox.Show("SVNerro\n"+ ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            }
         }
 
         private void Bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -194,6 +208,20 @@ namespace PullAndClassification.Forms
 
         private void MetroProjectListComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+
+            //Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
+            //Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
+            //if (Session.CurrentProject is null)
+            //    SummaryMessageBox("Project not found!", "Error", MessageBoxIcon.Error);
+            //else
+            //{
+            //    metroLabelProjectName.Text = Session.CurrentProject.Name;
+            //    UserSetting.setCurrentProjectId(Session.GetDatabaseContext(), Session.CurrentProjectId);
+            //    if (UserSetting.getRootDistinationPath(Session.GetDatabaseContext()) is not null)
+            //        destination.Text = Path.Combine(
+            //            UserSetting.getRootDistinationPath(Session.GetDatabaseContext()),
+            //            Session.CurrentProject.Name);
+            //}
 
             Session.CurrentProjectId = ((ComboboxItem)metroProjectListComboBox.SelectedItem).Value;
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();

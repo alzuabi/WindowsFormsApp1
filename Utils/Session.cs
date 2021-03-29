@@ -1,4 +1,5 @@
 ﻿using MULTISYSDbContext.Models;
+using MULTISYSUtilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace PullAndClassification.Utils
 {
     public static class Session
     {
-        public static DatabaseContext context = new DatabaseContext();
+        public static DatabaseContext context = new();
 
         private static Project? currentProject;
         public static Project? CurrentProject { get => currentProject; set => currentProject = value; }
@@ -29,5 +30,10 @@ namespace PullAndClassification.Utils
         public static DatabaseContext GetDatabaseContext() {
             return new DatabaseContext();
         }
+
+        public static string getTextMacth()=> GetDatabaseContext().ProjectFileNameStructures
+                                               .Where(s => s.Id == CurrentProjectId)
+                                               .Where(s => s.NameType == FNSTypes.fns_text_match.Id)
+                                               .Select(s => s.Description).FirstOrDefault();
     }
 }

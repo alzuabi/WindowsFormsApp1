@@ -27,9 +27,7 @@ namespace PullAndClassification
             MaximizeBox = false;
             ShadowType = MetroFormShadowType.AeroShadow;
             Session.CurrentProjectId = UserSetting.getCurrentProjectId(Session.GetDatabaseContext());
-
             Session.CurrentProject = Session.GetDatabaseContext().Projects.Where(p => p.Id == Session.CurrentProjectId).FirstOrDefault();
-           
             if (Session.CurrentProject is not null && UserSetting.getRootDistinationPath(Session.GetDatabaseContext()) is not null)
                 FillFilesDifferances(Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name));
         }
@@ -39,17 +37,17 @@ namespace PullAndClassification
             {
                 RemoveFromDB.Visible = false;
                 ClassificationButton.Visible = false;
-                IEnumerable<Temp.FileInfo>? filtered = FilterFiles(false, Path.Combine(destination), ".rvt");
+                metroUpdateProjectButton.Visible = false;
+                IEnumerable<Temp.FileInfo>? filtered = FilterFiles(false, Path.Combine(destination), RVTEXT);
                 List<ProjectFile>? projectFiles = Session.GetDatabaseContext().ProjectFiles.Where(project => project.ProjectId == Session.CurrentProjectId).ToList();
 
                 var leftOuterJoin =
                       from f in filtered
                       join p in projectFiles on Path.GetFullPath(f.Path) equals Path.GetFullPath(p.File) into t
                       from p in t.DefaultIfEmpty()
-                      select new 
+                      select new
                       {
                           Id = FormatPath(Path.Combine(f.Path)),
-
                           inDatabase = p != null,
                           inFileSystem = true,
                       };
@@ -58,10 +56,10 @@ namespace PullAndClassification
                     from p in projectFiles
                     join f in filtered on Path.GetFullPath(p?.File) equals Path.GetFullPath(f?.Path) into t
                     from f in t.DefaultIfEmpty()
-                    select new 
+                    select new
                     {
                         Id = FormatPath(Path.Combine(p?.File)),
-                       
+
                         inDatabase = true,
                         inFileSystem = f != null,
                     };
@@ -71,12 +69,11 @@ namespace PullAndClassification
                 dataGridViewFilesDifferances.MultiSelect = true;
                 dataGridViewFilesDifferances.AllowUserToAddRows = false;
                 dataGridViewFilesDifferances.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-                DataTable dtFiles = new DataTable();
+                DataTable dtFiles = new();
                 var temp = fullOuterJoin.Select(
                     x => new
                     {
                         x.Id,
-
                         x.inDatabase,
                         x.inFileSystem,
                     }
@@ -98,11 +95,9 @@ namespace PullAndClassification
 
                 }
                 dataGridViewFilesDifferances.DataSource = dtFiles;
-
                 dataGridViewFilesDifferances.Columns["_propertyParts"].Visible = false;
                 dataGridViewFilesDifferances.Columns["_ProjectFileProperties"].Visible = false;
                 dataGridViewFilesDifferances.Columns["_fullPath"].Visible = false;
-
                 dataGridViewFilesDifferances.Update();
 
             }
@@ -110,21 +105,16 @@ namespace PullAndClassification
             {
                 dataGridViewFilesDifferances.DataSource = null;
                 dataGridViewFilesDifferances.Update();
-
-
             }
         }
 
         private List<PropertyParts> GetPropertyPartsFromDB(string path)
         {
-
             if (string.IsNullOrEmpty(path))
                 return null;
 
-            var ProjectFileId = Session.GetDatabaseContext().ProjectFiles.Where(s => s.File.Equals(path)).Select(s => s.Id).FirstOrDefault();
-            List<ProjectFileProperty> temp = Session.GetDatabaseContext().ProjectFileProperties.Where(x => x.ProjectFileId == ProjectFileId)
-                .ToList();
-
+            int ProjectFileId = Session.GetDatabaseContext().ProjectFiles.Where(s => s.File.Equals(path)).Select(s => s.Id).FirstOrDefault();
+            List<ProjectFileProperty> temp = Session.GetDatabaseContext().ProjectFileProperties.Where(x => x.ProjectFileId == ProjectFileId).ToList();
             List<PropertyParts> output = temp.ConvertAll(new Converter<ProjectFileProperty, PropertyParts>(ConvertFromProjectFilePropertyToPropertyParts));
 
             return output;
@@ -135,12 +125,12 @@ namespace PullAndClassification
         {
             try
             {
-                ProjectFileNameParser projectFileNameParser = new ProjectFileNameParser(Session.GetDatabaseContext(), Session.CurrentProjectId);
+                ProjectFileNameParser projectFileNameParser = new(Session.GetDatabaseContext(), Session.CurrentProjectId);
 
-                List<Temp.FileInfo> filesFound = new List<Temp.FileInfo>();
+                List<Temp.FileInfo> filesFound = new();
 
-                DirectoryInfo directory = new DirectoryInfo(Path.Combine(sourceLocalFile));
-                System.IO.FileInfo[] files = new DirectoryInfo(Path.Combine(sourceLocalFile,PREFEXFolder)).GetFiles("*.*", SearchOption.AllDirectories).Where(file => !file.Directory.FullName.Contains(".svn")).ToArray();
+                DirectoryInfo directory = new(Path.Combine(sourceLocalFile));
+                System.IO.FileInfo[] files = new DirectoryInfo(Path.Combine(sourceLocalFile, PREFEXFolder)).GetFiles("*.*", SearchOption.AllDirectories).Where(file => !file.Directory.FullName.Contains(".svn")).ToArray();
 
                 var filtered = files
                     .Where(f => f.Attributes.HasFlag(FileAttributes.Hidden).Equals(withHidden))
@@ -165,23 +155,26 @@ namespace PullAndClassification
 
         private void DataGridViewFilesDifferances_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-
             foreach (DataGridViewRow row in dataGridViewFilesDifferances.Rows)
                 if (!(bool)row.Cells["inDatabase"].Value)
+
                 {
-                    row.DefaultCellStyle.BackColor = Color.DarkOrange;
-                    row.DefaultCellStyle.ForeColor = Color.White;
+                    row.DefaultCellStyle.ForeColor = Color.Crimson;
+                    row.DefaultCellStyle.SelectionBackColor = Color.DeepSkyBlue;
+                    row.DefaultCellStyle.SelectionForeColor = Color.Crimson;
+                    
                 }
                 else if (!(bool)row.Cells["inFileSystem"].Value)
                 {
-                    row.DefaultCellStyle.BackColor = Color.Red;
-                    row.DefaultCellStyle.ForeColor = Color.White;
+                    row.DefaultCellStyle.SelectionBackColor = Color.DeepSkyBlue;
+                        row.DefaultCellStyle.ForeColor = Color.SaddleBrown;
+                    row.DefaultCellStyle.SelectionForeColor = Color.SaddleBrown;
                 }
-
                 else
                 {
-                    row.DefaultCellStyle.BackColor = Color.FromArgb(0, 198, 247);
-                    row.DefaultCellStyle.ForeColor = Color.White;
+                    row.DefaultCellStyle.SelectionBackColor = Color.DeepSkyBlue; ;
+                    row.DefaultCellStyle.ForeColor = Color.Black;
+                    row.DefaultCellStyle.SelectionForeColor = Color.Black;
                 }
         }
 
@@ -194,15 +187,12 @@ namespace PullAndClassification
                 {
                     Text = Path.Combine(project.Name),
                     Value = project.Id
-                }
-                )
-
+                })
             );
             if (Session.CurrentProjectId != -1 && Session.CurrentProject is not null)
             {
                 metroProjectListComboBox.SelectedIndex = metroProjectListComboBox.FindStringExact(Session.CurrentProject.Name);
                 metroLabelProjectName.Text = Session.CurrentProject.Name;
-
             }
         }
 
@@ -224,7 +214,7 @@ namespace PullAndClassification
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(new Form { Size = new Size(600, 800) }, "Some Data is missing", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(new Form { Size = new Size(600, 800) }, "Some Data is missing", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
 
@@ -244,175 +234,99 @@ namespace PullAndClassification
         {
             try
             {
+                string tempText = "";
                 DataGridViewRow newDataRow = dataGridViewFilesDifferances.Rows[indexRow];
                 if ((bool)newDataRow.Cells["inDatabase"].Value == false)
                 {
                     foreach (var c in ListControls)
                     {
-                        foreach (Tuple<int, Control> tubleControl in c.LinkedList)
-                            if (string.IsNullOrEmpty(tubleControl.Item2.Text))
+                        foreach (LinkedListNode<Tuple<int, Control, string>> tubleControl in c.LinkedList)
+                            if (string.IsNullOrEmpty(tubleControl.Value.Item2.Text))
                             {
                                 SummaryMessageBox("Please fill all feilds!", "Error", MessageBoxIcon.Error);
                                 return;
                             }
                     }
-                    List<PropertyParts> propertyParts = new List<PropertyParts>();
-                    newDataRow.Cells["ClassificationPath"].Value = Path.Combine(Temp.PREFEXFolder, Path.Combine(ListControls.Select(linkedControls =>
-                     {
-                         string finalText = "";
-
-                         foreach (Tuple<int, Control> tubleControl in linkedControls.LinkedList)
-                         {
-                             var projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures.Where(s => s.Id == tubleControl.Item1).FirstOrDefault();
-                             string text = "";
-                             //if (!string.IsNullOrEmpty(tubleControl.Item2.Text))
-                             //{
-                             switch (tubleControl.Item2)
-                             {
-
-                                 case DateTimePicker picker:
-                                     {
-                                         //_properties.Add(projectFileNameStructures.NameType, picker.Value.ToString(projectFileNameStructures.Description));
-                                         if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date.Id))
-                                         {
-                                             text = picker.Value.ToString(projectFileNameStructures.Description);
-                                             propertyParts.Add(new PropertyParts()
-                                             {
-                                                 CreateFolder = projectFileNameStructures.CreateFolder,
-                                                 FNSId = projectFileNameStructures.Id,
-                                                 FolderOrder = projectFileNameStructures.FolderOrder,
-                                                 Name = picker.Value.ToString(projectFileNameStructures.Description),
-                                                 NameType = projectFileNameStructures.NameType
-
-                                             });
-                                             break;
-                                         }
-                                         else if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date_index.Id))
-                                         {
-                                             propertyParts.Add(new PropertyParts()
-                                             {
-                                                 CreateFolder = projectFileNameStructures.CreateFolder,
-                                                 FNSId = projectFileNameStructures.Id,
-                                                 FolderOrder = projectFileNameStructures.FolderOrder,
-                                                 Name = picker.Value.ToString(projectFileNameStructures.Description),
-                                                 NameType = projectFileNameStructures.NameType
-
-                                             });
-                                             text = picker.Value.ToString(projectFileNameStructures.Description) + "_";
-                                         }
-                                         break;
-                                     }
-                                 default:
-                                     //if (_properties.ContainsKey(projectFileNameStructures.NameType))
-                                     //    _properties[projectFileNameStructures.NameType] = _properties[projectFileNameStructures.NameType] + "_" + tubleControl.Item2.Text;
-                                     //else
-                                     //    _properties.Add(projectFileNameStructures.NameType, tubleControl.Item2.Text);
-                                     if (projectFileNameStructures.NameType.Equals(FNSTypes.fns_date_index.Id))
-                                     {
-                                         propertyParts.FindLast(s => s.NameType.Equals(projectFileNameStructures.NameType)).Name += "_" + tubleControl.Item2.Text;
-                                         text = tubleControl.Item2.Text;
-                                         break;
-                                     }
-                                     else
-                                     {
-                                         propertyParts.Add(
-                                                       new PropertyParts()
-                                                       {
-                                                           CreateFolder = projectFileNameStructures.CreateFolder,
-                                                           FNSId = projectFileNameStructures.Id,
-                                                           FolderOrder = projectFileNameStructures.FolderOrder,
-                                                           Name = tubleControl.Item2.Text,
-                                                           NameType = projectFileNameStructures.NameType
-                                                       }
-                                                       );
-                                         text = tubleControl.Item2.Text;
-                                         break;
-                                     }
-                             }
-                             if (projectFileNameStructures.CreateFolder)
-                                 finalText += text;
-                             //}
-                             //else {
-                             //    SummaryMessageBox("Please fill all feilds!", "Error", MessageBoxIcon.Error);
-                             //}
-                         }
-                         newDataRow.Cells["_propertyParts"].Value = propertyParts;
-                         return finalText;
-                     }
-
-                    ).ToArray()));
+                    List<PropertyParts> propertyParts = new();
+                    newDataRow.Cells["ClassificationPath"].Value = cleanClassificationPath(Path.Combine(UserSetting.getReceptionFolderName(Session.GetDatabaseContext()), Path.Combine(ListControls.Select(linkedControls =>
+                    {
+                        string finalText = "";
+                        LinkedListNode<Tuple<int, Control, string>> last = linkedControls.LinkedList.Last.Value;
+                        foreach (LinkedListNode<Tuple<int, Control, string>> tubleControl in linkedControls.LinkedList)
+                        {
+                            LinkedListNode<Tuple<int, Control, string>> linkedListNode = tubleControl;
+                            finalText += proceccUpdate(tubleControl.Value, propertyParts, tempText);
+                            if (!tubleControl.Equals(last))
+                                finalText += "_";
+                            tempText = Path.Combine(tempText, finalText);
+                        }
+                        newDataRow.Cells["_propertyParts"].Value = propertyParts;
+                        return finalText;
+                    }).ToArray())));
                     newDataRow.Cells["_ProjectFileProperties"].Value = Tuple.Create(Session.CurrentProjectId, newDataRow.Cells["ClassificationPath"].Value.ToString());
-
                 }
-                //Dictionary<string, string> _properties = new Dictionary<string, string>();
-                else 
+                else
                 {
                     foreach (var c in ListControls)
                     {
-                        foreach (Tuple<int, Control> tubleControl in c.LinkedList)
-                            if (string.IsNullOrEmpty(tubleControl.Item2.Text))
+                        foreach (LinkedListNode<Tuple<int, Control, string>> tubleControl in c.LinkedList)
+                            if (string.IsNullOrEmpty(tubleControl.Value.Item2.Text))
                             {
                                 SummaryMessageBox("Please fill all feilds!", "Error", MessageBoxIcon.Error);
                                 return;
                             }
                     }
-                    List<PropertyParts> propertyParts = new List<PropertyParts>();
-                    //newDataRow.Cells["ClassificationPath"].Value = Path.Combine(Controls1.Select(linkedControls =>
-                    //{
-                    //string finalText = "";
+                    List<PropertyParts> propertyParts = new();
+
                     for (int i = 0; i < ListControls.Count; i++)
                     {
+                        using var db = Session.GetDatabaseContext();
                         var temp = ListControls[i].LinkedList;
-                        if (temp.Count == 1)
+                        switch (temp.Count)
                         {
-                            using (var db = Session.GetDatabaseContext())
-                            {
-                                Tuple<int, Control> tubleControl = temp.First();
-                                ProjectFileProperty projectFileProperty = db.ProjectFileProperties.SingleOrDefault(b => b.Id == tubleControl.Item1);
+                            case 1:
+
+                                var p = temp.ToArray();
+                                LinkedListNode<Tuple<int, Control, string>> tubleControl1 = p[0];
+                                ProjectFileProperty projectFileProperty = db.ProjectFileProperties.SingleOrDefault(b => b.Id == tubleControl1.Value.Item1);
                                 if (projectFileProperty != null)
                                 {
-                                    projectFileProperty.Value = tubleControl.Item2.Text;
+                                    projectFileProperty.Value = tubleControl1.Value.Item2.Text;
                                     db.SaveChanges();
                                 }
-                            }
-                        }
-                        else if (temp.Count == 2)
-                        {
-                            using (var db = Session.GetDatabaseContext())
-                            {
-                                Tuple<int, Control> tubleControl1 = temp.First();
-                                Tuple<int, Control> tubleControl2 = temp.Last();
-                                ProjectFileProperty projectFileProperty = db.ProjectFileProperties.SingleOrDefault(b => b.Id == tubleControl1.Item1);
+                                break;
+
+                            case 2:
+                                p = temp.ToArray();
+                                tubleControl1 = p[0];
+                                LinkedListNode<Tuple<int, Control, string>> tubleControl2 = p[1];
+                                projectFileProperty = db.ProjectFileProperties.SingleOrDefault(b => b.Id == tubleControl1.Value.Item1);
                                 if (projectFileProperty != null)
                                 {
-                                    projectFileProperty.Value = tubleControl1.Item2.Text+"_"+ tubleControl2.Item2.Text;
+                                    projectFileProperty.Value = tubleControl1.Value.Item2.Text + "_" + tubleControl2.Value.Item2.Text;
                                     db.SaveChanges();
                                 }
-                            }
+                                break;
+
+                            case 3:
+                                p = temp.ToArray();
+
+                                tubleControl1 = p[0];
+                                tubleControl2 = p[1];
+                                LinkedListNode<Tuple<int, Control, string>> tubleControl3 = p[2];
+                                projectFileProperty = db.ProjectFileProperties.SingleOrDefault(b => b.Id == tubleControl1.Value.Item1);
+                                if (projectFileProperty != null)
+                                {
+                                    projectFileProperty.Value = tubleControl1.Value.Item2.Text + "_" + tubleControl2.Value.Item2.Text + "_" + (tubleControl3.Value.Item2 as CheckBox).Checked;
+                                    db.SaveChanges();
+                                }
+                                break;
                         }
                     }
-                    foreach (var linkedControls in ListControls)
-                    {
-                        foreach (Tuple<int, Control> tubleControl in linkedControls.LinkedList)
-                        {
-                            //var projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures.Where(s => s.Id == tubleControl.Item1).FirstOrDefault();
-                            //string text = "";
-
-                            using (var db = Session.GetDatabaseContext())
-                            {
-                                ProjectFileProperty projectFileProperty = db.ProjectFileProperties.SingleOrDefault(b => b.Id == tubleControl.Item1);
-                                if (projectFileProperty != null)
-                                {
-                                    projectFileProperty.Value = tubleControl.Item2.Text;
-                                    db.SaveChanges();
-                                }
-                            }
-                        }
-                    }
-
                 }
             }
-            catch {
+            catch
+            {
                 SummaryMessageBox("Please check the files!", "", MessageBoxIcon.Information);
             }
 
@@ -427,14 +341,14 @@ namespace PullAndClassification
                 indexRow = e.RowIndex;
                 if (e.RowIndex != -1)
                 {
-
                     ClassificationButton.Visible = false;
+                    metroUpdateProjectButton.Visible = false;
                     DataGridViewRow newDataRow = dataGridViewFilesDifferances.Rows[indexRow];
 
                     string file = newDataRow.Cells["Id"].Value as string;
-                    var id = Session.GetDatabaseContext().ProjectFiles.AsEnumerable().Where(s => Path.GetFullPath(s.File).Equals(Path.GetFullPath(file))).Select(s => s.Id).FirstOrDefault();
+                    int id = Session.GetDatabaseContext().ProjectFiles.AsEnumerable().Where(s => Path.GetFullPath(s.File).Equals(Path.GetFullPath(file))).Select(s => s.Id).FirstOrDefault();
                     if (id != 0)
-                    {
+                        {
                         if ((bool)newDataRow.Cells["inFileSystem"].Value == false)
                         {
                             RemoveFromDB.Visible = true;
@@ -443,47 +357,64 @@ namespace PullAndClassification
                         {
                             RemoveFromDB.Visible = false;
                         }
-                        ListControls = PrepareControls.RenderAndReturnListofLinkedControlsInForm2(this, id);
+                        ListControls = PrepareControls.RenderAndReturnListofLinkedControlsInForm(this, id);
                         List<PropertyParts> propertyParts = GetPropertyPartsFromDB(file);
                         if (propertyParts.Count > 0)
                         {
                             for (int i = 0; i < propertyParts.Count; i++)
                             {
-                                List<Tuple<int, Control>> tuple = GetTupleIntControlerWithId(propertyParts[i].FNSId);
-                                if (tuple is not null)
-                                    if (tuple.Count == 1)
-                                        tuple.First().Item2.Text = propertyParts[i].Name;
-                                    else if (tuple.Count == 2)
+                                List<LinkedListNode<Tuple<int, Control, string>>> tuples = GetTupleIntControlerWithId(propertyParts[i].FNSId);
+                                if (tuples is not null)
+                                    switch (tuples.Count)
                                     {
-                                        ProjectFileNameStructure? projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures.Where(s => s.NameType.Equals(FNSTypes.fns_date_index.Id)).FirstOrDefault();
-                                        if (projectFileNameStructures is not null)
-                                        {
-                                            DateTimePicker dateTimePicker = new DateTimePicker
-                                            {
-                                                Value = DateTime.ParseExact(GetPart(propertyParts[i].Name, "_", 0), projectFileNameStructures.Description, null),
-                                                CustomFormat = projectFileNameStructures.Description,
-                                                Format = DateTimePickerFormat.Custom
-                                            };
-                                            tuple[0].Item2.Text = dateTimePicker.Value.ToString();
-                                            tuple[1].Item2.Text = GetPart(propertyParts[i].Name, "_", 1);
-                                        }
-                                    }
+                                        case 1:
+
+                                            tuples.First().Value.Item2.Text = propertyParts[i].Name;
+                                            break;
+
+                                        case 2:
+
+                                            tuples[0].Value.Item2.Text = GetPart2(propertyParts[i].Name, '_', 2);
+                                            var temp = GetPart2(propertyParts[i].Name, '_', 1);
+                                            if (temp.Contains("True"))
+                                                (tuples[1].Value.Item2 as CheckBox).Checked = true;
+                                            else if (temp.Contains("False"))
+                                                (tuples[1].Value.Item2 as CheckBox).Checked = false;
+
+                                            break;
+                                        case 3:
+
+                                            tuples[0].Value.Item2.Text = GetPart2(propertyParts[i].Name, '_', 3);
+
+                                            tuples[1].Value.Item2.Text = GetPart2(propertyParts[i].Name, '_', 2);
+
+                                            temp = GetPart2(propertyParts[i].Name, '_', 1);
+                                            if (temp.Contains("True"))
+                                                (tuples[2].Value.Item2 as CheckBox).Checked = true;
+                                            else if (temp.Contains("False"))
+                                                (tuples[2].Value.Item2 as CheckBox).Checked = false;
+                                            else
+                                                tuples[2].Value.Item2.Text = temp;
+
+                                            break;
+                                    };
                             }
+
                         }
 
                     }
                     else
                     {
                         ClassificationButton.Visible = true;
+                        metroUpdateProjectButton.Visible = true;
                         ListControls = PrepareControls.RenderAndReturnListofLinkedControlsInForm(this);
                         if (string.IsNullOrEmpty(newDataRow.Cells["ClassificationPath"].Value.ToString()))
                         {
-
                             foreach (var l in ListControls)
                             {
-                                foreach (Tuple<int, Control> tubleControl in l.LinkedList)
+                                foreach (LinkedListNode<Tuple<int, Control, string>> tubleControl in l.LinkedList)
                                 {
-                                    switch (tubleControl.Item2)
+                                    switch (tubleControl.Value.Item2)
                                     {
 
                                         case ComboBox comboBox:
@@ -491,9 +422,6 @@ namespace PullAndClassification
                                             break;
                                         case DateTimePicker dateTimePicker:
                                             dateTimePicker.Text = "";
-                                            break;
-                                        default:
-                                            tubleControl.Item2.Text = "";
                                             break;
                                     }
                                 }
@@ -506,56 +434,49 @@ namespace PullAndClassification
                             {
                                 for (int i = 0; i < propertyParts.Count; i++)
                                 {
-                                    List<Tuple<int, Control>> tuple = GetTupleIntControlerWithId(propertyParts[i].FNSId);
+                                    List<LinkedListNode<Tuple<int, Control, string>>> tuple = GetTupleIntControlerWithId(propertyParts[i].FNSId);
                                     if (tuple is not null)
                                         if (tuple.Count == 1)
-                                            tuple.First().Item2.Text = propertyParts[i].Name;
+                                            tuple.First().Value.Item2.Text = propertyParts[i].Name;
                                         else if (tuple.Count == 2)
                                         {
                                             ProjectFileNameStructure? projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures.Where(s => s.NameType.Equals(FNSTypes.fns_date_index.Id)).FirstOrDefault();
                                             if (projectFileNameStructures is not null)
                                             {
-                                                DateTimePicker dateTimePicker = new DateTimePicker
+                                                DateTimePicker dateTimePicker = new()
                                                 {
                                                     Value = DateTime.ParseExact(GetPart(propertyParts[i].Name, "_", 0), projectFileNameStructures.Description, null),
                                                     CustomFormat = projectFileNameStructures.Description,
                                                     Format = DateTimePickerFormat.Custom
                                                 };
-                                                tuple[0].Item2.Text = dateTimePicker.Value.ToString();
-                                                tuple[1].Item2.Text = GetPart(propertyParts[i].Name, "_", 1);
+                                                tuple[0].Value.Item2.Text = dateTimePicker.Value.ToString();
+                                                tuple[1].Value.Item2.Text = GetPart(propertyParts[i].Name, "_", 1);
                                             }
                                         }
                                 }
                             }
                         }
                     }
-                    //}
 
-                    //getClassificationFolderFromProparties()
-                    //else
-                    //{
-                    //    classificationFolder.Visible = true;
-                    //    classificationFolderText.Visible = true;
-                    //}
                 }
             }
         }
 
-        private List<Tuple<int, Control>> GetTupleIntControlerWithId(int fNSId)
+        private List<LinkedListNode<Tuple<int, Control, string>>> GetTupleIntControlerWithId(int fNSId)
         {
-            List<Tuple<int, Control>> tuples = new List<Tuple<int, Control>>();
+            List<LinkedListNode<Tuple<int, Control, string>>> tuples = new();
             foreach (LinkedControls linkedControls in ListControls)
             {
-                foreach (Tuple<int, Control> tuple in linkedControls.LinkedList)
+                foreach (LinkedListNode<Tuple<int, Control, string>> tuple in linkedControls.LinkedList)
                 {
-                    if (tuple.Item1 == fNSId)
+                    if (tuple.Value.Item1 == fNSId)
                         tuples.Add(tuple);
                 }
             }
             return tuples;
         }
 
-        private void metroButtonFinish_Click(object sender, EventArgs e)
+        private void MetroButtonFinish_Click(object sender, EventArgs e)
         {
             Close();
         }
@@ -574,18 +495,16 @@ namespace PullAndClassification
                 var classification = Classification.Service.Classification.GetInstance();
 
                 classification.CopyAndClassification(null,
-                     Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name, newDataRow.Cells["Id"].Value.ToString()),
-                    Path.Combine(/*UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name, */newDataRow.Cells["ClassificationPath"].Value.ToString()),
+                    Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name, newDataRow.Cells["Id"].Value.ToString()),
+                    Path.Combine(newDataRow.Cells["ClassificationPath"].Value.ToString()),
                     Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name),
                     false,
                     true);
                 Tuple<int, string> _ProjectFileproperties = (Tuple<int, string>)newDataRow.Cells["_ProjectFileProperties"].Value;
 
-                int projectFileId = SaveProjectFile(_ProjectFileproperties, newDataRow.Cells["Id"].Value.ToString());
+                List<int> projectFileId = SaveProjectFile(_ProjectFileproperties, newDataRow.Cells["Id"].Value.ToString());
                 SaveProjectFileProperties(projectFileId, newDataRow.Cells["_propertyParts"].Value as List<PropertyParts>/*, row.Cells["_fullPath"].Value.ToString()*/);
                 FillFilesDifferances(Path.Combine(UserSetting.getRootDistinationPath(Session.GetDatabaseContext()), Session.CurrentProject.Name));
-
-
             }
         }
 
@@ -594,10 +513,10 @@ namespace PullAndClassification
             DataGridViewRow newDataRow = dataGridViewFilesDifferances.Rows[indexRow];
             using var db = Session.GetDatabaseContext();
             var file = newDataRow.Cells["Id"].Value.ToString();
-            var row = db.ProjectFiles.AsEnumerable().FirstOrDefault(r => Path.GetFullPath( r.File).Equals(Path.GetFullPath(file)));
+            var row = db.ProjectFiles.AsEnumerable().FirstOrDefault(r => Path.GetFullPath(r.File).Equals(Path.GetFullPath(file)));
             if (row != null)
             {
-                
+
                 db.ProjectFiles.Remove(row);
                 var projectProps = db.ProjectFileProperties.AsEnumerable().Where(s => s.ProjectFileId == row.Id).ToList();
                 if (projectProps is not null)
@@ -615,9 +534,107 @@ namespace PullAndClassification
 
         }
 
-        private void metroProjectListComboBox_Click(object sender, EventArgs e)
+        private void MetroProjectListComboBox_Click(object sender, EventArgs e)
         {
             RefreshComboBox(metroProjectListComboBox);
         }
+        private object cleanClassificationPath(string classificationPath)
+        {
+            string[] words = classificationPath.Split('\\');
+            string[] outPut = new string[words.Length];
+            for (int i = 0; i < words.Length; i++)
+            {
+                outPut[i] = words[i].TrimEnd('_');
+            }
+            return Path.Combine(outPut);
+
+        }
+        private string proceccUpdate(Tuple<int, Control, string> tubleControl, List<PropertyParts> propertyParts, string finalText)
+        {
+            var projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures.Where(s => s.Id == tubleControl.Item1).FirstOrDefault();
+            string text = "";
+            switch (tubleControl.Item2)
+            {
+                case DateTimePicker picker:
+                    {
+                        text = picker.Value.ToString(projectFileNameStructures.Description);
+                        propertyParts.Add(new PropertyParts()
+                        {
+                            CreateFolder = projectFileNameStructures.CreateFolder,
+                            FNSId = projectFileNameStructures.Id,
+                            FolderOrder = projectFileNameStructures.FolderOrder,
+                            Name = picker.Value.ToString(projectFileNameStructures.Description),
+                            NameType = projectFileNameStructures.NameType
+
+                        });
+                        break;
+                    }
+
+                default:
+                    string n;
+                    if (tubleControl.Item2 is CheckBox c)
+                        n = c.Checked.ToString();
+                    else
+                        n = tubleControl.Item2.Text;
+                    propertyParts.Add(
+                          new PropertyParts()
+                          {
+                              CreateFolder = projectFileNameStructures.CreateFolder,
+                              FNSId = projectFileNameStructures.Id,
+                              FolderOrder = projectFileNameStructures.FolderOrder,
+                              Name = n,
+                              NameType = projectFileNameStructures.NameType
+                          }
+                          );
+                    if (tubleControl.Item2 is CheckBox check)
+                        text = check.Checked ? getTempName(finalText) : "";
+                    else
+                        text = tubleControl.Item2.Text;
+                    break;
+            }
+            if (projectFileNameStructures.CreateFolder)
+                return text;
+            else
+                return "";
+        }
+
+
+        public string getTempName(string finalText)
+        {
+            string tempDir = "temp_";
+            int lastNum = 0;
+            try
+            {
+
+
+                string root = UserSetting.getRootDistinationPath(Session.GetDatabaseContext());
+                string rec = UserSetting.getReceptionFolderName(Session.GetDatabaseContext());
+                string curProjName = Session.CurrentProject.Name;
+                string checkDir = Path.Combine(root, curProjName, rec, Path.Combine(finalText));
+                string[] dirs = Directory.GetDirectories((Path.GetDirectoryName(checkDir)), new DirectoryInfo(checkDir).Name + tempDir + "*", SearchOption.TopDirectoryOnly);
+                if (dirs.Length > 0)
+                {
+                    foreach (string s in dirs)
+                    {
+                        int n = getLastNum(s, tempDir);
+                        if (n >= lastNum)
+                            lastNum = n + 1;
+                    }
+                }
+                return tempDir + lastNum;
+            }
+            catch
+            {
+                return tempDir + lastNum;
+            }
+        }
+
+        public int getLastNum(string checkdir, string tempDir)
+        {
+            string toBeSearched = tempDir;
+            string num = checkdir.Substring(checkdir.IndexOf(toBeSearched) + toBeSearched.Length);
+            return int.Parse(num);
+        }
+
     }
 }

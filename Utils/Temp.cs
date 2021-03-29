@@ -20,29 +20,40 @@ namespace Utils
 {
     public class Temp
     {
+        public static string textMach;
+        public Func<string, Control> getControl;
         public const string PREFEXFolder = "Reception";
         public const string LASTSVNURL = "last_svn_url";
         public const string LASTLOCALFILE = "last_local_file";
-
+        public const string RVTEXT = ".rvt";
 
         public static string GetDateFromDateIndex(string date)
         {
-            string res = "";
-            ProjectFileNameStructure? projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures
-                .Where(s => s.NameType.Equals(FNSTypes.fns_date_index.Id))
-                .FirstOrDefault();
-            if (projectFileNameStructures is not null)
+            try
             {
-                DateTimePicker dateTimePicker = new()
+                string res = "";
+                ProjectFileNameStructure? projectFileNameStructures = Session.CurrentProject.ProjectFileNameStructures
+                    .Where(s => s.NameType.Equals(FNSTypes.fns_date_index.Id))
+                    .FirstOrDefault();
+
+                if (projectFileNameStructures is not null)
                 {
-                    Value = DateTime.ParseExact(GetPart(date, "_", 0), projectFileNameStructures.Description, null),
-                    CustomFormat = projectFileNameStructures.Description,
-                    Format = DateTimePickerFormat.Custom
-                };
-                res = dateTimePicker.Value.ToString();
+                    DateTimePicker dateTimePicker = new()
+                    {
+                        Value = DateTime.ParseExact(date, projectFileNameStructures.Description, null),
+                        CustomFormat = projectFileNameStructures.Description,
+                        Format = DateTimePickerFormat.Custom
+                    };
+                    res = dateTimePicker.Value.ToString();
+                }
+                return res;
             }
-            return res;
-        }
+            catch
+            {
+                return "";
+            }
+            }
+
         public static string GetPart(string str, string sep, int i)
         {
             int idx = str.LastIndexOf(sep);
@@ -53,7 +64,23 @@ namespace Utils
                     res = str.Substring(0, idx);
                 else if (i == 1)
                     res = str.Substring(idx + 1);
+                else if (i == 2)
+                    res = str.Substring(idx + 2);
             }
+            return res;
+        }
+
+        public static string GetPart2(string str, char  sep, int i)
+        {
+            string res = "";
+            string[] words = str.Split(sep);
+                if (i == 1)
+                    res = words[words.Length-1];
+                else if (i == 2)
+                    res = words[words.Length - 2];
+                else if (i == 3)
+                    res = words[words.Length - 3];
+
             return res;
         }
 
@@ -69,6 +96,8 @@ namespace Utils
                 FNSId = projectFileProperty.Id
             };
         }
+
+
         public static string FormatPath(string path)
         {
             string result = path.Replace("/", "\\");
@@ -134,145 +163,135 @@ namespace Utils
             var log = Log.GetInstance();
             List<string> summary = new();
             List<DataGridViewRow> selectedFiles = new();
+            PrepareSelectedFilesAndProgressBar(selectedFiles, selectedFilesForm);
             var classification = Classification.Service.Classification.GetInstance();
+            SvnClient client = null;
             if (fromSvn)
             {
-                SvnClient client = new();
+                client = new();
                 client.Authentication.DefaultCredentials = new NetworkCredential(UserName, Password);
-               
-                selectedFiles.AddRange(selectedFilesForm.GetSelectedFiles(selectedFilesForm.FilesDataGridView));
-                selectedFilesForm.ClassificationProgressBar.Visible = true;
-                selectedFilesForm.ClassificationProgressBar.Minimum = 1;
-                selectedFilesForm.ClassificationProgressBar.Maximum = 100;
-                selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Where(s => !string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString())).ToList().Count;
-                try
-                {
-                    selectedFiles.ForEach(row =>
-                    {
-                        if (!string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
-                        {
-                            if (classification.CopyAndClassification(client, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, fromSvn))
-                            {
-                                Tuple<int, string> _ProjectFileproperties = (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
-
-                                int projectFileId = SaveProjectFile(_ProjectFileproperties, row.Cells["_fullPath"].Value.ToString());
-                                SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>);
-                                selectedFilesForm.ClassificationProgressBar.PerformStep();
-                                summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
-                            }
-                        }
-                    }
-                    );
-                }
-                catch { }
             }
-            else
+            try
             {
-                selectedFiles.AddRange(selectedFilesForm?.GetSelectedFiles(selectedFilesForm?.FilesDataGridView));
-                selectedFilesForm.ClassificationProgressBar.Visible = true;
-                selectedFilesForm.ClassificationProgressBar.Minimum = 1;
-                selectedFilesForm.ClassificationProgressBar.Maximum = 100;
-                selectedFilesForm.ClassificationProgressBar.Step = 100 / selectedFiles.Where(s => !string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString())).ToList().Count;
-                try
+                selectedFiles.ForEach(row =>
                 {
-
-                    selectedFiles.ForEach(row =>
+                    if (!string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
                     {
-
-                        if (!string.IsNullOrEmpty(row.Cells["ClassificationPath"].Value.ToString()))
+                        if (classification.CopyAndClassification(client, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, fromSvn))
                         {
-                            if (classification.CopyAndClassification(null, row.Cells["_fullPath"].Value.ToString(), row.Cells["ClassificationPath"].Value.ToString(), destination, false))
-                            {
-
-                                Tuple<int, string>? _ProjectFileproperties = string.IsNullOrEmpty(row.Cells["_ProjectFileProperties"].Value.ToString()) ? null : (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
-
-
-                                int projectFileId = SaveProjectFile(_ProjectFileproperties, Path.Combine(row.Cells["_fullPath"].Value.ToString()));
-                                SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>);
-                                selectedFilesForm.ClassificationProgressBar.PerformStep();
-                                summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
-                            }
+                            Tuple<int, string>? _ProjectFileproperties = string.IsNullOrEmpty(row.Cells["_ProjectFileProperties"].Value.ToString()) ? null : (Tuple<int, string>)row.Cells["_ProjectFileProperties"].Value;
+                            List<int> projectFileId = SaveProjectFile(_ProjectFileproperties, Path.Combine(row.Cells["_fullPath"].Value.ToString()));
+                            SaveProjectFileProperties(projectFileId, row.Cells["_propertyParts"].Value as List<PropertyParts>);
+                            selectedFilesForm.ClassificationProgressBar.PerformStep();
+                            summary.Add("The file " + row.Cells["_fullPath"].Value.ToString() + " has been copied  to " + row.Cells["ClassificationPath"].Value.ToString());
                         }
                     }
-                    );
-
                 }
-                catch (Exception)
-                {
-                    return null;
-                }
+                );
             }
+            catch { return null; }
             return summary;
         }
 
-        public static int SaveProjectFile(Tuple<int, string> projectFileproperties, string file)
+        private static void PrepareSelectedFilesAndProgressBar(List<DataGridViewRow> selectedFiles, SelectFileForm selectedFilesForm)
+        {
+            selectedFiles.AddRange(selectedFilesForm?.GetSelectedFiles(selectedFilesForm?.FilesDataGridView));
+            selectedFilesForm.ClassificationProgressBar.Visible = true;
+            selectedFilesForm.ClassificationProgressBar.Minimum = 1;
+            selectedFilesForm.ClassificationProgressBar.Maximum = 100;
+            int count = selectedFiles.Where(s => !string.IsNullOrEmpty(s.Cells["ClassificationPath"].Value.ToString())).ToList().Count;
+            selectedFilesForm.ClassificationProgressBar.Step = 100 / count;
+        }
+
+        public static List<int> SaveProjectFile(Tuple<int, string> projectFileproperties, string file)
         {
             using var db = Session.GetDatabaseContext();
-            ProjectFile projectFile = new ProjectFile()
+            ProjectFile projectFile = new()
             {
                 ProjectId = projectFileproperties.Item1,
-
-
                 File = FormatPath(Path.Combine(
                     projectFileproperties.Item2, Path.GetFileName(file))
                 )
             };
-            var ProjectFiles = db.ProjectFiles.AsEnumerable()
+
+            List<int> ProjectFilesIds = db.ProjectFiles.AsEnumerable()
                 .Where(s => Path.GetFullPath(s.File).Equals(Path.GetFullPath(projectFile.File)))
                 .Where(s => s.ProjectId == projectFileproperties.Item1)
+                .Select(s => s.Id)
                 .ToList();
-            if (ProjectFiles.Count != 0)
+            if (ProjectFilesIds.Count == 0)
             {
-                foreach (var row in ProjectFiles)
+                db.ProjectFiles.Add(projectFile);
+                db.SaveChanges();
+                return new List<int> { projectFile.Id };
+            }
+            else
+                return ProjectFilesIds;
+        }
+        public static void SaveProjectFileProperties(List<int> projectFileIds, List<PropertyParts> listPropertyParts)
+        {
+            using var db = Session.GetDatabaseContext();
+            foreach (int projectFileId in projectFileIds)
+            {
+                List<ProjectFileProperty> projectFileProperties = db.ProjectFileProperties.AsEnumerable().Where(s => s.ProjectFileId == projectFileId).ToList();
+                if (projectFileProperties.Count == 0)
                 {
-                    db.ProjectFiles.Remove(row);
-                    var projectProps = db.ProjectFileProperties.AsEnumerable().Where(s => s.ProjectFileId == row.Id).ToList();
-                    if (projectProps.Count != 0)
+                    List<ProjectFileProperty> projectFileProperties1 = new();
+                    foreach (PropertyParts propertyParts in listPropertyParts)
                     {
-                        foreach (var r in projectProps)
-                            db.ProjectFileProperties.Remove(r);
+                        ProjectFileProperty projectFileProperty = new()
+                        {
+                            ProjectFileId = projectFileId,
+                            CreateFolder = propertyParts.CreateFolder,
+                            FolderOrder = propertyParts.FolderOrder,
+                            Name = propertyParts.NameType,
+                            Value = propertyParts.Name,
+                            SortingNumber = db.ProjectFileNameStructures.Where(t => t.Id == propertyParts.FNSId).Select(t => t.SortingNumber).FirstOrDefault()
+                        };
+                        ProjectFileProperty? ex = projectFileProperties1.FirstOrDefault(s => s.Name == propertyParts.NameType);
+                        if (ex is not null)
+                            projectFileProperties1.FirstOrDefault(s => s.Name == propertyParts.NameType).Value += '_' + propertyParts.Name;
+                        else
+                            projectFileProperties1.Add(projectFileProperty);
+                    }
+                    db.ProjectFileProperties.AddRange(projectFileProperties1);
+                }
+                else
+                {
 
-                        db.SaveChanges();
-
+                    foreach (ProjectFileProperty prop in projectFileProperties)
+                    {
+                        prop.Value = "";
+                        foreach (PropertyParts propertyParts in listPropertyParts)
+                        {
+                            if (prop.Name.Equals(propertyParts.NameType))
+                            {
+                                if (propertyParts.NameType.Equals(FNSTypes.fns_date_index.Id)|| propertyParts.NameType.Equals(FNSTypes.fns_index.Id))
+                                {
+                                    prop.Value += propertyParts.Name + '_';
+                                    prop.CreateFolder = propertyParts.CreateFolder;
+                                    prop.FolderOrder = propertyParts.FolderOrder;
+                                    prop.Name = propertyParts.NameType;
+                                    prop.SortingNumber = db.ProjectFileNameStructures.Where(t => t.Id == propertyParts.FNSId).Select(t => t.SortingNumber).FirstOrDefault();
+                                }
+                                else 
+                                {
+                                    prop.Value = propertyParts.Name;
+                                    prop.CreateFolder = propertyParts.CreateFolder;
+                                    prop.FolderOrder = propertyParts.FolderOrder;
+                                    prop.Name = propertyParts.NameType;
+                                    prop.SortingNumber = db.ProjectFileNameStructures.Where(t => t.Id == propertyParts.FNSId).Select(t => t.SortingNumber).FirstOrDefault();
+                                }
+                            }
+                        }
+                        prop.Value = prop.Value.TrimEnd('_');
                     }
                 }
                 db.SaveChanges();
-
             }
-            db.ProjectFiles.Add(projectFile);
-            db.SaveChanges();
-            return projectFile.Id;
         }
-        public static void SaveProjectFileProperties(int projectFileId, List<PropertyParts> propertyParts)
-        {
-            using var db = Session.GetDatabaseContext();
-            var projectProps = db.ProjectFileProperties.AsEnumerable().Where(s => s.ProjectFileId == projectFileId).ToList();
-            if (projectProps.Count != 0)
-            {
-                foreach (var r in projectProps)
-                    db.ProjectFileProperties.Remove(r);
 
-                db.SaveChanges();
-            }
-            foreach (PropertyParts propertyParts1 in propertyParts)
-            {
-                ProjectFileProperty projectFileProperty = new ProjectFileProperty()
-                {
-                    ProjectFileId = projectFileId,
-                    CreateFolder = propertyParts1.CreateFolder,
-                    FolderOrder = propertyParts1.FolderOrder,
-                    Name = propertyParts1.NameType,
-                    Value = propertyParts1.Name,
-                    SortingNumber = db.ProjectFileNameStructures.Where(t => t.Id == propertyParts1.FNSId).Select(t => t.SortingNumber).FirstOrDefault()
-                };
-                db.ProjectFileProperties.Add(projectFileProperty);
-            }
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (Exception e) { }
-        }
+
 
         public class FileStructure
         {
@@ -329,12 +348,12 @@ namespace Utils
         }
         public static class PrepareControls
         {
-            public static List<LinkedControls> RenderAndReturnListofLinkedControlsInForm(Form form) => GetAdditionalControls(
-                       Session.CurrentProject.ProjectFileNameStructures.ToList(),
-                       700,
-                       20,
-                       60,
-                       form);
+            public static List<LinkedControls> RenderAndReturnListofLinkedControlsInForm(Form form) => 
+                GetAdditionalControls(projectFileNameStructures: Session.CurrentProject.ProjectFileNameStructures.ToList(),
+                    beginX: 600,
+                    beginY: 20,
+                    SepDest: 60,
+                    form);
 
             public static List<LinkedControls> GetAdditionalControls(
                 List<ProjectFileNameStructure> projectFileNameStructures,
@@ -343,237 +362,61 @@ namespace Utils
                 int SepDest,
                 Form form)
             {
+                ConditionalControl delegates = new();
                 int i = 0;
                 List<LinkedControls> controls = new();
                 projectFileNameStructures./*Where(t => t.CreateFolder).*/OrderBy(t => t.FolderOrder).ToList().ForEach(t =>
                     {
-
-                        if (t.NameType.Equals(FNSTypes.fns_date.Id))
-                        {
-
-                            DateTimePicker dateTimePicker = new MetroDateTime
-                            {
-                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Default,
-                                Style = MetroFramework.MetroColorStyle.Blue,
-                                Height = 20,
-                                Width = 200,
-                                Name = "Added_"
-                            };
-                            form.Controls.Add(dateTimePicker);
-                            controls.Add(new LinkedControls(t.Id, dateTimePicker));
-                        }
-                        else if (t.NameType.Equals(FNSTypes.fns_lot.Id))
-                        {
-                            MetroComboBox metroComboBox = new()
-                            {
-                                Text = t.Name,
-                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Default,
-                                Style = MetroFramework.MetroColorStyle.Blue,
-                                Height = 20,
-                                Width = 200,
-                                Name = "Added_"
-
-
-                            };
-                            Session.GetDatabaseContext().LOTs.Where(lot => lot.ProjectId == Session.CurrentProjectId).ToList().ForEach(lot => metroComboBox.Items.Add(new ComboboxItem()
-                            {
-                                Text = lot.Name,
-                                Value = lot.Id
-                            })
+                        LinkedControls linkedControls = delegates.conditionsGenerate[t.NameType](beginX + 200, beginY + (SepDest * ++i), 200, 20, "", "Added_", t.Id);
+                        form.Controls.AddRange(linkedControls.getControls());
+                        controls.Add(linkedControls);
+                        
+                        form.Controls.AddRange(
+                            new List<Control>() {
+                            delegates.conditionsGenerate[ConditionalControl.folder_icon](beginX + 150, beginY + (SepDest * i), 30, 30, t.CreateFolder, "Added_",t.Id).getControls().First(),
+                            delegates.conditionsGenerate[ConditionalControl.label](beginX +60, beginY + (SepDest * i), 0, 0, t.Name, "Added_",t.Id).getControls().First(),
+                            delegates.conditionsGenerate[ConditionalControl.small_label](beginX+60 , beginY + (SepDest * i)+20, 0, 0, t.NameType, "Added_",t.Id).getControls().First(),
+                            }.ToArray()
                             );
-                            metroComboBox.SelectedIndex = metroComboBox.Items.Count - 1;
-                            form.Controls.Add(metroComboBox);
-                            controls.Add(new LinkedControls(t.Id, metroComboBox));
-                        }
-                        else if (t.NameType.Equals(FNSTypes.fns_date_index.Id))
-                        {
-                            LinkedControls linkedControls = new();
-                            Tuple<int, Control> tuple;
-                            DateTimePicker dateTimePicker = new MetroDateTime
-                            {
-                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Default,
-                                Style = MetroFramework.MetroColorStyle.Blue,
-                                Height = 20,
-                                Width = 200,
-                                Name = "Added_"
-                            };
-                            form.Controls.Add(dateTimePicker);
-                            tuple = Tuple.Create<int, Control>(t.Id, dateTimePicker);
-                            linkedControls.LinkedList.AddFirst(tuple);
-                            MetroTextBox metroTextBox = new()
-                            {
-                                Text = "index",
-                                Location = new Point(beginX + 300, beginY + (SepDest * i)),
-                                Theme = MetroFramework.MetroThemeStyle.Default,
-                                Style = MetroFramework.MetroColorStyle.Blue,
-                                Height = 20,
-                                Width = 50,
-                                Name = "Added_"
-                            };
-                            form.Controls.Add(metroTextBox);
-                            tuple = Tuple.Create<int, Control>(t.Id, metroTextBox);
-                            linkedControls.LinkedList.AddLast(tuple);
-                            controls.Add(linkedControls);
-                        }
-                        else
-                        {
-
-                            MetroTextBox metroTextBox = new()
-                            {
-                                //ReadOnly = t.NameType.Equals(FNSTypes.fns_text_match.Id),
-                                Text = t.Name,
-                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Default,
-                                Style = MetroFramework.MetroColorStyle.Blue,
-                                Height = 20,
-                                Width = 200,
-                                Name = "Added_"
-                            };
-                            form.Controls.Add(metroTextBox);
-                            controls.Add(new LinkedControls(t.Id, metroTextBox));
-                        }
-                        form.Controls.Add(new MetroLabel
-                        {
-
-                            Text = t.Name,
-                            Location = new Point(beginX, beginY + (SepDest * i)),
-                            Theme = MetroFramework.MetroThemeStyle.Default,
-                            Name = "Added_"
-
-                        });
                     });
                 return controls;
             }
 
-            public static List<LinkedControls> RenderAndReturnListofLinkedControlsInForm2(CheckDiscrepancyForm checkDiscrepancyForm, int fileid)
-   => GetAdditionalControls2(
+            public static List<LinkedControls> RenderAndReturnListofLinkedControlsInForm(CheckDiscrepancyForm checkDiscrepancyForm, int fileid) => GetAdditionalControls(
                        Session.GetDatabaseContext().ProjectFileProperties.Where(s => s.ProjectFileId == fileid).ToList(),
-                       700,
+                       600,
                        20,
                        60,
                        checkDiscrepancyForm);
 
-            public static List<LinkedControls> GetAdditionalControls2(
+            public static List<LinkedControls> GetAdditionalControls(
             List<ProjectFileProperty> projectFileProperties,
             int beginX,
             int beginY,
             int SepDest,
             Form form)
             {
+
                 int i = 0;
+                int k = 0;
+                ConditionalControl delegates = new();
                 List<LinkedControls> controls = new();
+                List<ProjectFileNameStructure> ProjectFNS = Session.GetDatabaseContext().ProjectFileNameStructures.Where(s => s.ProjectId == Session.CurrentProjectId).OrderBy(s => s.SortingNumber).ToList();
                 projectFileProperties./*Where(t => t.CreateFolder).*/OrderBy(t => t.FolderOrder).ToList().ForEach(t =>
-                    {
-                        if (t.Name.Equals(FNSTypes.fns_date.Id))
-                        {
-
-                            DateTimePicker dateTimePicker = new MetroDateTime
-                            //GetControl<MetroDateTime>(MetroFramework.MetroThemeStyle.Default,
-                            //                                                          MetroFramework.MetroColorStyle.Blue,
-                            //                                                          20,
-                            //                                                          200,
-                            //                                                          "Added_",
-                            //                                                          new Point(beginX + 100, beginY + (SepDest * ++i)));
-                            //dateTimePicker
-                            {
-                                //Text = t.Name,
-                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Default,
-                                Style = MetroFramework.MetroColorStyle.Blue,
-                                Height = 20,
-                                Width = 200,
-                                Name = "Added_"
-                            };
-                            form.Controls.Add(dateTimePicker);
-                            controls.Add(new LinkedControls(t.Id, dateTimePicker));
-                        }
-                        else if (t.Name.Equals(FNSTypes.fns_lot.Id))
-                        {
-                            MetroComboBox metroComboBox = new MetroComboBox
-                            {
-                                Text = t.Name,
-                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Default,
-                                Style = MetroFramework.MetroColorStyle.Blue,
-                                Height = 20,
-                                Width = 200,
-                                Name = "Added_"
-
-
-                            };
-                            Session.GetDatabaseContext().LOTs.Where(lot => lot.ProjectId == Session.CurrentProjectId).ToList().ForEach(lot => metroComboBox.Items.Add(new ComboboxItem()
-                            {
-                                Text = lot.Name,
-                                Value = lot.Id
-                            })
-                            );
-                            metroComboBox.SelectedIndex = metroComboBox.FindStringExact(t.Value);
-                            metroComboBox.SelectedText = metroComboBox.SelectedItem.ToString();
-                            form.Controls.Add(metroComboBox);
-                            controls.Add(new LinkedControls(t.Id, metroComboBox));
-                        }
-                        else if (t.Name.Equals(FNSTypes.fns_date_index.Id))
-                        {
-                            LinkedControls linkedControls = new();
-                            Tuple<int, Control> tuple;
-                            DateTimePicker dateTimePicker = new MetroDateTime
-                            {
-                                Text = GetDateFromDateIndex(t.Value),
-                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Default,
-                                Style = MetroFramework.MetroColorStyle.Blue,
-                                Height = 20,
-                                Width = 200,
-                                Name = "Added_"
-                            };
-                            form.Controls.Add(dateTimePicker);
-                            tuple = Tuple.Create<int, Control>(t.Id, dateTimePicker);
-                            linkedControls.LinkedList.AddFirst(tuple);
-                            MetroTextBox metroTextBox = new MetroTextBox
-                            {
-                                Text = GetPart(t.Value, "_", 1),
-                                Location = new Point(beginX + 300, beginY + (SepDest * i)),
-                                Theme = MetroFramework.MetroThemeStyle.Default,
-                                Style = MetroFramework.MetroColorStyle.Blue,
-                                Height = 20,
-                                Width = 50,
-                                Name = "Added_"
-                            };
-                            form.Controls.Add(metroTextBox);
-                            tuple = Tuple.Create<int, Control>(t.Id, metroTextBox);
-                            linkedControls.LinkedList.AddLast(tuple);
-                            controls.Add(linkedControls);
-                        }
-                        else
-                        {
-
-                            MetroTextBox metroTextBox = new()
-                            {
-                                ReadOnly = t.Name.Equals(FNSTypes.fns_text_match.Id),
-                                Text = t.Name,
-                                Location = new Point(beginX + 100, beginY + (SepDest * ++i)),
-                                Theme = MetroFramework.MetroThemeStyle.Default,
-                                Style = MetroFramework.MetroColorStyle.Blue,
-                                Height = 20,
-                                Width = 200,
-                                Name = "Added_"
-                            };
-                            form.Controls.Add(metroTextBox);
-                            controls.Add(new LinkedControls(t.Id, metroTextBox));
-                        }
-                        form.Controls.Add(new MetroLabel
-                        {
-
-                            Text = t.Name,
-                            Location = new Point(beginX, beginY + (SepDest * i)),
-                            Theme = MetroFramework.MetroThemeStyle.Default,
-                            Name = "Added_"
-
-                        });
-                    });
+                {
+                    LinkedControls linkedControls = delegates.conditionsGenerate[t.Name](beginX + 200, beginY + (SepDest * ++i), 200, 20, "", "Added_", t.Id);
+                    form.Controls.AddRange(linkedControls.getControls());
+                    controls.Add(linkedControls);
+                       
+                    form.Controls.AddRange(
+                        new List<Control>() {
+                            delegates.conditionsGenerate["createFolderIcon"](beginX + 150, beginY + (SepDest * i), 30, 30, t.CreateFolder, "Added_",t.Id).getControls().First(),
+                            k<ProjectFNS.Count? delegates.conditionsGenerate["label"](beginX +80, beginY + (SepDest * i), 0, 0, ProjectFNS[k].Name, "Added_",t.Id).getControls().First() : null,
+                            delegates.conditionsGenerate["smallLabel"](beginX+80 , beginY + (SepDest * i)+20, 0, 0, t.Name, "Added_",t.Id).getControls().First(),
+                        }.ToArray()
+                        );
+                    k++;
+                });
                 return controls;
             }
         }
@@ -589,14 +432,18 @@ namespace Utils
         }
         public class LinkedControls
         {
-            private LinkedList<Tuple<int, Control>> linkedList = new();
+            private LinkedList<LinkedListNode<Tuple<int, Control, string>>> linkedList = new();
 
-            public LinkedList<Tuple<int, Control>> LinkedList { get => linkedList; set => linkedList = value; }
+            public LinkedList<LinkedListNode<Tuple<int, Control, string>>> LinkedList { get => linkedList; set => linkedList = value; }
 
-            public LinkedControls(int id, Control control)
+            public LinkedControls(int id, Control control, string type)
             {
-                linkedList.AddLast(Tuple.Create(id, control));
+                linkedList.AddLast(new LinkedListNode<Tuple<int, Control, string>>(Tuple.Create(id, control,type)));
             }
+
+            public Control getControl(LinkedListNode<Tuple<int, Control, string>>  tuple) => tuple.Value.Item2;
+
+            public Control[] getControls() => linkedList.Where(s => s is not null).Select(s => s.Value.Item2).ToArray();
             public LinkedControls() { }
         }
         public static DialogResult SummaryMessageBox(string message, string caption, MessageBoxIcon messageType, MessageBoxButtons messageBox = MessageBoxButtons.OK)
@@ -604,7 +451,7 @@ namespace Utils
             return MessageBox.Show(new Form { Size = new Size(600, 800) }, message, caption, messageBox, messageType);
         }
 
-        public static void RefreshComboBox(MetroComboBox metroComboBox)
+        public static void RefreshComboBox(ComboBox metroComboBox)
         {
             metroComboBox.Items.Clear();
             Session.GetDatabaseContext().Projects.ToList().ForEach(project => metroComboBox.Items.Add(
@@ -614,21 +461,6 @@ namespace Utils
                 Value = project.Id
             })
         );
-        }
-        public static Control GetControl<T>(MetroFramework.MetroThemeStyle metroThemeStyle,
-                                            MetroFramework.MetroColorStyle metroColorStyle,
-                                            int height,
-                                            int width,
-                                            string name,
-                                            Point location) where T : new()
-        {
-            Control control = new T() as Control;
-            control.Height = height;
-            control.Width = width;
-            control.Name = name;
-            control.Location = location;
-
-            return control;
         }
 
         public static void SetLast(string kye, string value)
@@ -653,6 +485,7 @@ namespace Utils
             using var db = Session.GetDatabaseContext();
             return db.UserSettings.FirstOrDefault(s => s.Name.Equals(key))?.Value;
         }
+
     }
 
 

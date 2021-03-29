@@ -13,122 +13,120 @@ namespace Utils
     {
         public static void CheckoutUpdate(Parameters parameters)
         {
-            using (var client = new SvnClient())
+            using var client = new SvnClient();
+            client.Progress += new EventHandler<SvnProgressEventArgs>(Client_Progress);
+            SetUpClient(parameters, client);
+
+            var target = SvnTarget.FromString(parameters.Path);
+            SvnInfoEventArgs svnInfoEventArgs;
+            SvnUpdateResult svnUpdateResult;
+
+            var nonExistentUrl = false;
+            EventHandler<SvnErrorEventArgs> ignoreNonexistent = (o, eventArgs) =>
             {
-                client.Progress += new EventHandler<SvnProgressEventArgs>(Client_Progress);
-                SetUpClient(parameters, client);
-
-                var target = SvnTarget.FromString(parameters.Path);
-                SvnInfoEventArgs svnInfoEventArgs;
-                SvnUpdateResult svnUpdateResult;
-
-                var nonExistentUrl = false;
-                EventHandler<SvnErrorEventArgs> ignoreNonexistent = (o, eventArgs) =>
-                {
-                    nonExistentUrl = false;
+                nonExistentUrl = false;
                     //if (eventArgs.Exception.SubversionErrorCode == 170000)
                     if (eventArgs.Exception.Message.Contains("non-existent in revision"))
-                    {
-                        nonExistentUrl = true;
-                        eventArgs.Cancel = true;
-                    }
-                };
-
-                if (client.GetWorkingCopyRoot(parameters.Path) == null)
                 {
-                    client.SvnError += ignoreNonexistent;
-                    var getInfoSucceeded = client.GetInfo(SvnUriTarget.FromString(parameters.Url), out svnInfoEventArgs);
-                    client.SvnError -= ignoreNonexistent;
+                    nonExistentUrl = true;
+                    eventArgs.Cancel = true;
+                }
+            };
 
-                    if (!getInfoSucceeded)
+            if (client.GetWorkingCopyRoot(parameters.Path) == null)
+            {
+                client.SvnError += ignoreNonexistent;
+                var getInfoSucceeded = client.GetInfo(SvnUriTarget.FromString(parameters.Url), out svnInfoEventArgs);
+                client.SvnError -= ignoreNonexistent;
+
+                if (!getInfoSucceeded)
+                {
+                    if (nonExistentUrl)
                     {
-                        if (nonExistentUrl)
+                        Console.WriteLine("SVN info reported nonexistent URL; creating remote directory.");
+                        if (!client.RemoteCreateDirectory(new Uri(parameters.Url), new SvnCreateDirectoryArgs { CreateParents = true, LogMessage = parameters.Message }))
                         {
-                            Console.WriteLine("SVN info reported nonexistent URL; creating remote directory.");
-                            if (!client.RemoteCreateDirectory(new Uri(parameters.Url), new SvnCreateDirectoryArgs { CreateParents = true, LogMessage = parameters.Message }))
-                            {
-                                throw new Exception("Create directory failed on " + parameters.Url);
-                            }
-                        }
-                        else
-                        {
-                            throw new Exception("SVN info failed");
+                            throw new Exception("Create directory failed on " + parameters.Url);
                         }
                     }
-
-                    DebugMessage(parameters, "Checking out");
-                    if (client.CheckOut(SvnUriTarget.FromString(parameters.Url), parameters.Path, out svnUpdateResult))
+                    else
                     {
-                        DebugMessage(parameters, "Done");
-                        Console.WriteLine("Checked out r" + svnUpdateResult.Revision);
-                        return;
+                        throw new Exception("SVN info failed");
                     }
-
-                    throw new Exception("SVN checkout failed");
                 }
 
-                if (!client.GetInfo(target, out svnInfoEventArgs))
-                {
-                    throw new Exception("SVN info failed");
-                }
-
-                if (!UrlsMatch(svnInfoEventArgs.Uri.ToString(), parameters.Url))
-                {
-                    throw new Exception(string.Format("A different URL is already checked out ({0} != {1})", svnInfoEventArgs.Uri, parameters.Url));
-                }
-
-                if (parameters.Cleanup)
-                {
-                    DebugMessage(parameters, "Cleaning up");
-                    client.CleanUp(parameters.Path);
-                    DebugMessage(parameters, "Done");
-                }
-
-                if (parameters.Revert)
-                {
-                    DebugMessage(parameters, "Reverting");
-                    client.Revert(parameters.Path);
-                    DebugMessage(parameters, "Done");
-                }
-
-                if (parameters.DeleteUnversioned)
-                {
-                    DebugMessage(parameters, "Deleting unversioned files");
-                    Collection<SvnStatusEventArgs> changedFiles;
-                    client.GetStatus(parameters.Path, out changedFiles);
-                    foreach (var changedFile in changedFiles)
-                    {
-                        if (changedFile.LocalContentStatus == SvnStatus.NotVersioned)
-                        {
-                            if (changedFile.NodeKind == SvnNodeKind.Directory)
-                            {
-                                DebugMessage(parameters, "NodeKind is directory for [" + changedFile.FullPath + "]");
-                            }
-                            if ((File.GetAttributes(changedFile.FullPath) & FileAttributes.Directory) == FileAttributes.Directory)
-                            {
-                                DebugMessage(parameters, "Deleting directory [" + changedFile.FullPath + "] recursively!");
-                                Directory.Delete(changedFile.FullPath, true);
-                            }
-                            else
-                            {
-                                DebugMessage(parameters, "Deleting file [" + changedFile.FullPath + "]");
-                                File.Delete(changedFile.FullPath);
-                            }
-                        }
-                    }
-                    DebugMessage(parameters, "Done");
-                }
-
-                DebugMessage(parameters, "Updating");
-                if (client.Update(parameters.Path, out svnUpdateResult))
+                DebugMessage(parameters, "Checking out");
+                if (client.CheckOut(SvnUriTarget.FromString(parameters.Url), parameters.Path, out svnUpdateResult))
                 {
                     DebugMessage(parameters, "Done");
-                    Console.WriteLine("Updated to r" + svnUpdateResult.Revision);
+                    Console.WriteLine("Checked out r" + svnUpdateResult.Revision);
                     return;
                 }
 
-                throw new Exception("SVN update failed");
+                throw new Exception("SVN checkout failed");
             }
+
+            if (!client.GetInfo(target, out svnInfoEventArgs))
+            {
+                throw new Exception("SVN info failed");
+            }
+
+            if (!UrlsMatch(svnInfoEventArgs.Uri.ToString(), parameters.Url))
+            {
+                throw new Exception(string.Format("A different URL is already checked out ({0} != {1})", svnInfoEventArgs.Uri, parameters.Url));
+            }
+
+            if (parameters.Cleanup)
+            {
+                DebugMessage(parameters, "Cleaning up");
+                client.CleanUp(parameters.Path);
+                DebugMessage(parameters, "Done");
+            }
+
+            if (parameters.Revert)
+            {
+                DebugMessage(parameters, "Reverting");
+                client.Revert(parameters.Path);
+                DebugMessage(parameters, "Done");
+            }
+
+            if (parameters.DeleteUnversioned)
+            {
+                DebugMessage(parameters, "Deleting unversioned files");
+                Collection<SvnStatusEventArgs> changedFiles;
+                client.GetStatus(parameters.Path, out changedFiles);
+                foreach (var changedFile in changedFiles)
+                {
+                    if (changedFile.LocalContentStatus == SvnStatus.NotVersioned)
+                    {
+                        if (changedFile.NodeKind == SvnNodeKind.Directory)
+                        {
+                            DebugMessage(parameters, "NodeKind is directory for [" + changedFile.FullPath + "]");
+                        }
+                        if ((File.GetAttributes(changedFile.FullPath) & FileAttributes.Directory) == FileAttributes.Directory)
+                        {
+                            DebugMessage(parameters, "Deleting directory [" + changedFile.FullPath + "] recursively!");
+                            Directory.Delete(changedFile.FullPath, true);
+                        }
+                        else
+                        {
+                            DebugMessage(parameters, "Deleting file [" + changedFile.FullPath + "]");
+                            File.Delete(changedFile.FullPath);
+                        }
+                    }
+                }
+                DebugMessage(parameters, "Done");
+            }
+
+            DebugMessage(parameters, "Updating");
+            if (client.Update(parameters.Path, out svnUpdateResult))
+            {
+                DebugMessage(parameters, "Done");
+                Console.WriteLine("Updated to r" + svnUpdateResult.Revision);
+                return;
+            }
+
+            throw new Exception("SVN update failed");
         }
 
         private static void Client_Progress(object sender, SvnProgressEventArgs e)
@@ -151,7 +149,7 @@ namespace Utils
         }
 
         // TODO: make trusting not the default
-        private static void TrustUnsignedCertificates(SharpSvn.SvnClient client)
+        private static void TrustUnsignedCertificates(SvnClient client)
         {
             client.Authentication.SslServerTrustHandlers += (sender, e) =>
             {
@@ -244,7 +242,7 @@ namespace Utils
             }
         }
 
-        private static void SetUpClient(Parameters parameters, SharpSvn.SvnClient client)
+        private static void SetUpClient(Parameters parameters, SvnClient client)
         {
             if (!string.IsNullOrEmpty(parameters.Username) && !string.IsNullOrEmpty(parameters.Password))
             {
